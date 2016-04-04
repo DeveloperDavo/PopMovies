@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -42,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStart() {
+        final String POPULAR = "popular";
+        final String TOP_RATED = "top_rated";
         super.onStart();
-        (new FetchMovieData()).execute();
+        (new FetchMovieData()).execute(TOP_RATED);
     }
 
     /**
@@ -51,31 +54,38 @@ public class MainActivity extends AppCompatActivity {
      * Parses data as a JSON string on background thread and
      * publishes the result on the UI.
      */
-    public class FetchMovieData extends AsyncTask<Void, Void, Void> {
+    public class FetchMovieData extends AsyncTask<String, Void, Void> {
 
         private final String LOG_TAG = FetchMovieData.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(String... params) {
+
+            // check
+            if (params.length == 0) {
+                return null;
+            }
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-
-            // will contain the raw JSON response as a string.
-            String popularMovies = null;
+            String popularMovies;
 
             try {
                 // https://www.themoviedb.org/
-                String baseUrl = "http://api.themoviedb.org/3/movie/popular";
-                String apiKey = "?api_key=" + BuildConfig.MOVIE_DB_API_KEY;
-                URL url = new URL(baseUrl.concat(apiKey));
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+                final String API_PARAM = "api_key";
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendPath(params[0])
+                        .appendQueryParameter(API_PARAM,BuildConfig.MOVIE_DB_API_KEY).build();
+                URL url = new URL(builtUri.toString());
+                Log.d(LOG_TAG, "url: " + url);
 
-                // create the request to OpenWeatherMap, and open the connection
+                // create the request to TMDb, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
-                // read the input stream into a String
+                // read the input stream into a string
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
@@ -99,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data
+                // no movie data found
                 return null;
             } finally {
                 if (urlConnection != null) {
