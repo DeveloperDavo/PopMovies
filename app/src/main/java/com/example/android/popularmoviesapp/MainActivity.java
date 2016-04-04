@@ -1,10 +1,13 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -33,6 +36,27 @@ public class MainActivity extends AppCompatActivity {
         // attach adapter to GridView
         GridView gridView = (GridView) findViewById(R.id.grid_view_posters);
         gridView.setAdapter(mPosterAdapter);
+
+        // method invoked when an item in the list has been clicked
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Enter detail upon clicking on the item in the list
+             *
+             * @param parent the AdapterView where the click happened
+             * @param view the view within the AdapterView that was clicked
+             *             (this will be a view provided by the adapter)
+             * @param position the position of the view in the adapter
+             * @param id the row id of the item that was clicked
+             */
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String movieData = mPosterAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieData);
+                startActivity(intent);
+//                Toast.makeText(getActivity(), weatherItem, Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     /**
