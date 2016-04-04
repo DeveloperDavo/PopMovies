@@ -17,6 +17,14 @@ public class MoviePosterAdapter extends ArrayAdapter<Integer> {
         super(context, 0, moviePosters);
     }
 
+    /**
+     *
+     * TODO: comment
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return Grid View of image views
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Integer moviePoster = getItem(position);

@@ -7,6 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +20,6 @@ import java.net.URL;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
-//    ArrayAdapter<Integer> mPosterAdapter;
     MoviePosterAdapter mPosterAdapter;
 
     @Override
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
                 R.drawable.interstellar, R.drawable.picasso
         };
 
+        // update array adapter
         mPosterAdapter = new MoviePosterAdapter(this, Arrays.asList(images));
 
         // attach adapter to GridView
@@ -41,12 +45,15 @@ public class MainActivity extends AppCompatActivity {
         gridView.setAdapter(mPosterAdapter);
     }
 
+    /**
+     * Fetches movie data up start up.
+     */
     @Override
     public void onStart() {
         final String POPULAR = "popular";
         final String TOP_RATED = "top_rated";
         super.onStart();
-        (new FetchMovieData()).execute(TOP_RATED);
+        (new FetchMovieDataTask()).execute(TOP_RATED);
     }
 
     /**
@@ -54,12 +61,18 @@ public class MainActivity extends AppCompatActivity {
      * Parses data as a JSON string on background thread and
      * publishes the result on the UI.
      */
-    public class FetchMovieData extends AsyncTask<String, Void, Void> {
+    public class FetchMovieDataTask extends AsyncTask<String, Void, String[]> {
 
-        private final String LOG_TAG = FetchMovieData.class.getSimpleName();
+        private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
 
+        /**
+         * TODO: comment
+         * HTTP request on background thread.
+         * @param params
+         * @return
+         */
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
 
             // check
             if (params.length == 0) {
@@ -68,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            String popularMovies;
+            String movieJsonStr;
 
             try {
                 // https://www.themoviedb.org/
@@ -104,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
                     // stream was empty
                     return null;
                 }
-                popularMovies = buffer.toString();
-                Log.d(LOG_TAG, "popularMovies: " + popularMovies);
+                movieJsonStr = buffer.toString();
+//                Log.d(LOG_TAG, "movieJsonStr: " + movieJsonStr);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -123,7 +136,55 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
+            try {
+                return getMoviePostersFromJsonString(movieJsonStr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
             return null;
+        }
+
+
+        /**
+         * Updates the UI after using AsyncTask.
+         * @param result returned from AsyncTask
+         */
+//        @Override
+//        protected void onPostExecute(String[] result) {
+//            if (result != null) {
+//                mPosterAdapter.clear();
+//                for (String posterUrl : result) {
+//                    mPosterAdapter.add(posterUrl);
+//                }
+//            }
+//        }
+
+        private String[] getMoviePostersFromJsonString(String dataJsonStr) throws JSONException {
+            final String MD_RESULTS = "results";
+            final String MD_POSTER_PATH = "poster_path";
+
+            JSONObject data = new JSONObject(dataJsonStr);
+            JSONArray dataArray = data.getJSONArray(MD_RESULTS);
+
+            int dataSize = dataArray.length();
+            String[] posterUrls = new String[dataSize];
+
+            for (int i = 0; i < dataSize; i++) {
+
+                // get movie poster
+                posterUrls[i] = dataArray.getJSONObject(i).getString(MD_POSTER_PATH);
+
+            }
+
+            // log forecast
+            for (String posterUrl : posterUrls) {
+                Log.d(LOG_TAG, "posterId: " + posterUrl);
+            }
+
+            return posterUrls;
         }
     }
 }
