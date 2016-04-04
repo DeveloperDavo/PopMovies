@@ -20,6 +20,9 @@ android {
     repositories {
         mavenCentral()
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'MOVIE_DB_API_KEY', movieDBApiKey
+    }
 }
 
 dependencies {
