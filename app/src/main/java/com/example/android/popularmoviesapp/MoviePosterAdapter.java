@@ -7,27 +7,29 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 /**
  * Created by David on 04/04/16.
  */
-public class MoviePosterAdapter extends ArrayAdapter<Integer> {
-    public MoviePosterAdapter(Activity context, List<Integer> moviePosters) {
-        super(context, 0, moviePosters);
+public class MoviePosterAdapter extends ArrayAdapter<String> {
+    public MoviePosterAdapter(Activity context, List<String> moviePosterUrls) {
+        super(context, 0, moviePosterUrls);
     }
 
     /**
+     * Custom array adapter used when returning more than a simple text view.
      *
-     * TODO: comment
-     * @param position
-     * @param convertView
-     * @param parent
-     * @return Grid View of image views
+     * @param position of item
+     * @param convertView old view to reuse, if possible
+     * @param parent view that this will eventually be attached to
+     * @return View of image views
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Integer moviePoster = getItem(position);
+        String moviePosterUrl = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
@@ -35,7 +37,7 @@ public class MoviePosterAdapter extends ArrayAdapter<Integer> {
         }
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.photo_image_view);
-        imageView.setImageResource(moviePoster);
+        Picasso.with(getContext()).load(moviePosterUrl).into(imageView);
 
         return convertView;
     }

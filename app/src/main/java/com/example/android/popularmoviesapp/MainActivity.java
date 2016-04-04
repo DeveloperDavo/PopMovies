@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     MoviePosterAdapter mPosterAdapter;
@@ -27,18 +27,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        ImageView imageView = (ImageView) findViewById(R.id.photo_image_view);
-        // load Picasso image
-//        Picasso.with(this).load("http://i.imgur.com/DvpvklR.png").into(imageView);
-
-        // references to images
-        Integer[] images = {
-                R.drawable.picasso, R.drawable.interstellar,
-                R.drawable.interstellar, R.drawable.picasso
-        };
-
         // update array adapter
-        mPosterAdapter = new MoviePosterAdapter(this, Arrays.asList(images));
+        mPosterAdapter = new MoviePosterAdapter(this, new ArrayList<String>());
 
         // attach adapter to GridView
         GridView gridView = (GridView) findViewById(R.id.grid_view_posters);
@@ -138,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
+                // log posterUrls
+//                String[] posterUrls = getMoviePostersFromJsonString(movieJsonStr);
+//                for (String posterUrl : posterUrls) {
+//                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
+//                }
                 return getMoviePostersFromJsonString(movieJsonStr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -152,16 +147,19 @@ public class MainActivity extends AppCompatActivity {
          * Updates the UI after using AsyncTask.
          * @param result returned from AsyncTask
          */
-//        @Override
-//        protected void onPostExecute(String[] result) {
-//            if (result != null) {
-//                mPosterAdapter.clear();
-//                for (String posterUrl : result) {
-//                    mPosterAdapter.add(posterUrl);
-//                }
-//            }
-//        }
+        @Override
+        protected void onPostExecute(String[] result) {
+            String moviePosterUrl = "http://image.tmdb.org/t/p/w185/";
+            if (result != null) {
+                mPosterAdapter.clear();
+                for (String posterUrl : result) {
+                    mPosterAdapter.add(moviePosterUrl + posterUrl);
+                }
+            }
+        }
 
+        // TODO: do the same for other attributes
+        // TODO: comment
         private String[] getMoviePostersFromJsonString(String dataJsonStr) throws JSONException {
             final String MD_RESULTS = "results";
             final String MD_POSTER_PATH = "poster_path";
@@ -177,11 +175,6 @@ public class MainActivity extends AppCompatActivity {
                 // get movie poster
                 posterUrls[i] = dataArray.getJSONObject(i).getString(MD_POSTER_PATH);
 
-            }
-
-            // log forecast
-            for (String posterUrl : posterUrls) {
-                Log.d(LOG_TAG, "posterId: " + posterUrl);
             }
 
             return posterUrls;
