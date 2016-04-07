@@ -23,7 +23,9 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    MoviePosterAdapter mPosterAdapter;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private MoviePosterAdapter mPosterAdapter;
+    private String movieJsonStr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String movieData = mPosterAdapter.getItem(position);
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieData);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
                 startActivity(intent);
 //                Toast.makeText(getActivity(), weatherItem, Toast.LENGTH_SHORT).show();
 
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            String movieJsonStr;
 
             try {
                 // https://www.themoviedb.org/
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
 //                }
-                return getMoviePostersFromJsonString(movieJsonStr);
+                return (new MovieAttributes(movieJsonStr)).getPosterUrls();
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -180,28 +181,6 @@ public class MainActivity extends AppCompatActivity {
                     mPosterAdapter.add(moviePosterUrl + posterUrl);
                 }
             }
-        }
-
-        // TODO: do the same for other attributes
-        // TODO: comment
-        private String[] getMoviePostersFromJsonString(String dataJsonStr) throws JSONException {
-            final String MD_RESULTS = "results";
-            final String MD_POSTER_PATH = "poster_path";
-
-            JSONObject data = new JSONObject(dataJsonStr);
-            JSONArray dataArray = data.getJSONArray(MD_RESULTS);
-
-            int dataSize = dataArray.length();
-            String[] posterUrls = new String[dataSize];
-
-            for (int i = 0; i < dataSize; i++) {
-
-                // get movie poster
-                posterUrls[i] = dataArray.getJSONObject(i).getString(MD_POSTER_PATH);
-
-            }
-
-            return posterUrls;
         }
     }
 }
