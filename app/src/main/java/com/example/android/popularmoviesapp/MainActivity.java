@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
 //                }
-                return (new MovieAttributes(movieJsonStr)).getPosterUrls();
+                return (new MovieAttributes(movieJsonStr)).parsePosterUrls();
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();

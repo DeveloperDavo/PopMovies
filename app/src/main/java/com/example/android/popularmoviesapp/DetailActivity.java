@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -28,21 +29,40 @@ public class DetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String dataJsonStr = intent.getStringExtra(Intent.EXTRA_TEXT);
 
+            // get attributes
             MovieAttributes movieAttributes = null;
+            String posterUrl = null;
+            String title = null;
+            String overview = null;
+            String userRating = null;
+            String releaseDate = null;
             try {
                 movieAttributes = new MovieAttributes(dataJsonStr, position);
+                posterUrl = movieAttributes.parsePosterUrl();
+                title = movieAttributes.parseOriginalTitle();
+                overview = movieAttributes.parseOverview();
+                userRating = movieAttributes.parseRating();
+                releaseDate = movieAttributes.parseRelease();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            // show movie poster
-            String posterUrl = movieAttributes.getPosterUrl();
             ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
             Picasso.with(this).load(posterUrl).into(imageView);
 
-            // show other attributes
-            String title = movieAttributes.getOriginalTitle();
             Log.d(LOG_TAG, "title : " + title);
+            Log.d(LOG_TAG, "overview : " + overview);
+            Log.d(LOG_TAG, "userRating : " + userRating);
+            Log.d(LOG_TAG, "releaseDate : " + releaseDate);
+
+            // set text views
+            TextView titleView = (TextView) findViewById(R.id.title);
+            titleView.setText(title);
+            TextView overviewView = (TextView) findViewById(R.id.overview);
+            overviewView.setText(overview);
+            TextView userRatingView = (TextView) findViewById(R.id.rating);
+            userRatingView.setText(userRating);
+            TextView releaseDateView = (TextView) findViewById(R.id.release);
+            releaseDateView.setText(releaseDate);
         }
     }
 }
