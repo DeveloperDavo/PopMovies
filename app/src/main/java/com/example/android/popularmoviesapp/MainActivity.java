@@ -1,11 +1,9 @@
 package com.example.android.popularmoviesapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -71,8 +69,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+        if (id == R.id.action_sort_by_popularity) {
+            (new FetchMovieDataTask()).execute(getString(R.string.pref_sort_by_popularity));
+            return true;
+        } else if (id == R.id.action_sort_by_ration) {
+            (new FetchMovieDataTask()).execute(getString(R.string.pref_sort_by_rating));
             return true;
         }
 
@@ -84,14 +85,8 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public void onStart() {
-        final String POPULAR = "popular";
-        final String TOP_RATED = "top_rated";
         super.onStart();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String sortOrder = prefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_top_rated));
-
-        (new FetchMovieDataTask()).execute(sortOrder);
+        (new FetchMovieDataTask()).execute(getString(R.string.pref_sort_by_rating));
     }
 
     /**
