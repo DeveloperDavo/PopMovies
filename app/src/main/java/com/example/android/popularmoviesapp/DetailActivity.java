@@ -3,7 +3,6 @@ package com.example.android.popularmoviesapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,11 +47,6 @@ public class DetailActivity extends AppCompatActivity {
             }
             ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
             Picasso.with(this).load(posterUrl).into(imageView);
-
-            Log.d(LOG_TAG, "title : " + title);
-            Log.d(LOG_TAG, "overview : " + overview);
-            Log.d(LOG_TAG, "userRating : " + userRating);
-            Log.d(LOG_TAG, "releaseDate : " + releaseDate);
 
             // set text views
             TextView titleView = (TextView) findViewById(R.id.title);

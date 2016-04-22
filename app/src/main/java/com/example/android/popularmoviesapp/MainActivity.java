@@ -1,18 +1,20 @@
 package com.example.android.popularmoviesapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,13 +54,29 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String movieData = mPosterAdapter.getItem(position);
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
                 startActivity(intent);
-//                Toast.makeText(getActivity(), weatherItem, Toast.LENGTH_SHORT).show();
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -69,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
         final String POPULAR = "popular";
         final String TOP_RATED = "top_rated";
         super.onStart();
-        (new FetchMovieDataTask()).execute(TOP_RATED);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String sortOrder = prefs.getString(getString(R.string.pref_sort_order_key), getString(R.string.pref_sort_order_top_rated));
+
+        (new FetchMovieDataTask()).execute(sortOrder);
     }
 
     /**
@@ -82,10 +104,10 @@ public class MainActivity extends AppCompatActivity {
         private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
 
         /**
-         * TODO: comment
          * HTTP request on background thread.
-         * @param params
-         * @return
+         *
+         * @param params is either top_rated or popular
+         * @return array of poster URLs
          */
         @Override
         protected String[] doInBackground(String... params) {
@@ -104,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 final String API_PARAM = "api_key";
                 Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                         .appendPath(params[0])
-                        .appendQueryParameter(API_PARAM,BuildConfig.MOVIE_DB_API_KEY).build();
+                        .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY).build();
                 URL url = new URL(builtUri.toString());
                 Log.d(LOG_TAG, "url: " + url);
 
@@ -170,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * Updates the UI after using AsyncTask.
+         *
          * @param result returned from AsyncTask
          */
         @Override
