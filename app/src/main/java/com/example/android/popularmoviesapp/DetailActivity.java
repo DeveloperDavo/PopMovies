@@ -11,6 +11,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 
 public class DetailActivity extends AppCompatActivity {
+
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
     @Override
@@ -21,34 +22,39 @@ public class DetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        // get posterUrl from MainActivity and load image
         Intent intent = this.getIntent();
+
+        // get position of movie in grid (default to -1)
         int position = intent.getIntExtra("position", -1);
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String dataJsonStr = intent.getStringExtra(Intent.EXTRA_TEXT);
 
             // get attributes
-            MovieAttributes movieAttributes = null;
+            MovieInfoParser movieInfoParser;
             String posterUrl = null;
             String title = null;
             String overview = null;
             String userRating = null;
             String releaseDate = null;
+
             try {
-                movieAttributes = new MovieAttributes(dataJsonStr, position);
-                posterUrl = movieAttributes.parsePosterUrl();
-                title = movieAttributes.parseOriginalTitle();
-                overview = movieAttributes.parseOverview();
-                userRating = movieAttributes.parseRating();
-                releaseDate = movieAttributes.parseRelease();
+                movieInfoParser = new MovieInfoParser(dataJsonStr, position);
+                posterUrl = movieInfoParser.parsePosterUrl();
+                title = movieInfoParser.parseOriginalTitle();
+                overview = movieInfoParser.parseOverview();
+                userRating = movieInfoParser.parseRating();
+                releaseDate = movieInfoParser.parseRelease();
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            // load poster into image view
             ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
             Picasso.with(this).load(posterUrl).into(imageView);
 
-            // set text views
+            // load text into text views
             TextView titleView = (TextView) findViewById(R.id.title);
             titleView.setText(title);
             TextView overviewView = (TextView) findViewById(R.id.overview);

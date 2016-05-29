@@ -15,6 +15,9 @@ import java.util.List;
  * Created by David on 04/04/16.
  */
 public class MoviePosterAdapter extends ArrayAdapter<String> {
+
+    private static final String LOG_TAG = MoviePosterAdapter.class.getSimpleName();
+
     public MoviePosterAdapter(Activity context, List<String> moviePosterUrls) {
         super(context, 0, moviePosterUrls);
     }
@@ -29,16 +32,28 @@ public class MoviePosterAdapter extends ArrayAdapter<String> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        String moviePosterUrl = getItem(position);
 
+        convertView = inflateView(convertView, parent);
+        loadMoviePoster(position, convertView);
+
+        return convertView;
+    }
+
+    private View inflateView(View convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
                     R.layout.grid_item_poster, parent, false);
         }
+        return convertView;
+    }
+
+    private void loadMoviePoster(int position, View convertView) {
+        String moviePosterUrl = getItem(position);
+
+//        Log.d(LOG_TAG, "posterUrl: " + moviePosterUrl);
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.photo_image_view);
         Picasso.with(getContext()).load(moviePosterUrl).into(imageView);
 
-        return convertView;
     }
 }

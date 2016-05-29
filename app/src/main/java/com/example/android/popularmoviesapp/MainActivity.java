@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private MoviePosterAdapter mPosterAdapter;
     private String movieJsonStr;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         // method invoked when an item in the list has been clicked
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
-             * Enter detail upon clicking on the item in the list
+             * Enter detail activity upon clicking on the item in the list
              *
              * @param parent the AdapterView where the click happened
              * @param view the view within the AdapterView that was clicked
@@ -52,11 +53,15 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
-                startActivity(intent);
+                enterDetailActivity(position);
 
             }
         });
+    }
+
+    private void enterDetailActivity(int position) {
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
+        startActivity(intent);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Fetches movie data up start up.
+     * Fetches movie data upon start up.
      */
     @Override
     public void onStart() {
@@ -107,11 +112,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String[] doInBackground(String... params) {
 
-            // check
+            // if there is no preference, there is nothing to look up
             if (params.length == 0) {
                 return null;
             }
 
+            // Declared outside in order to be closed in finally block
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -119,10 +125,14 @@ public class MainActivity extends AppCompatActivity {
                 // https://www.themoviedb.org/
                 final String BASE_URL = "http://api.themoviedb.org/3/movie/";
                 final String API_PARAM = "api_key";
+
                 Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                         .appendPath(params[0])
-                        .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY).build();
+                        .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
+                        .build();
+
                 URL url = new URL(builtUri.toString());
+
                 Log.d(LOG_TAG, "url: " + url);
 
                 // create the request to TMDb, and open the connection
@@ -141,7 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // useful for debugging
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
                     buffer.append(line + "\n");
                 }
 
@@ -171,11 +183,11 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 // log posterUrls
-//                String[] posterUrls = getMoviePostersFromJsonString(movieJsonStr);
+//                String[] posterUrls = (new MovieInfoParser(movieJsonStr)).parsePosterUrls();
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
 //                }
-                return (new MovieAttributes(movieJsonStr)).parsePosterUrls();
+                return (new MovieInfoParser(movieJsonStr)).parsePosterUrls();
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -192,11 +204,11 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         protected void onPostExecute(String[] result) {
-            String moviePosterUrl = "http://image.tmdb.org/t/p/w185/";
+            String PosterUrlBase = "http://image.tmdb.org/t/p/w185";
             if (result != null) {
                 mPosterAdapter.clear();
                 for (String posterUrl : result) {
-                    mPosterAdapter.add(moviePosterUrl + posterUrl);
+                    mPosterAdapter.add(PosterUrlBase + posterUrl);
                 }
             }
         }

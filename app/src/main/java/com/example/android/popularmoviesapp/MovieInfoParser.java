@@ -5,10 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * //TODO: comment
  * Created by davidswallow on 07/04/16.
  */
-public class MovieAttributes {
+public class MovieInfoParser {
+
     private final static String MD_RESULTS = "results";
     private final static String MD_TITLE = "original_title";
     private final static String MD_POSTER_PATH = "poster_path";
@@ -16,15 +16,16 @@ public class MovieAttributes {
     private final static String MD_RATING = "vote_average";
     private final static String MD_RELEASE = "release_date";
     private final static String URL_BASE = "http://image.tmdb.org/t/p/w185/";
+
     private JSONArray moviesData;
     private JSONObject movieData;
 
-    public MovieAttributes(String dataJsonStr, int position) throws JSONException {
+    public MovieInfoParser(String dataJsonStr, int position) throws JSONException {
         parseMoviesData(dataJsonStr);
         parseMovieData(position);
     }
 
-    public MovieAttributes(String dataJsonStr) throws JSONException {
+    public MovieInfoParser(String dataJsonStr) throws JSONException {
         parseMoviesData(dataJsonStr);
     }
 
@@ -55,7 +56,6 @@ public class MovieAttributes {
 
     public String parsePosterUrl() throws JSONException {
         return URL_BASE + movieData.getString(MD_POSTER_PATH);
-
     }
 
     public String parseOriginalTitle() throws JSONException {
@@ -64,17 +64,14 @@ public class MovieAttributes {
     }
     public String parseOverview() throws JSONException {
         return movieData.getString(MD_OVERVIEW);
-
     }
 
     public String parseRating() throws JSONException {
         return movieData.getString(MD_RATING);
-
     }
 
     public String parseRelease() throws JSONException {
         return movieData.getString(MD_RELEASE);
-
     }
 
 }
