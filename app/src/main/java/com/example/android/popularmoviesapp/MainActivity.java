@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private MoviePosterAdapter mPosterAdapter;
     private String movieJsonStr;
+    private MovieInfoParser movieInfoParser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // TODO: pass movieInfoParser instead of movieJsonStr
     private void enterDetailActivity(int position) {
         Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
         startActivity(intent);
@@ -182,12 +184,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
+                movieInfoParser = new MovieInfoParser(movieJsonStr);
+
                 // log posterUrls
-//                String[] posterUrls = (new MovieInfoParser(movieJsonStr)).parsePosterUrls();
+//                String[] posterUrls = movieInfoParser.parsePosterUrls();
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
 //                }
-                return (new MovieInfoParser(movieJsonStr)).parsePosterUrls();
+
+                return movieInfoParser.parsePosterUrls();
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();

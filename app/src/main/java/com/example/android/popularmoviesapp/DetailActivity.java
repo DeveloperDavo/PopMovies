@@ -3,6 +3,7 @@ package com.example.android.popularmoviesapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,13 +15,29 @@ public class DetailActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
+    private static final String POSTER = "poster";
+    private static final String TITLE = "title";
+    private static final String OVERVIEW = "overview";
+    private static final String RATING = "rating";
+    private static final String RELEASE = "release";
+
+    private MovieInfoParser movieInfoParser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        parseMovieInfo();
+
+        loadViews();
+
+    }
+
+    private void parseMovieInfo() {
 
         Intent intent = this.getIntent();
 
@@ -30,39 +47,75 @@ public class DetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String dataJsonStr = intent.getStringExtra(Intent.EXTRA_TEXT);
 
-            // get attributes
-            MovieInfoParser movieInfoParser;
-            String posterUrl = null;
-            String title = null;
-            String overview = null;
-            String userRating = null;
-            String releaseDate = null;
-
             try {
                 movieInfoParser = new MovieInfoParser(dataJsonStr, position);
-                posterUrl = movieInfoParser.parsePosterUrl();
-                title = movieInfoParser.parseOriginalTitle();
-                overview = movieInfoParser.parseOverview();
-                userRating = movieInfoParser.parseRating();
-                releaseDate = movieInfoParser.parseRelease();
-
             } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
-
-            // load poster into image view
-            ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
-            Picasso.with(this).load(posterUrl).into(imageView);
-
-            // load text into text views
-            TextView titleView = (TextView) findViewById(R.id.title);
-            titleView.setText(title);
-            TextView overviewView = (TextView) findViewById(R.id.overview);
-            overviewView.setText(overview);
-            TextView userRatingView = (TextView) findViewById(R.id.rating);
-            userRatingView.setText(userRating);
-            TextView releaseDateView = (TextView) findViewById(R.id.release);
-            releaseDateView.setText(releaseDate);
         }
+    }
+
+    private void loadViews() {
+        loadPosterIntoView();
+        loadTitleIntoView();
+        loadOverviewIntoView();
+        loadRatingIntoView();
+        loadReleaseIntoView();
+    }
+
+    private void loadPosterIntoView() {
+        ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
+        String posterUrl = parse(POSTER);
+        if (posterUrl != null) {
+            Picasso.with(this).load(posterUrl).into(imageView);
+        }
+    }
+
+    private void loadTitleIntoView() {
+        String title = parse(TITLE);
+        TextView titleView = (TextView) findViewById(R.id.title);
+        titleView.setText(title);
+    }
+
+    private void loadOverviewIntoView() {
+        String overview = parse(OVERVIEW);
+        TextView overviewView = (TextView) findViewById(R.id.overview);
+        overviewView.setText(overview);
+
+    }
+
+    private void loadRatingIntoView() {
+        String userRating = parse(RATING);
+        TextView userRatingView = (TextView) findViewById(R.id.rating);
+        userRatingView.setText(userRating);
+    }
+
+    private void loadReleaseIntoView() {
+        String releaseDate = parse(RELEASE);
+        TextView releaseDateView = (TextView) findViewById(R.id.release);
+        releaseDateView.setText(releaseDate);
+    }
+
+
+    private String parse(String movieInfoAttribute) {
+        try {
+            if (movieInfoAttribute == POSTER) {
+                return movieInfoParser.parsePosterUrl();
+            } else if (movieInfoAttribute == TITLE) {
+                return movieInfoParser.parseOriginalTitle();
+            } else if (movieInfoAttribute == OVERVIEW) {
+                return movieInfoParser.parseOverview();
+            } else if (movieInfoAttribute == RATING) {
+                return movieInfoParser.parseRating();
+            } else if (movieInfoAttribute == RELEASE) {
+                return movieInfoParser.parseRelease();
+            }
+
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return null;
     }
 }
