@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesapp;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,9 +51,9 @@ public class MoviePosterAdapter extends ArrayAdapter<String> {
     private void loadMoviePoster(int position, View convertView) {
         String moviePosterUrl = getItem(position);
 
-//        Log.d(LOG_TAG, "posterUrl: " + moviePosterUrl);
+        Log.d(LOG_TAG, "posterUrl: " + moviePosterUrl);
 
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.photo_image_view);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.poster_image_view);
         Picasso.with(getContext()).load(moviePosterUrl).into(imageView);
 
     }

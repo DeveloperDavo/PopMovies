@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
+    <string name="app_name">Pop Movies</string>
     <string name="title_activity_detail">Details</string>
     <string name="action_sort_order">Sort By</string>
     <string name="action_sort_by_rating">Rating</string>
