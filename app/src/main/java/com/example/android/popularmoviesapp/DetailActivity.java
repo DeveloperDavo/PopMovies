@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -117,5 +118,13 @@ public class DetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Intent newIntent(Context context, String movieJsonStr, int position) {
+        Log.d(LOG_TAG, "newIntent");
+        Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra(Intent.EXTRA_TEXT, movieJsonStr);
+        intent.putExtra("position", position);
+        return intent;
     }
 }

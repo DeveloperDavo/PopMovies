@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesapp;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -54,16 +53,10 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                enterDetailActivity(position);
-
+                // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
+                startActivity(DetailActivity.newIntent(MainActivity.this, movieJsonStr, position));
             }
         });
-    }
-
-    // TODO: pass movieInfoParser instead of movieJsonStr
-    private void enterDetailActivity(int position) {
-        Intent intent = new Intent(MainActivity.this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieJsonStr).putExtra("position", position);
-        startActivity(intent);
     }
 
     @Override
