@@ -24,23 +24,25 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private MoviePosterAdapter mPosterAdapter;
+    private MoviePosterAdapter posterAdapter;
     private String movieJsonStr;
     private MovieInfoParser movieInfoParser;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // update array adapter
-        mPosterAdapter = new MoviePosterAdapter(this, new ArrayList<String>());
+        posterAdapter = new MoviePosterAdapter(this, new ArrayList<String>());
 
         // attach adapter to GridView
         GridView gridView = (GridView) findViewById(R.id.grid_view_posters);
-        gridView.setAdapter(mPosterAdapter);
+        gridView.setAdapter(posterAdapter);
 
-        // method invoked when an item in the list has been clicked
+        // invoke when an item in the list has been clicked
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
              * Enter detail activity upon clicking on the item in the list
@@ -57,6 +59,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(DetailActivity.newIntent(MainActivity.this, movieJsonStr, position));
             }
         });
+    }
+
+    /* Fetches movie data upon start up. */
+    @Override
+    public void onStart() {
+        Log.d(LOG_TAG, "onStart");
+        super.onStart();
+        (new FetchMovieDataTask()).execute(getString(R.string.pref_sort_by_rating));
     }
 
     @Override
@@ -78,15 +88,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Fetches movie data upon start up.
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        (new FetchMovieDataTask()).execute(getString(R.string.pref_sort_by_rating));
     }
 
     /**
@@ -204,9 +205,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String[] result) {
             String PosterUrlBase = "http://image.tmdb.org/t/p/w185";
             if (result != null) {
-                mPosterAdapter.clear();
+                posterAdapter.clear();
                 for (String posterUrl : result) {
-                    mPosterAdapter.add(PosterUrlBase + posterUrl);
+                    posterAdapter.add(PosterUrlBase + posterUrl);
                 }
             }
         }
