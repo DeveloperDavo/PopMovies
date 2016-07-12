@@ -6,7 +6,7 @@ The criteria for passing this project can be found [here](https://review.udacity
 and [here](http://udacity.github.io/android-nanodegree-guidelines/core.html).
 
 ### Instructions
-Add `movieDBApiKey="API-KEY"` to `gradle.properties`. This can be found at www.themoviedb.org
+Add `movieDBApiKey="API-KEY"` to `~/.gradle/gradle.properties`. This can be found at www.themoviedb.org
 
 ### Stage 1 Tasks
 - See a grid view of movie posters upon launch
