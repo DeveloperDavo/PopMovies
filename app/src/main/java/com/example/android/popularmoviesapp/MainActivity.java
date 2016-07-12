@@ -203,11 +203,10 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         protected void onPostExecute(String[] result) {
-            String PosterUrlBase = "http://image.tmdb.org/t/p/w185";
             if (result != null) {
                 posterAdapter.clear();
                 for (String posterUrl : result) {
-                    posterAdapter.add(PosterUrlBase + posterUrl);
+                    posterAdapter.add(MovieInfoParser.POSTER_URL_BASE + posterUrl);
                 }
             }
         }

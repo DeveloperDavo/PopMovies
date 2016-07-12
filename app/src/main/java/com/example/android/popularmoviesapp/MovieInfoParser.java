@@ -15,7 +15,7 @@ public class MovieInfoParser {
     private final static String MD_OVERVIEW = "overview";
     private final static String MD_RATING = "vote_average";
     private final static String MD_RELEASE = "release_date";
-    private final static String URL_BASE = "http://image.tmdb.org/t/p/w185/";
+    public final static String POSTER_URL_BASE = "http://image.tmdb.org/t/p/w185/";
 
     private JSONArray moviesData;
     private JSONObject movieData;
@@ -55,7 +55,7 @@ public class MovieInfoParser {
     }
 
     public String parsePosterUrl() throws JSONException {
-        return URL_BASE + movieData.getString(MD_POSTER_PATH);
+        return POSTER_URL_BASE + movieData.getString(MD_POSTER_PATH);
     }
 
     public String parseOriginalTitle() throws JSONException {
