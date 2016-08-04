@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesapp.data;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -30,5 +31,9 @@ public class MovieContract {
         public static final String COLUMN_RATING = "rating";
         public static final String COLUMN_RELEASE = "release";
         public static final String COLUMN_FAVORITE = "favorite";
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 }
