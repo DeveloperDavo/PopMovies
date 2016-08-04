@@ -30,7 +30,7 @@ public class MovieInfoParser {
     }
 
     private void parseMoviesData(String dataJsonStr) throws JSONException {
-        JSONObject data = new JSONObject(dataJsonStr);
+        final JSONObject data = new JSONObject(dataJsonStr);
         this.moviesData = data.getJSONArray(MD_RESULTS);
     }
 

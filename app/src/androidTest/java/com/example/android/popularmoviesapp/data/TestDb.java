@@ -55,25 +55,25 @@ public class TestDb extends AndroidTestCase {
                 "for table information.", c.moveToFirst());
 
         // Build a HashSet of all of the column names we want to look for
-        final HashSet<String> locationColumnHashSet = new HashSet<>();
-        locationColumnHashSet.add(MovieContract.MovieEntry._ID);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_TITLE);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_OVERVIEW);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_RATING);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_RELEASE);
-        locationColumnHashSet.add(MovieContract.MovieEntry.COLUMN_FAVORITE);
+        final HashSet<String> movieColumnHashSet = new HashSet<>();
+        movieColumnHashSet.add(MovieContract.MovieEntry._ID);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_TITLE);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_OVERVIEW);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_RATING);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_RELEASE);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_FAVORITE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {
             String columnName = c.getString(columnNameIndex);
-            locationColumnHashSet.remove(columnName);
+            movieColumnHashSet.remove(columnName);
         } while (c.moveToNext());
 
         // if this fails, it means that your database doesn't contain all of the required location
         // entry columns
         assertTrue("Error: The database doesn't contain all of the required location entry columns",
-                locationColumnHashSet.isEmpty());
+                movieColumnHashSet.isEmpty());
         db.close();
     }
 

@@ -31,7 +31,7 @@ public class TestUtilities extends AndroidTestCase {
         }
     }
 
-    // Default weather values.
+    // Default movie values.
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Star Wars: The Force Awakens");
