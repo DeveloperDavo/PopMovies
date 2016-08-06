@@ -33,15 +33,31 @@ public class TestProvider extends AndroidTestCase {
                 null // selection args
         );
 
-        Cursor cursor = mContext.getContentResolver().query(
+        mContext.getContentResolver().delete(
+                MovieContract.TopRatedEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // selection args
+        );
+
+        final Cursor movieCursor = mContext.getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI, // URI
                 null, // all columns
                 null, // all rows
                 null, // selection args
                 null // sort order
         );
-        assertEquals("Error: Records not deleted from movie table during delete", 0, cursor.getCount());
-        cursor.close();
+        assertEquals("Error: Records not deleted from movie table during delete", 0, movieCursor.getCount());
+        movieCursor.close();
+
+        final Cursor topRatedCursor = mContext.getContentResolver().query(
+                MovieContract.TopRatedEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // selection args
+                null // sort order
+        );
+        assertEquals("Error: Records not deleted from top_rated table during delete", 0, movieCursor.getCount());
+        movieCursor.close();
     }
 
     /*
@@ -54,6 +70,7 @@ public class TestProvider extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         db.delete(MovieContract.MovieEntry.TABLE_NAME, null, null);
+        db.delete(MovieContract.TopRatedEntry.TABLE_NAME, null, null);
         db.close();
     }
 
@@ -65,19 +82,20 @@ public class TestProvider extends AndroidTestCase {
         deleteAllRecordsFromDB();
     }
 
-    static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
+    static private final int BULK_ENTRIES = 10;
 
-    static ContentValues[] createBulkInsertWeatherValues() {
-        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
+    static ContentValues[] createBulkInsertWeatherValues(long movieRowId) {
+        ContentValues[] returnContentValues = new ContentValues[BULK_ENTRIES];
 
-        for (int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
+        for (int i = 0; i < BULK_ENTRIES; i++) {
             ContentValues movieValues = new ContentValues();
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieRowId);
             movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Title " + i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "Poster Path " + i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Overview " + i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, i);
             movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "01-01-200" + i % 9);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, i % 2);
+//            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, i % 2);
             returnContentValues[i] = movieValues;
         }
         return returnContentValues;
