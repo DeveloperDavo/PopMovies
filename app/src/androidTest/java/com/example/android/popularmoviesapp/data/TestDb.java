@@ -21,6 +21,7 @@ public class TestDb extends AndroidTestCase {
         mContext.deleteDatabase(com.example.android.popularmoviesapp.data.MovieDbHelper.DATABASE_NAME);
     }
 
+    // TODO: separate into two or three separate tests
     public void testCreateDb() throws Throwable {
 
         // build a HashSet of all of the table names we wish to look for
@@ -28,7 +29,7 @@ public class TestDb extends AndroidTestCase {
         // Android metadata (db version information)
         final HashSet<String> tableNameHashSet = new HashSet<>();
         tableNameHashSet.add(MovieContract.MovieEntry.TABLE_NAME);
-        tableNameHashSet.add(MovieContract.TopRatedEntry.TABLE_NAME);
+        tableNameHashSet.add(MovieContract.ReviewEntry.TABLE_NAME);
 
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
         SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
@@ -78,49 +79,87 @@ public class TestDb extends AndroidTestCase {
                 movieColumnHashSet.isEmpty());
 
         // now, do our tables contain the correct columns?
-        c = db.rawQuery("PRAGMA table_info(" + MovieContract.TopRatedEntry.TABLE_NAME + ")",
+        c = db.rawQuery("PRAGMA table_info(" + MovieContract.ReviewEntry.TABLE_NAME + ")",
                 null);
 
         assertTrue("Error: This means that we were unable to query the database " +
                 "for table information.", c.moveToFirst());
-        // Build a HashSet of all of the column names we want to look for in top_rated
-        final HashSet<String> topRatedColumnHashSet = new HashSet<>();
-        topRatedColumnHashSet.add(MovieContract.TopRatedEntry._ID);
-        topRatedColumnHashSet.add(MovieContract.TopRatedEntry.COLUMN_MOVIE_ID);
 
-        int topRatedColumnIndex = c.getColumnIndex("name");
+        // Build a HashSet of all of the column names we want to look for in reviews
+        final HashSet<String> reviewColumnHashSet = new HashSet<>();
+        reviewColumnHashSet.add(MovieContract.ReviewEntry._ID);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_MOVIE_ID);
+
+        int reviewColumnIndex = c.getColumnIndex("name");
         do {
-            String columnName = c.getString(topRatedColumnIndex);
-            topRatedColumnHashSet.remove(columnName);
+            String columnName = c.getString(reviewColumnIndex);
+            reviewColumnHashSet.remove(columnName);
         } while (c.moveToNext());
 
         // if this fails, it means that your database doesn't contain all of the required location
         // entry columns
-        assertTrue("Error: The database doesn't contain all of the required top_rated columns",
-                topRatedColumnHashSet.isEmpty());
+        assertTrue("Error: The database doesn't contain all of the required reviews columns",
+                reviewColumnHashSet.isEmpty());
         db.close();
     }
 
-    public void testTopRatedTable() {
+    public void testMovieTable() {
         insertMovieId();
     }
 
-    public void testMovieTable() {
+    public void testReviewsTable() {
 
-        // Insert movie id
+        // get movie_id
         long movieRowId = insertMovieId();
 
-        // Make sure we have a valid row ID.
-        assertFalse("Error: Movie id Not Inserted Correctly", movieRowId == -1L);
+        // Get reference to writable database
+        final SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
 
+        // Create ContentValues of what you want to insert
+        final ContentValues contentValues = TestUtilities.createReviewsValues(movieRowId);
+
+        // Insert ContentValues into database and get a row ID back
+        final long rowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, contentValues);
+
+        // Verify we got a row back.
+        assertTrue(rowId != -1);
+
+        // Query the database and receive a Cursor back
+        final Cursor cursor = db.query(
+                MovieContract.ReviewEntry.TABLE_NAME, // table
+                null, // all columns
+                null, // columns for the "where" clause
+                null, // values for the "where" clause
+                null, // columns to group by
+                null, // columns ot filter by row groups
+                null // sort order
+        );
+
+        // Move the cursor to a valid database row
+        assertTrue("Error: No Records returned from reviews query", cursor.moveToFirst());
+
+        // Validate data in resulting Cursor with the original ContentValues
+        TestUtilities.validateCurrentRecord("Error: Reviews Query Validation Failed", cursor, contentValues);
+
+        // Move the cursor to demonstrate that there is only one record in the database
+        assertFalse("Error: More than one record returned from reviews query",
+                cursor.moveToNext());
+
+        // Finally, close the cursor and database
+        cursor.close();
+        db.close();
+    }
+
+    private long insertMovieId() {
         // Get reference to writable database
         SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
 
         // Create ContentValues of what you want to insert
-        ContentValues contentValues = TestUtilities.createMovieValues(movieRowId);
+        ContentValues contentValues = TestUtilities.createMovieValues();
 
         // Insert ContentValues into database and get a row ID back
-        db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+        long moviesRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+        assertTrue(moviesRowId != -1);
 
         // Query the database and receive a Cursor back
         Cursor cursor = db.query(
@@ -146,48 +185,7 @@ public class TestDb extends AndroidTestCase {
         // Finally, close the cursor and database
         cursor.close();
         db.close();
+
+        return moviesRowId;
     }
-
-    public long insertMovieId() {
-
-        // Get reference to writable database
-        final SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
-
-        // Create ContentValues of what you want to insert
-        final ContentValues contentValues = TestUtilities.createTopRatedValues();
-
-        // Insert ContentValues into database and get a row ID back
-        final long rowId = db.insert(MovieContract.TopRatedEntry.TABLE_NAME, null, contentValues);
-
-        // Verify we got a row back.
-        assertTrue(rowId != -1);
-
-        // Query the database and receive a Cursor back
-        final Cursor cursor = db.query(
-                MovieContract.TopRatedEntry.TABLE_NAME, // table
-                null, // all columns
-                null, // columns for the "where" clause
-                null, // values for the "where" clause
-                null, // columns to group by
-                null, // columns ot filter by row groups
-                null // sort order
-        );
-
-        // Move the cursor to a valid database row
-        assertTrue("Error: No Records returned from top_rated query", cursor.moveToFirst());
-
-        // Validate data in resulting Cursor with the original ContentValues
-        TestUtilities.validateCurrentRecord("Error: top_rated Query Validation Failed", cursor, contentValues);
-
-        // Move the cursor to demonstrate that there is only one record in the database
-        assertFalse("Error: More than one record returned from top_rated query",
-                cursor.moveToNext());
-
-        // Finally, close the cursor and database
-        cursor.close();
-        db.close();
-
-        return rowId;
-    }
-
 }

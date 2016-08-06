@@ -24,10 +24,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     private void createMovieTable(SQLiteDatabase db) {
 
-        final String SQL_CREATE_TOP_RATED_TABLE = "CREATE TABLE " + MovieContract.TopRatedEntry.TABLE_NAME + " (" +
-                MovieContract.TopRatedEntry._ID + " INTEGER PRIMARY KEY, " +
-                MovieContract.TopRatedEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL);";
-
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY, " +
                 MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
@@ -36,10 +32,20 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
+                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0" +
+                ");";
 
-        db.execSQL(SQL_CREATE_TOP_RATED_TABLE);
+        final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME + " (" +
+                MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
+                MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " INTEGER UNIQUE NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_URL + " TEXT NOT NULL" +
+                ");";
+
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_REVIEWS_TABLE);
     }
 
     @Override
@@ -50,7 +56,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
-        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.TopRatedEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.ReviewEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
         onCreate(db);
     }

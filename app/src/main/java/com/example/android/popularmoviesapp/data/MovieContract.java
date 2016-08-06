@@ -15,7 +15,7 @@ public class MovieContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_MOVIE = "movies";
-    public static final String PATH_TOP_RATED = "top_rated";
+    public static final String PATH_REVIEW = "reviews";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
@@ -41,20 +41,24 @@ public class MovieContract {
         }
     }
 
-    public static final class TopRatedEntry implements BaseColumns {
+    public static final class ReviewEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TOP_RATED;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TOP_RATED;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
-        public static final String TABLE_NAME = "top_rated";
+        public static final String TABLE_NAME = "reviews";
 
         public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_REVIEW_ID = "review_id";
+        public static final String COLUMN_AUTHOR = "author";
+        public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_URL = "url";
 
-        public static Uri buildMovieTopRatedUri(long id) {
+        public static Uri buildReviewsUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

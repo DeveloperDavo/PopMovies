@@ -38,23 +38,27 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     // default movie values
-    static ContentValues createMovieValues(long topRatedRowId) {
+    static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, topRatedRowId);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, 1);
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Star Wars: The Force Awakens");
         movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "path_to_poster");
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker is no where to be found...");
         movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, "8.5");
         movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "2015-12-17");
-//        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
         return movieValues;
     }
 
-    // default top_rated values
-    static ContentValues createTopRatedValues() {
-        ContentValues topRatedValues = new ContentValues();
-        topRatedValues.put(MovieContract.TopRatedEntry.COLUMN_MOVIE_ID, 1);
-        return topRatedValues;
+    // default review values
+    static ContentValues createReviewsValues(long moviesRowId) {
+        ContentValues reviewValues = new ContentValues();
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_ID, moviesRowId);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, 1);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, "David S");
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT, "Great movie :)");
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL, "www.example.com");
+        return reviewValues;
     }
 
     /*
