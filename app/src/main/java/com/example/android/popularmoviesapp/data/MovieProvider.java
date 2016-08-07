@@ -30,23 +30,25 @@ public class MovieProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         // determine kind of request and query database
-        Cursor retCursor;
+        Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
             case MovieUriMatcher.MOVIE: {
-                // TODO
-                retCursor = null;
+                cursor = getCursorForMovies(projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case MovieUriMatcher.REVIEW: {
-                // TODO
-                retCursor = null;
+                cursor = getCursorForReviews(projection, selection, selectionArgs, sortOrder);
+                break;
+            }
+            case MovieUriMatcher.MOVIE_WITH_REVIEW: {
+                cursor = getCursorForMovieWithReviews(uri, projection, sortOrder);
                 break;
             }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
-        return retCursor;
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
     @Nullable

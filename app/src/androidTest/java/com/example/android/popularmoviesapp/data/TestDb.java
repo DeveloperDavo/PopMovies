@@ -116,7 +116,7 @@ public class TestDb extends AndroidTestCase {
         final SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
 
         // Create ContentValues of what you want to insert
-        final ContentValues contentValues = TestUtilities.createReviewsValues(movieRowId);
+        final ContentValues contentValues = TestUtilities.createReviewValues(movieRowId);
 
         // Insert ContentValues into database and get a row ID back
         final long rowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, contentValues);

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.test.AndroidTestCase;
 
 /**
@@ -78,6 +79,72 @@ public class TestProvider extends AndroidTestCase {
         // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
         assertEquals("Error: the MovieEntry CONTENT_URI with reviews should return ReviewEntry.CONTENT_TYPE",
                 MovieContract.ReviewEntry.CONTENT_TYPE, type);
+    }
+
+    public void testMovieQuery() {
+
+        // insert test records into the database
+        long movieRowId = TestUtilities.insertMovieValues(mContext);
+
+        // assert movie values have been inserted correctly
+        assertTrue("Unable to Insert MovieEntry into the Database", movieRowId != -1);
+
+        // add movie values
+        ContentValues movieValues = TestUtilities.createMovieValues();
+
+        // test the basic content provider query
+        Cursor movieCursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testMovieQuery, movie query", movieCursor, movieValues);
+
+        // Has the NotificationUri been set correctly? --- we can only test this easily against API
+        // level 19 or greater because getNotificationUri was added in API level 19.
+        if (Build.VERSION.SDK_INT >= 19) {
+            assertEquals("Error: Movie Query did not properly set NotificationUri",
+                    movieCursor.getNotificationUri(), MovieContract.MovieEntry.CONTENT_URI);
+        }
+    }
+
+    /*
+        This test uses the database directly to insert and then uses the ContentProvider to
+        read out the data.  Uncomment this test to see if the basic weather query functionality
+        given in the ContentProvider is working correctly.
+     */
+    public void testReviewQuery() {
+
+        // insert test records into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long movieRowId = TestUtilities.insertMovieValues(mContext);
+
+        // assert movie values have been inserted correctly
+        assertTrue("Unable to Insert MovieEntry into the Database", movieRowId != -1);
+
+        // add review values
+        ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
+
+        // assert review values have been inserted correctly
+        long reviewRowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
+        assertTrue("Unable to Insert ReviewEntry into the Database", reviewRowId != -1);
+
+        db.close();
+
+        // test the basic content provider query
+        Cursor reviewCursor = mContext.getContentResolver().query(
+                MovieContract.ReviewEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
     }
 
     /*

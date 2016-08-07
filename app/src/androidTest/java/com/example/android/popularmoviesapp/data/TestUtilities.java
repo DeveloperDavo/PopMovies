@@ -1,8 +1,10 @@
 package com.example.android.popularmoviesapp.data;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -51,7 +53,7 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     // default review values
-    static ContentValues createReviewsValues(long moviesRowId) {
+    static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_ID, moviesRowId);
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, 1);
@@ -59,6 +61,21 @@ public class TestUtilities extends AndroidTestCase {
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT, "Great movie :)");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL, "www.example.com");
         return reviewValues;
+    }
+
+    static long insertMovieValues(Context context) {
+
+        // insert our test records into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMovieValues();
+
+        long moviesRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, testValues);
+
+        // Verify we got a row back.
+        assertTrue("Error: Failure to insert movie values", moviesRowId != -1);
+
+        return moviesRowId;
     }
 
     /*
