@@ -14,17 +14,17 @@ public class MovieContract {
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    public static final String PATH_MOVIE = "movies";
-    public static final String PATH_REVIEW = "reviews";
+    public static final String PATH_MOVIES = "movies";
+    public static final String PATH_REVIEWS = "reviews";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
 
         public static final String TABLE_NAME = "movies";
 
@@ -40,8 +40,14 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildMovieWithReviews(long movieId) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(movieId))
+                    .appendPath(PATH_REVIEWS).build();
+        }
+
         public static Uri buildMovieWithReview(long movieId, long reviewId) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(movieId))
+                    .appendPath(PATH_REVIEWS)
                     .appendPath(Long.toString(reviewId)).build();
         }
 
@@ -57,12 +63,12 @@ public class MovieContract {
 
     public static final class ReviewEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEWS).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
 
         public static final String TABLE_NAME = "reviews";
 
