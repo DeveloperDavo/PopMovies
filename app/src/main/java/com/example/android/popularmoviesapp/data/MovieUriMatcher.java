@@ -7,11 +7,11 @@ import android.content.UriMatcher;
  */
 public class MovieUriMatcher extends UriMatcher {
 
-    static final int MOVIES = 100;
-    static final int REVIEWS = 010;
-    static final int MOVIE_WITH_REVIEWS = 110;
+    static final int MOVIE = 100;
+    static final int REVIEW = 200;
+    static final int MOVIE_WITH_REVIEW = 300;
+
     private static final String contentAuthority = MovieContract.CONTENT_AUTHORITY;
-    // TODO: MOVIE_WITH_REVIEW = 111 ??
 
     public MovieUriMatcher(int code) {
         super(code);
@@ -19,11 +19,12 @@ public class MovieUriMatcher extends UriMatcher {
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(contentAuthority, MovieContract.PATH_MOVIES, MOVIES);
+        uriMatcher.addURI(contentAuthority, MovieContract.PATH_MOVIES, MOVIE);
         uriMatcher.addURI(contentAuthority,
-                MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS, MOVIE_WITH_REVIEWS);
+                MovieContract.PATH_REVIEWS, REVIEW);
         uriMatcher.addURI(contentAuthority,
-                MovieContract.PATH_REVIEWS, REVIEWS);
+                MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS + "/#",
+                MOVIE_WITH_REVIEW);
         return uriMatcher;
     }
 }

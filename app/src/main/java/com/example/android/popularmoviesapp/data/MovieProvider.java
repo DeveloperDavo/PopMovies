@@ -19,39 +19,6 @@ public class MovieProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER = MovieUriMatcher.buildUriMatcher();
 
-    private static final SQLiteQueryBuilder REVIEWS_BY_MOVIE_QUERY_BUILDER;
-
-    static {
-        REVIEWS_BY_MOVIE_QUERY_BUILDER = new SQLiteQueryBuilder();
-
-        // reviews INNER JOIN movies ON reviews.movie_id = movies.movie_id
-        // TODO: check SQL logic
-        REVIEWS_BY_MOVIE_QUERY_BUILDER.setTables(
-                MovieContract.ReviewEntry.TABLE_NAME + " INNER JOIN " +
-                        MovieContract.MovieEntry.TABLE_NAME +
-                        " ON " + MovieContract.ReviewEntry.TABLE_NAME +
-                        "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
-                        " = " + MovieContract.MovieEntry.TABLE_NAME +
-                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-    }
-
-    // movies.movie_id = ?
-    private static final String MOVIE_SELECTION =
-            MovieContract.MovieEntry.TABLE_NAME + "." +
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
-
-    // reviews.review_id = ?
-    private static final String REVIEW_SELECTION =
-            MovieContract.ReviewEntry.TABLE_NAME + "." +
-                    MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " = ?";
-
-    // movies.movie_id = ? AND reviews.review_id = ?
-    private static final String MOVIE_WITH_REVIEW_SELECTION =
-            MovieContract.ReviewEntry.TABLE_NAME + "." +
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
-                    MovieContract.ReviewEntry.TABLE_NAME + "." +
-                    MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " = ?";
-
     @Override
     public boolean onCreate() {
         movieDbHelper = new MovieDbHelper(getContext());
@@ -65,39 +32,22 @@ public class MovieProvider extends ContentProvider {
         // determine kind of request and query database
         Cursor retCursor;
         switch (URI_MATCHER.match(uri)) {
-            case MovieUriMatcher.MOVIES: {
+            case MovieUriMatcher.MOVIE: {
+                // TODO
                 retCursor = null;
                 break;
             }
-            case MovieUriMatcher.REVIEWS: {
+            case MovieUriMatcher.REVIEW: {
+                // TODO
                 retCursor = null;
                 break;
             }
-            case MovieUriMatcher.MOVIE_WITH_REVIEWS: {
-                retCursor = getReviewsByMovieId(uri, projection, sortOrder);
-                break;
-            }
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
-
-    private Cursor getReviewsByMovieId(Uri uri, String[] projection, String sortOrder) {
-        final int movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
-
-        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(movieDbHelper.getReadableDatabase(),
-                projection,
-                MOVIE_WITH_REVIEW_SELECTION,
-                new String[]{Integer.toString(movieId)},
-                null,
-                null,
-                sortOrder
-        );
-    }
-
 
     @Nullable
     @Override
@@ -107,13 +57,12 @@ public class MovieProvider extends ContentProvider {
         final int match = URI_MATCHER.match(uri);
 
         switch (match) {
-            case MovieUriMatcher.MOVIES:
+            case MovieUriMatcher.MOVIE:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
-            case MovieUriMatcher.REVIEWS:
+            case MovieUriMatcher.REVIEW:
                 return MovieContract.ReviewEntry.CONTENT_TYPE;
-            case MovieUriMatcher.MOVIE_WITH_REVIEWS:
-                // TODO
-                return null;
+            case MovieUriMatcher.MOVIE_WITH_REVIEW:
+                return MovieContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -128,7 +77,7 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case MovieUriMatcher.MOVIES: {
+            case MovieUriMatcher.MOVIE: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
@@ -136,7 +85,7 @@ public class MovieProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case MovieUriMatcher.REVIEWS: {
+            case MovieUriMatcher.REVIEW: {
                 long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.ReviewEntry.buildReviewUri(_id);
@@ -166,7 +115,7 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = URI_MATCHER.match(uri);
         switch (match) {
-            case MovieUriMatcher.MOVIES:
+            case MovieUriMatcher.MOVIE:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -196,6 +145,53 @@ public class MovieProvider extends ContentProvider {
         movieDbHelper.close();
         super.shutdown();
     }
+
+    private Cursor getCursorForMovies(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return movieDbHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
+                projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    private Cursor getCursorForReviews(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return movieDbHelper.getReadableDatabase().query(MovieContract.ReviewEntry.TABLE_NAME,
+                projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    private Cursor getCursorForMovieWithReviews(Uri uri, String[] projection, String sortOrder) {
+        final int movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
+        final int reviewId = MovieContract.MovieEntry.getReviewIdFromUri(uri);
+
+        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(movieDbHelper.getReadableDatabase(),
+                projection,
+                MOVIE_WITH_REVIEW_SELECTION,
+                new String[]{Integer.toString(movieId), Integer.toString(reviewId)},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private static final SQLiteQueryBuilder REVIEWS_BY_MOVIE_QUERY_BUILDER;
+
+    static {
+        REVIEWS_BY_MOVIE_QUERY_BUILDER = new SQLiteQueryBuilder();
+
+        // reviews INNER JOIN movies ON reviews.movie_id = movies.movie_id
+        // TODO: check SQL logic
+        REVIEWS_BY_MOVIE_QUERY_BUILDER.setTables(
+                MovieContract.ReviewEntry.TABLE_NAME + " INNER JOIN " +
+                        MovieContract.MovieEntry.TABLE_NAME +
+                        " ON " + MovieContract.ReviewEntry.TABLE_NAME +
+                        "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
+                        " = " + MovieContract.MovieEntry.TABLE_NAME +
+                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+    }
+
+    // movies.movie_id = ? AND reviews.review_id = ?
+    private static final String MOVIE_WITH_REVIEW_SELECTION =
+            MovieContract.ReviewEntry.TABLE_NAME + "." +
+                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
+                    MovieContract.ReviewEntry.TABLE_NAME + "." +
+                    MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " = ?";
 }
 
 

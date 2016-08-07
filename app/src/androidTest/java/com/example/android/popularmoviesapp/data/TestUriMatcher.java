@@ -9,55 +9,55 @@ import android.test.AndroidTestCase;
  */
 public class TestUriMatcher extends AndroidTestCase {
 
-    public void test_match_whenMoviesDir() {
+    public void test_match_movies() {
 
         // GIVEN
 
-        // content://com.example.android.popularmovies/movies"
+        // content://com.example.android.popularmoviesapp/movies"
         final Uri moviesDir = MovieContract.MovieEntry.CONTENT_URI;
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int movies = MovieUriMatcher.MOVIES;
+        final int movies = MovieUriMatcher.MOVIE;
 
         // THEN
-        assertEquals("Error: The MOVIES URI was matched incorrectly.",
+        assertEquals("Error: The MOVIE URI was matched incorrectly.",
                 testMatcher.match(moviesDir), movies);
     }
 
-    public void test_match_whenReviewsDir() {
+    public void test_match_reviews() {
 
         // GIVEN
 
-        // content://com.example.android.popularmovies/reviews"
+        // content://com.example.android.popularmoviesapp/reviews"
         final Uri reviewsDir = MovieContract.ReviewEntry.CONTENT_URI;
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.REVIEWS;
+        final int reviews = MovieUriMatcher.REVIEW;
 
         // THEN
-        assertEquals("Error: The REVIEWS URI was matched incorrectly.",
+        assertEquals("Error: The REVIEW URI was matched incorrectly.",
                 testMatcher.match(reviewsDir), reviews);
     }
 
-    public void test_match_whenMoviesWithReviewsDir() {
+    public void test_match_movieWithReviews() {
 
         // GIVEN
-        final long movieID = 1001;
+        final int movieId = 565545;
+        final int reviewId = 1;
 
-        // content://com.example.android.popularmovies/movies/movie_id/reviews"
-        final Uri movieWithReviewsDir =
-                MovieContract.MovieEntry.buildMovieWithReviews(movieID);
+        // content://com.example.android.popularmoviesapp/movies/movie_id/reviews/reviews_id"
+        final Uri movieWithReviewDir = MovieContract.MovieEntry.buildReviewMovie(movieId, reviewId);
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int movieWithReviews = MovieUriMatcher.MOVIE_WITH_REVIEWS;
+        final int reviews = MovieUriMatcher.MOVIE_WITH_REVIEW;
 
         // THEN
-        assertEquals("Error: The MOVIE WITH REVIEWS URI was matched incorrectly.",
-                testMatcher.match(movieWithReviewsDir), movieWithReviews);
-    }
+        assertEquals("Error: The MOVIE_WITH_REVIEW URI was matched incorrectly.",
+                testMatcher.match(movieWithReviewDir), reviews);
 
+    }
 
 }

@@ -40,37 +40,21 @@ public class TestMovieContract extends AndroidTestCase {
                 reviewUri.toString());
     }
 
-    public void test_buildMovieWithReviews() {
+    public void test_buildReviewMovie() {
 
         // GIVEN
-        final long movieId = 17;
+        final int movieId = 3;
+        final int reviewId = 10;
 
         // WHEN
-        final Uri movieWithReviewUri = MovieContract.MovieEntry.buildMovieWithReviews(movieId);
+        final Uri reviewUri = MovieContract.MovieEntry.buildReviewMovie(movieId, reviewId);
 
         // THEN
-        assertNotNull(movieWithReviewUri);
-        assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId + "/" +
-                        MovieContract.PATH_REVIEWS,
-                movieWithReviewUri.toString());
-    }
-
-    public void test_buildMovieWithReview() {
-
-        // GIVEN
-        final long movieId = 1001;
-        final long reviewId = 1;
-
-        // WHEN
-        final Uri movieWithReviewUri =
-                MovieContract.MovieEntry.buildMovieWithReview(movieId, reviewId);
-
-        // THEN
-        assertNotNull(movieWithReviewUri);
+        assertNotNull(reviewUri);
         assertEquals("Error: Uri doesn't match expected result",
                 BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId + "/" +
                         MovieContract.PATH_REVIEWS + "/" + reviewId,
-                movieWithReviewUri.toString());
+                reviewUri.toString());
+
     }
 }

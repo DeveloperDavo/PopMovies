@@ -45,6 +45,41 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
+    public void test_getType_movies() {
+
+        // content://com.example.android.popularmoviesapp/movies/
+        final String type = mContext.getContentResolver().
+                getType(MovieContract.MovieEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/movies
+        assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE",
+                MovieContract.MovieEntry.CONTENT_TYPE, type);
+    }
+
+    public void test_getType_reviews() {
+
+        // content://com.example.android.popularmoviesapp/reviews/
+        final String type = mContext.getContentResolver().
+                getType(MovieContract.ReviewEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
+        assertEquals("Error: the ReviewEntry CONTENT_URI should return ReviewEntry.CONTENT_TYPE",
+                MovieContract.ReviewEntry.CONTENT_TYPE, type);
+    }
+
+    public void test_getType_movieWithReviews() {
+
+        // GIVEN
+        final int movieId = 789;
+        final int reviewId = 10;
+
+        // WHEN
+        // content://com.example.android.popularmoviesapp/movies/789/reviews/10
+        final String type = mContext.getContentResolver().
+                getType(MovieContract.MovieEntry.buildReviewMovie(movieId, reviewId));
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
+        assertEquals("Error: the MovieEntry CONTENT_URI with reviews should return ReviewEntry.CONTENT_TYPE",
+                MovieContract.ReviewEntry.CONTENT_TYPE, type);
+    }
+
     /*
         Student: Refactor this function to use the deleteAllRecordsFromProvider functionality once
         you have implemented delete functionality there.

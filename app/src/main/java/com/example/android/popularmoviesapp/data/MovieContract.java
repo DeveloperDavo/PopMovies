@@ -40,23 +40,20 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildMovieWithReviews(long movieId) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(movieId))
-                    .appendPath(PATH_REVIEWS).build();
-        }
-
-        public static Uri buildMovieWithReview(long movieId, long reviewId) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(movieId))
-                    .appendPath(PATH_REVIEWS)
-                    .appendPath(Long.toString(reviewId)).build();
+        public static Uri buildReviewMovie(long movieId, long reviewId) {
+            return CONTENT_URI.buildUpon().
+                    appendPath(Long.toString(movieId)).
+                    appendPath(PATH_REVIEWS).
+                    appendPath(Long.toString(reviewId))
+                    .build();
         }
 
         public static int getMovieIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(1));
+            return Integer.parseInt(uri.getPathSegments().get(2));
         }
 
         public static int getReviewIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(2));
+            return Integer.parseInt(uri.getPathSegments().get(4));
         }
 
     }
