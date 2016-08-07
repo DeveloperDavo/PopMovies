@@ -32,8 +32,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0" +
-                ");";
+                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME + " (" +
                 MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -41,8 +40,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " INTEGER UNIQUE NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_URL + " TEXT NOT NULL" +
-                ");";
+                MovieContract.ReviewEntry.COLUMN_URL + " TEXT NOT NULL);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);

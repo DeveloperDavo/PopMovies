@@ -8,6 +8,8 @@ import android.test.AndroidTestCase;
  */
 public class TestMovieContract extends AndroidTestCase {
 
+    private static final String BASE_URL = "content://com.example.android.popularmoviesapp/";
+
     public void test_buildMovieUri() {
 
         // GIVEN
@@ -19,8 +21,7 @@ public class TestMovieContract extends AndroidTestCase {
         // THEN
         assertNotNull(movieUri);
         assertEquals("Error: Uri doesn't match expected result",
-                "content://com.example.android.popularmovies/" +
-                        MovieContract.PATH_MOVIES + "/" + id,
+                BASE_URL + MovieContract.PATH_MOVIES + "/" + id,
                 movieUri.toString());
     }
 
@@ -35,8 +36,7 @@ public class TestMovieContract extends AndroidTestCase {
         // THEN
         assertNotNull(reviewUri);
         assertEquals("Error: Uri doesn't match expected result",
-                "content://com.example.android.popularmovies/" +
-                        MovieContract.PATH_REVIEWS + "/" + id,
+                BASE_URL + MovieContract.PATH_REVIEWS + "/" + id,
                 reviewUri.toString());
     }
 
@@ -51,8 +51,7 @@ public class TestMovieContract extends AndroidTestCase {
         // THEN
         assertNotNull(movieWithReviewUri);
         assertEquals("Error: Uri doesn't match expected result",
-                "content://com.example.android.popularmovies/" +
-                        MovieContract.PATH_MOVIES + "/" + movieId + "/" +
+                BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId + "/" +
                         MovieContract.PATH_REVIEWS,
                 movieWithReviewUri.toString());
     }
@@ -70,8 +69,7 @@ public class TestMovieContract extends AndroidTestCase {
         // THEN
         assertNotNull(movieWithReviewUri);
         assertEquals("Error: Uri doesn't match expected result",
-                "content://com.example.android.popularmovies/" +
-                        MovieContract.PATH_MOVIES + "/" + movieId + "/" +
+                BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId + "/" +
                         MovieContract.PATH_REVIEWS + "/" + reviewId,
                 movieWithReviewUri.toString());
     }
