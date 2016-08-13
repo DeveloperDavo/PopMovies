@@ -196,6 +196,43 @@ public class TestProvider extends AndroidTestCase {
                 singleMovieCursor, testValues);
     }
 
+    public void test_bulkInsert_movies() {
+
+        ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertMovieValues();
+
+        // register content observer
+        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(
+                MovieContract.MovieEntry.CONTENT_URI, true, movieObserver);
+
+        int insertCount = mContext.getContentResolver().bulkInsert(
+                MovieContract.MovieEntry.CONTENT_URI, bulkInsertContentValues);
+
+        movieObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(movieObserver);
+
+        assertEquals(TestUtilities.BULK_INSERT_SIZE, insertCount);
+
+        // TODO: sort order
+        String sortOrder = null;
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                sortOrder
+        );
+
+        assertEquals(cursor.getCount(), TestUtilities.BULK_INSERT_SIZE);
+
+        cursor.moveToFirst();
+        for ( int i = 0; i < TestUtilities.BULK_INSERT_SIZE; i++, cursor.moveToNext() ) {
+            TestUtilities.validateCurrentRecord("test_bulkInsert_movies.  Error validating MovieEntry " + i,
+                    cursor, bulkInsertContentValues[i]);
+        }
+        cursor.close();
+    }
+
     public void testDeleteRecords() {
         testInsertReadProvider();
 
@@ -220,9 +257,9 @@ public class TestProvider extends AndroidTestCase {
         // Create a new map of values, where column names are the keys
         ContentValues values = TestUtilities.createMovieValues();
 
-        Uri locationUri = mContext.getContentResolver().
+        Uri movieUri = mContext.getContentResolver().
                 insert(MovieContract.MovieEntry.CONTENT_URI, values);
-        long movieRowId = ContentUris.parseId(locationUri);
+        long movieRowId = ContentUris.parseId(movieUri);
 
         // Verify we got a row back.
         assertTrue(movieRowId != -1);
@@ -312,23 +349,5 @@ public class TestProvider extends AndroidTestCase {
         movieCursor.close();
     }
 
-    static private final int BULK_ENTRIES = 10;
-
-    static ContentValues[] createBulkInsertMoviesValues() {
-        ContentValues[] returnContentValues = new ContentValues[BULK_ENTRIES];
-
-        for (int i = 0; i < BULK_ENTRIES; i++) {
-            ContentValues movieValues = new ContentValues();
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, i + 1000);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Title " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "Poster Path " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Overview " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "01-01-200" + i % 9);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, i % 2);
-            returnContentValues[i] = movieValues;
-        }
-        return returnContentValues;
-    }
 }
 

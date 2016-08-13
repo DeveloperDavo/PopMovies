@@ -174,6 +174,8 @@ public class MovieProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
+            // TODO reviews
+            // TODO videos
             default:
                 return super.bulkInsert(uri, values);
         }

@@ -28,6 +28,7 @@ public class TestUtilities extends AndroidTestCase {
     public static final int FAVORITE = 1;
 
     public final static long REVIEW_ID = 5;
+    public static final int BULK_INSERT_SIZE = 10;
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
@@ -86,6 +87,27 @@ public class TestUtilities extends AndroidTestCase {
         assertTrue("Error: Failure to insert movie values", moviesRowId != -1);
 
         return moviesRowId;
+    }
+
+    static ContentValues[] createBulkInsertMovieValues() {
+        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_SIZE];
+
+        for (int i = 0; i < BULK_INSERT_SIZE; i++) {
+            ContentValues movieValues = new ContentValues();
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, i + 1000);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "title " + i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "posterPath " + i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "overview " + i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, i + 0.99);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "release " + i);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, i % 1);
+
+            returnContentValues[i] = movieValues;
+        }
+
+        // TODO try adding a movie with the same movie_id
+
+        return returnContentValues;
     }
 
     static long createAndInsertReviewValues(Context context, long movieRowId) {

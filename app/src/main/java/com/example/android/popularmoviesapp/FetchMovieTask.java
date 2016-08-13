@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -165,7 +166,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             final String release = movieData.getString(MD_RELEASE);
             final int favorite = 0; // default to false
 
-            addMovie(movieId, title, posterPath, overview, rating, release, favorite);
+//            addMovie(movieId, title, posterPath, overview, rating, release, favorite);
 
             // TODO add reviews (later do it only when needed?)
             // TODO only poster_path and movie id is necessary for the main activity
@@ -184,14 +185,45 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
         }
 
-        // add to database
-        if (contentValuesVector.size() > 0) {
-//            ContentValues[] cvArray = new ContentValues[contentValuesVector.size()];
-//            contentValuesVector.toArray(cvArray);
-//            context.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+        // bulk insert into database
+        // TODO not to be used so often in final version
+        bulkInsertAndDelete(contentValuesVector);
+
+        // TODO sortOrder
+        final String sortOrder = null;
+        final Cursor cursor = context.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                null, null, null, sortOrder);
+
+        contentValuesVector = new Vector<>(cursor.getCount());
+        if (cursor.moveToFirst()) {
+            do {
+                ContentValues contentValues = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
+                contentValuesVector.add(contentValues);
+            } while (cursor.moveToNext());
         }
 
+        Log.d(LOG_TAG, "FetchMovieTask Complete. " + contentValuesVector.size() + " Inserted");
+
         return getPosterUrls(contentValuesVector);
+    }
+
+    private void bulkInsertAndDelete(Vector<ContentValues> contentValuesVector) {
+        if (contentValuesVector.size() > 0) {
+            Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+            ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
+            contentValuesVector.toArray(contentValuesArray);
+            deleteOldMovieData();
+            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
+            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+        }
+    }
+
+    private void deleteOldMovieData() {
+
+        int deleted = context.getContentResolver().delete(
+                MovieContract.MovieEntry.CONTENT_URI, null, null);
+        Log.d(LOG_TAG, "delete complete. " + deleted + " deleted");
     }
 
     private String[] getPosterUrls(Vector<ContentValues> contentValuesVector) {
@@ -218,6 +250,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         }
     }
 
+    // TODO update instead of insert if movie_id already exists
     public long addMovie(long movieId, String title, String posterPath, String overview,
                          double rating, String release, int favorite) {
         long movieRowId;
