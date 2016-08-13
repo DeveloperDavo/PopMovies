@@ -6,10 +6,10 @@ import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 /**
  * Created by David on 13/07/16.
@@ -196,26 +196,80 @@ public class TestProvider extends AndroidTestCase {
                 singleMovieCursor, testValues);
     }
 
+    public void testDeleteRecords() {
+        testInsertReadProvider();
+
+        // Register a content observer for our movies delete.
+        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, movieObserver);
+
+        // Register a content observer for our reviews delete.
+        TestUtilities.TestContentObserver reviewObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieContract.ReviewEntry.CONTENT_URI, true, reviewObserver);
+
+        deleteAllRecordsFromProvider();
+
+        movieObserver.waitForNotificationOrFail();
+        reviewObserver.waitForNotificationOrFail();
+
+        mContext.getContentResolver().unregisterContentObserver(movieObserver);
+        mContext.getContentResolver().unregisterContentObserver(reviewObserver);
+    }
+
+    public void testUpdateMovies() {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = TestUtilities.createMovieValues();
+
+        Uri locationUri = mContext.getContentResolver().
+                insert(MovieContract.MovieEntry.CONTENT_URI, values);
+        long movieRowId = ContentUris.parseId(locationUri);
+
+        // Verify we got a row back.
+        assertTrue(movieRowId != -1);
+        Log.d(LOG_TAG, "New row id: " + movieRowId);
+
+        ContentValues updatedValues = new ContentValues(values);
+        updatedValues.put(MovieContract.MovieEntry._ID, movieRowId);
+        updatedValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker has ben found");
+
+        // Create a cursor with observer to make sure that the content provider is notifying
+        // the observers as expected
+        Cursor movieCursor = mContext.getContentResolver().
+                query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
+
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        movieCursor.registerContentObserver(tco);
+
+        int count = mContext.getContentResolver().update(
+                MovieContract.MovieEntry.CONTENT_URI, updatedValues, MovieContract.MovieEntry._ID + "= ?",
+                new String[] { Long.toString(movieRowId)});
+        assertEquals(count, 1);
+
+        tco.waitForNotificationOrFail();
+
+        movieCursor.unregisterContentObserver(tco);
+        movieCursor.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null,   // projection
+                MovieContract.MovieEntry._ID + " = " + movieRowId,
+                null,   // Values for the "where" clause
+                null    // sort order
+        );
+
+        TestUtilities.validateCursor("testUpdateMovies.  Error validating movie entry update.",
+                cursor, updatedValues);
+
+        cursor.close();
+    }
+
     /*
         Student: Refactor this function to use the deleteAllRecordsFromProvider functionality once
         you have implemented delete functionality there.
      */
     public void deleteAllRecords() {
-        deleteAllRecordsFromDB();
-    }
-
-    /*
-      This helper function deletes all records from both database tables using the database
-      functions only.  This is designed to be used to reset the state of the database until the
-      delete functionality is available in the ContentProvider.
-    */
-    public void deleteAllRecordsFromDB() {
-        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        db.delete(MovieContract.MovieEntry.TABLE_NAME, null, null);
-        db.delete(MovieContract.ReviewEntry.TABLE_NAME, null, null);
-        db.close();
+        deleteAllRecordsFromProvider();
     }
 
     /*
