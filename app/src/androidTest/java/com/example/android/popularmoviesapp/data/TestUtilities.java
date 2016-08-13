@@ -19,8 +19,15 @@ import java.util.Set;
  * Created by David on 10/07/16.
  */
 public class TestUtilities extends AndroidTestCase {
-    final static long TEST_MOVIE_ID = 32343;
-    final static long TEST_REVIEW_ID = 5;
+    public final static long MOVIE_ID = 32343;
+    public final static String TITLE = "Star Wars: The Force Awakens";
+    public static final String POSTER_PATH = "path_to_poster";
+    public static final String OVERVIEW = "Luke Skywalker is no where to be found...";
+    public static final double RATING = 8.5;
+    public static final String RELEASE = "2015-12-17";
+    public static final int FAVORITE = 1;
+
+    public final static long REVIEW_ID = 5;
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
@@ -45,13 +52,13 @@ public class TestUtilities extends AndroidTestCase {
     // default movie values
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, TEST_MOVIE_ID);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Star Wars: The Force Awakens");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "path_to_poster");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker is no where to be found...");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, "8.5");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "2015-12-17");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, TITLE);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, POSTER_PATH);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, RATING);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, RELEASE);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, FAVORITE);
         return movieValues;
     }
 
@@ -59,7 +66,7 @@ public class TestUtilities extends AndroidTestCase {
     static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, TEST_REVIEW_ID);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, REVIEW_ID);
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, "David S");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT, "Great movie :)");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL, "www.example.com");

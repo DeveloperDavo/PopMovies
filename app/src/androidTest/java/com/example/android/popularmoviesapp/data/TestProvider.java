@@ -186,7 +186,7 @@ public class TestProvider extends AndroidTestCase {
 
         // joined data
         final Cursor singleMovieCursor = mContext.getContentResolver().query(
-                MovieContract.MovieEntry.buildSingleMovie(TestUtilities.TEST_MOVIE_ID),
+                MovieContract.MovieEntry.buildSingleMovie(TestUtilities.MOVIE_ID),
                 null,
                 null,
                 null,

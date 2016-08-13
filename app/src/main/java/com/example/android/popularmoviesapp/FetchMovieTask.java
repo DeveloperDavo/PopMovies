@@ -1,7 +1,9 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -135,7 +137,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
-    private void persistMovieData(String movieJsonStr) throws JSONException {
+    private long persistMovieData(String movieJsonStr) throws JSONException {
 
         final String MD_RESULTS = "results";
         final String MD_TITLE = "original_title";
@@ -154,8 +156,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
             // get data from JSON String
             final JSONObject movieData = moviesData.getJSONObject(i);
-            final String url = POSTER_URL_BASE + movieData.getString(MD_POSTER_PATH);
             final String title = movieData.getString(MD_TITLE);
+            final String posterPath = POSTER_URL_BASE + movieData.getString(MD_POSTER_PATH);
             final String overview = movieData.getString(MD_OVERVIEW);
             final String rating = movieData.getString(MD_RATING);
             final String release = movieData.getString(MD_RELEASE);
@@ -164,14 +166,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             // persist data
             ContentValues movieValues = new ContentValues();
 
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, url);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, title);
+//            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, asdfsf);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
             movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
             movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
             movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, release);
             movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, favorite);
 
             cVVector.add(movieValues);
+
         }
 
         // add to database
@@ -181,6 +185,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             context.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
         }
 
+        long movieRowId = -1;
+        return movieRowId;
     }
 
 
@@ -197,5 +203,43 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
                 posterAdapter.add(MovieInfoParser.POSTER_URL_BASE + posterUrl);
             }
         }
+    }
+
+    public long addMovie(long movieId, String title, String posterPath, String overview,
+                         double rating, String release, int favorite) {
+        long movieRowId;
+
+        // check if movie_id already exists
+        Cursor movieCursor = context.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI, // uri
+                new String[]{MovieContract.MovieEntry._ID}, // projection
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?", // selection
+                new String[]{Long.toString(movieId)}, // selectionArgs
+                null); // sortOrder
+
+        if (movieCursor.moveToFirst()) {
+            int locationIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
+            movieRowId = movieCursor.getLong(locationIdIndex);
+        } else {
+            ContentValues movieValues = new ContentValues();
+
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, release);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, favorite);
+
+            // insert movieValues into db
+            Uri insertedUri = context.getContentResolver().insert(
+                    MovieContract.MovieEntry.CONTENT_URI, movieValues);
+
+            // extract movieRowId from URI
+            movieRowId = ContentUris.parseId(insertedUri);
+        }
+
+        movieCursor.close();
+        return movieRowId;
     }
 }
