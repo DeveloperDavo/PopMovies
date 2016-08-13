@@ -119,16 +119,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         }
 
         try {
-//                persistMovieData(movieJsonStr);
-            movieInfoParser = new MovieInfoParser(movieJsonStr);
+            return persistMovies(movieJsonStr);
+//            movieInfoParser = new MovieInfoParser(movieJsonStr);
 
             // log posterUrls
-//                String[] posterUrls = movieInfoParser.parsePosterUrls();
+//                String[] posterUrls = movieInfoParser.getPosterUrls();
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
 //                }
 
-            return movieInfoParser.parsePosterUrls();
+//            return movieInfoParser.getPosterUrls();
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -137,9 +137,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
-    private long persistMovieData(String movieJsonStr) throws JSONException {
+    private String[] persistMovies(String movieJsonStr) throws JSONException {
 
         final String MD_RESULTS = "results";
+        final String MD_ID = "id";
         final String MD_TITLE = "original_title";
         final String MD_POSTER_PATH = "poster_path";
         final String MD_OVERVIEW = "overview";
@@ -148,25 +149,30 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         final String POSTER_URL_BASE = "http://image.tmdb.org/t/p/w185/";
 
         final JSONObject data = new JSONObject(movieJsonStr);
-        final JSONArray moviesData = data.getJSONArray(MD_RESULTS);
+        final JSONArray movies = data.getJSONArray(MD_RESULTS);
 
-        Vector<ContentValues> cVVector = new Vector<>(moviesData.length());
+        Vector<ContentValues> contentValuesVector = new Vector<>(movies.length());
 
-        for (int i = 0; i < moviesData.length(); i++) {
+        for (int i = 0; i < movies.length(); i++) {
 
             // get data from JSON String
-            final JSONObject movieData = moviesData.getJSONObject(i);
+            final JSONObject movieData = movies.getJSONObject(i);
+            final long movieId = movieData.getLong(MD_ID);
             final String title = movieData.getString(MD_TITLE);
             final String posterPath = POSTER_URL_BASE + movieData.getString(MD_POSTER_PATH);
             final String overview = movieData.getString(MD_OVERVIEW);
-            final String rating = movieData.getString(MD_RATING);
+            final double rating = movieData.getDouble(MD_RATING);
             final String release = movieData.getString(MD_RELEASE);
             final int favorite = 0; // default to false
 
-            // persist data
+            addMovie(movieId, title, posterPath, overview, rating, release, favorite);
+
+            // TODO add reviews (later do it only when needed?)
+            // TODO only poster_path and movie id is necessary for the main activity
+
             ContentValues movieValues = new ContentValues();
 
-//            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, asdfsf);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
             movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
             movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
             movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
@@ -174,21 +180,28 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, release);
             movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, favorite);
 
-            cVVector.add(movieValues);
+            contentValuesVector.add(movieValues);
 
         }
 
         // add to database
-        if (cVVector.size() > 0) {
-            ContentValues[] cvArray = new ContentValues[cVVector.size()];
-            cVVector.toArray(cvArray);
-            context.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+        if (contentValuesVector.size() > 0) {
+//            ContentValues[] cvArray = new ContentValues[contentValuesVector.size()];
+//            contentValuesVector.toArray(cvArray);
+//            context.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
         }
 
-        long movieRowId = -1;
-        return movieRowId;
+        return getPosterUrls(contentValuesVector);
     }
 
+    private String[] getPosterUrls(Vector<ContentValues> contentValuesVector) {
+        String[] posterUrls = new String[contentValuesVector.size()];
+        for (int i = 0; i < contentValuesVector.size(); i++) {
+            final ContentValues movieValues = contentValuesVector.elementAt(i);
+            posterUrls[i] = movieValues.getAsString(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+        }
+        return posterUrls;
+    }
 
     /**
      * Updates the UI after using AsyncTask.
