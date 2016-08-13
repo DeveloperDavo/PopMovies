@@ -27,21 +27,40 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
+    public String getType(Uri uri) {
+
+        // use Uri Matcher to determine kind of URI
+        final int match = URI_MATCHER.match(uri);
+
+        switch (match) {
+            case MovieUriMatcher.MOVIES:
+                return MovieContract.MovieEntry.CONTENT_TYPE;
+            case MovieUriMatcher.REVIEWS:
+                return MovieContract.ReviewEntry.CONTENT_TYPE;
+            case MovieUriMatcher.MOVIE:
+                return MovieContract.ReviewEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+    }
+
+    @Nullable
+    @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         // determine kind of request and query database
         Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
-            case MovieUriMatcher.MOVIE: {
+            case MovieUriMatcher.MOVIES: {
                 cursor = getCursorForMovies(projection, selection, selectionArgs, sortOrder);
                 break;
             }
-            case MovieUriMatcher.REVIEW: {
+            case MovieUriMatcher.REVIEWS: {
                 cursor = getCursorForReviews(projection, selection, selectionArgs, sortOrder);
                 break;
             }
-            case MovieUriMatcher.MOVIE_WITH_REVIEW: {
-                cursor = getCursorForMovieWithReviews(uri, projection, sortOrder);
+            case MovieUriMatcher.MOVIE: {
+                cursor = getCursorForSingleMovie(uri, projection, sortOrder);
                 break;
             }
             default:
@@ -53,25 +72,6 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
-
-        // use Uri Matcher to determine kind of URI
-        final int match = URI_MATCHER.match(uri);
-
-        switch (match) {
-            case MovieUriMatcher.MOVIE:
-                return MovieContract.MovieEntry.CONTENT_TYPE;
-            case MovieUriMatcher.REVIEW:
-                return MovieContract.ReviewEntry.CONTENT_TYPE;
-            case MovieUriMatcher.MOVIE_WITH_REVIEW:
-                return MovieContract.ReviewEntry.CONTENT_TYPE;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-    }
-
-    @Nullable
-    @Override
     public Uri insert(Uri uri, ContentValues values) {
 
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
@@ -79,7 +79,7 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case MovieUriMatcher.MOVIE: {
+            case MovieUriMatcher.MOVIES: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
@@ -87,7 +87,7 @@ public class MovieProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case MovieUriMatcher.REVIEW: {
+            case MovieUriMatcher.REVIEWS: {
                 long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.ReviewEntry.buildReviewUri(_id);
@@ -117,7 +117,7 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = URI_MATCHER.match(uri);
         switch (match) {
-            case MovieUriMatcher.MOVIE:
+            case MovieUriMatcher.MOVIES:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -158,14 +158,13 @@ public class MovieProvider extends ContentProvider {
                 projection, selection, selectionArgs, null, null, sortOrder);
     }
 
-    private Cursor getCursorForMovieWithReviews(Uri uri, String[] projection, String sortOrder) {
+    private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
         final int movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
-        final int reviewId = MovieContract.MovieEntry.getReviewIdFromUri(uri);
 
         return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(movieDbHelper.getReadableDatabase(),
                 projection,
-                MOVIE_WITH_REVIEW_SELECTION,
-                new String[]{Integer.toString(movieId), Integer.toString(reviewId)},
+                SINGLE_MOVIE_SELECTION,
+                new String[]{Integer.toString(movieId)},
                 null,
                 null,
                 sortOrder
@@ -177,19 +176,23 @@ public class MovieProvider extends ContentProvider {
     static {
         REVIEWS_BY_MOVIE_QUERY_BUILDER = new SQLiteQueryBuilder();
 
-        // reviews INNER JOIN movies ON reviews.movie_id = movies.movie_id
-        // TODO: check SQL logic
+        // reviews INNER JOIN movies ON reviews.movie_key = movies._id
         REVIEWS_BY_MOVIE_QUERY_BUILDER.setTables(
-                MovieContract.ReviewEntry.TABLE_NAME + " INNER JOIN " +
-                        MovieContract.MovieEntry.TABLE_NAME +
+                MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
+                        MovieContract.ReviewEntry.TABLE_NAME +
                         " ON " + MovieContract.ReviewEntry.TABLE_NAME +
-                        "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID +
+                        "." + MovieContract.ReviewEntry.COLUMN_MOVIE_KEY +
                         " = " + MovieContract.MovieEntry.TABLE_NAME +
-                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+                        "." + MovieContract.MovieEntry._ID);
     }
 
+    // movies.movie_id = ?
+    private static final String SINGLE_MOVIE_SELECTION =
+            MovieContract.MovieEntry.TABLE_NAME + "." +
+                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
+
     // movies.movie_id = ? AND reviews.review_id = ?
-    private static final String MOVIE_WITH_REVIEW_SELECTION =
+    private static final String SINGLE_REVIEW_SELECTION =
             MovieContract.ReviewEntry.TABLE_NAME + "." +
                     MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
                     MovieContract.ReviewEntry.TABLE_NAME + "." +

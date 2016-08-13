@@ -88,7 +88,11 @@ public class TestDb extends AndroidTestCase {
         // Build a HashSet of all of the column names we want to look for in reviews
         final HashSet<String> reviewColumnHashSet = new HashSet<>();
         reviewColumnHashSet.add(MovieContract.ReviewEntry._ID);
-        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_MOVIE_ID);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_REVIEW_ID);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_AUTHOR);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_CONTENT);
+        reviewColumnHashSet.add(MovieContract.ReviewEntry.COLUMN_URL);
 
         int reviewColumnIndex = c.getColumnIndex("name");
         do {

@@ -40,20 +40,23 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildReviewMovie(long movieId, long reviewId) {
+        // build URI with specific movie id and specific review
+        public static Uri buildSingleReview(long movieId, long reviewId) {
             return CONTENT_URI.buildUpon().
                     appendPath(Long.toString(movieId)).
                     appendPath(PATH_REVIEWS).
-                    appendPath(Long.toString(reviewId))
-                    .build();
+                    appendPath(Long.toString(reviewId)).
+                    build();
+        }
+        // build URI with specific movie id and its reviews
+        public static Uri buildSingleMovie(long movieId) {
+            return CONTENT_URI.buildUpon().
+                    appendPath(Long.toString(movieId)).
+                    build();
         }
 
         public static int getMovieIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(2));
-        }
-
-        public static int getReviewIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(4));
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
 
     }
@@ -69,7 +72,7 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "reviews";
 
-        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_MOVIE_KEY = "movie_key";
         public static final String COLUMN_REVIEW_ID = "review_id";
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";

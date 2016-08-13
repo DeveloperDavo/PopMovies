@@ -19,6 +19,8 @@ import java.util.Set;
  * Created by David on 10/07/16.
  */
 public class TestUtilities extends AndroidTestCase {
+    final static long TEST_MOVIE_ID = 32343;
+    final static long TEST_REVIEW_ID = 5;
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
@@ -33,16 +35,17 @@ public class TestUtilities extends AndroidTestCase {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
-            assertEquals("Value '" + entry.getValue().toString() +
+            final String actualValue = valueCursor.getString(idx);
+            assertEquals("Value '" + actualValue +
                     "' did not match the expected value '" +
-                    expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
+                    expectedValue + "'. " + error, expectedValue, actualValue);
         }
     }
 
     // default movie values
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, 1);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, TEST_MOVIE_ID);
         movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Star Wars: The Force Awakens");
         movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "path_to_poster");
         movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker is no where to be found...");
@@ -55,15 +58,15 @@ public class TestUtilities extends AndroidTestCase {
     // default review values
     static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_ID, moviesRowId);
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, 1);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, TEST_REVIEW_ID);
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, "David S");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT, "Great movie :)");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL, "www.example.com");
         return reviewValues;
     }
 
-    static long insertMovieValues(Context context) {
+    static long createAndInsertMovieValues(Context context) {
 
         // insert our test records into the database
         MovieDbHelper dbHelper = new MovieDbHelper(context);
@@ -76,6 +79,21 @@ public class TestUtilities extends AndroidTestCase {
         assertTrue("Error: Failure to insert movie values", moviesRowId != -1);
 
         return moviesRowId;
+    }
+
+    static long createAndInsertReviewValues(Context context, long movieRowId) {
+
+        // insert our test records into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+
+        long reviewRowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, testValues);
+
+        // Verify we got a row back.
+        assertTrue("Error: Failure to insert review values", reviewRowId != -1);
+
+        return reviewRowId;
     }
 
     /*

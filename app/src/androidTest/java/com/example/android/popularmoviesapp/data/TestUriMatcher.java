@@ -18,10 +18,10 @@ public class TestUriMatcher extends AndroidTestCase {
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int movies = MovieUriMatcher.MOVIE;
+        final int movies = MovieUriMatcher.MOVIES;
 
         // THEN
-        assertEquals("Error: The MOVIE URI was matched incorrectly.",
+        assertEquals("Error: The MOVIES URI was matched incorrectly.",
                 testMatcher.match(moviesDir), movies);
     }
 
@@ -34,29 +34,28 @@ public class TestUriMatcher extends AndroidTestCase {
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.REVIEW;
+        final int reviews = MovieUriMatcher.REVIEWS;
 
         // THEN
-        assertEquals("Error: The REVIEW URI was matched incorrectly.",
+        assertEquals("Error: The REVIEWS URI was matched incorrectly.",
                 testMatcher.match(reviewsDir), reviews);
     }
 
-    public void test_match_movieWithReviews() {
+    public void test_match_movie() {
 
         // GIVEN
         final int movieId = 565545;
-        final int reviewId = 1;
 
-        // content://com.example.android.popularmoviesapp/movies/movie_id/reviews/reviews_id"
-        final Uri movieWithReviewDir = MovieContract.MovieEntry.buildReviewMovie(movieId, reviewId);
+        // content://com.example.android.popularmoviesapp/movies/movie_id/"
+        final Uri movieItem = MovieContract.MovieEntry.buildSingleMovie(movieId);
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.MOVIE_WITH_REVIEW;
+        final int reviews = MovieUriMatcher.MOVIE;
 
         // THEN
-        assertEquals("Error: The MOVIE_WITH_REVIEW URI was matched incorrectly.",
-                testMatcher.match(movieWithReviewDir), reviews);
+        assertEquals("Error: The MOVIE URI was matched incorrectly.",
+                testMatcher.match(movieItem), reviews);
 
     }
 

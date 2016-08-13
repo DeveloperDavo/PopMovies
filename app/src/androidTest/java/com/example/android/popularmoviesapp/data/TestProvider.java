@@ -1,11 +1,13 @@
 package com.example.android.popularmoviesapp.data;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
@@ -66,30 +68,27 @@ public class TestProvider extends AndroidTestCase {
                 MovieContract.ReviewEntry.CONTENT_TYPE, type);
     }
 
-    public void test_getType_movieWithReviews() {
+    public void test_getType_movie() {
 
         // GIVEN
         final int movieId = 789;
-        final int reviewId = 10;
 
         // WHEN
-        // content://com.example.android.popularmoviesapp/movies/789/reviews/10
+        // content://com.example.android.popularmoviesapp/movies/789/
         final String type = mContext.getContentResolver().
-                getType(MovieContract.MovieEntry.buildReviewMovie(movieId, reviewId));
-        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
-        assertEquals("Error: the MovieEntry CONTENT_URI with reviews should return ReviewEntry.CONTENT_TYPE",
-                MovieContract.ReviewEntry.CONTENT_TYPE, type);
+                getType(MovieContract.MovieEntry.buildSingleMovie(movieId));
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/movies/789
+        assertEquals("Error: the MovieEntry CONTENT_URI with reviews should return ReviewEntry.CONTENT_ITEM_TYPE",
+                MovieContract.ReviewEntry.CONTENT_ITEM_TYPE, type);
     }
 
-    public void testMovieQuery() {
+    public void testMoviesQuery() {
 
-        // insert test records into the database
-        long movieRowId = TestUtilities.insertMovieValues(mContext);
-
-        // assert movie values have been inserted correctly
+        // create and insert movie values
+        long movieRowId = TestUtilities.createAndInsertMovieValues(mContext);
         assertTrue("Unable to Insert MovieEntry into the Database", movieRowId != -1);
 
-        // add movie values
+        // create movie values
         ContentValues movieValues = TestUtilities.createMovieValues();
 
         // test the basic content provider query
@@ -101,7 +100,7 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
 
-        TestUtilities.validateCursor("testMovieQuery, movie query", movieCursor, movieValues);
+        TestUtilities.validateCursor("testSingleMovieQuery, movie query", movieCursor, movieValues);
 
         // Has the NotificationUri been set correctly? --- we can only test this easily against API
         // level 19 or greater because getNotificationUri was added in API level 19.
@@ -111,29 +110,14 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
-    /*
-        This test uses the database directly to insert and then uses the ContentProvider to
-        read out the data.  Uncomment this test to see if the basic weather query functionality
-        given in the ContentProvider is working correctly.
-     */
-    public void testReviewQuery() {
-
-        // insert test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        long movieRowId = TestUtilities.insertMovieValues(mContext);
-
-        // assert movie values have been inserted correctly
-        assertTrue("Unable to Insert MovieEntry into the Database", movieRowId != -1);
-
-        // add review values
-        ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
-
-        // assert review values have been inserted correctly
-        long reviewRowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
+    public void testReviewsQuery() {
+        // create and insert review values
+        final long testMovieRowId = 1;
+        long reviewRowId = TestUtilities.createAndInsertReviewValues(mContext, testMovieRowId);
         assertTrue("Unable to Insert ReviewEntry into the Database", reviewRowId != -1);
 
-        db.close();
+        // create review values
+        ContentValues reviewValues = TestUtilities.createReviewValues(testMovieRowId);
 
         // test the basic content provider query
         Cursor reviewCursor = mContext.getContentResolver().query(
@@ -143,8 +127,73 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null
         );
-
         TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
+    }
+
+    public void testInsertReadProvider() {
+
+        final ContentValues testMovieValues = TestUtilities.createMovieValues();
+
+        // register content observer
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().
+                registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, tco);
+        Uri movieUri = mContext.getContentResolver().
+                insert(MovieContract.MovieEntry.CONTENT_URI, testMovieValues);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        long movieRowId = ContentUris.parseId(movieUri);
+        assertTrue(movieRowId != -1);
+
+        final Cursor moviesCursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null, // all columns
+                null, // selection
+                null, // selection args
+                null  // sort order
+        );
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating MovieEntry.",
+                moviesCursor, testMovieValues);
+
+        final ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+
+        tco = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().
+                registerContentObserver(MovieContract.ReviewEntry.CONTENT_URI, true, tco);
+
+        Uri reviewInsertUri = mContext.getContentResolver()
+                .insert(MovieContract.ReviewEntry.CONTENT_URI, testValues);
+        assertTrue(reviewInsertUri != null);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        final Cursor reviewsCursor = mContext.getContentResolver().query(
+                MovieContract.ReviewEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating ReviewEntry insert.",
+                reviewsCursor, testValues);
+
+        // add expected movie values to review values
+        testValues.putAll(testMovieValues);
+
+        // joined data
+        final Cursor singleMovieCursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.buildSingleMovie(TestUtilities.TEST_MOVIE_ID),
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Movie and Review Data.",
+                singleMovieCursor, testValues);
     }
 
     /*
