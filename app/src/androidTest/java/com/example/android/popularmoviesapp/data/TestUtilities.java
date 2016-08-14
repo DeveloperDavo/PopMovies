@@ -15,10 +15,14 @@ import com.example.android.popularmoviesapp.utils.PollingCheck;
 import java.util.Map;
 import java.util.Set;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+
 /**
  * Created by David on 10/07/16.
  */
 public class TestUtilities extends AndroidTestCase {
+
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
     public static final String POSTER_PATH = "path_to_poster";
@@ -30,12 +34,19 @@ public class TestUtilities extends AndroidTestCase {
     public final static long REVIEW_ID = 5;
     public static final int BULK_INSERT_SIZE = 10;
 
+    /**
+     * Ensures an empty cursor is not returned.
+     * @param error message that is different for each test case
+     */
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
         valueCursor.close();
     }
 
+    /**
+     * Ensures all columns are found and have the correct values.
+     */
     static void validateCurrentRecord(String error, Cursor valueCursor, ContentValues expectedValues) {
         Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
         for (Map.Entry<String, Object> entry : valueSet) {
@@ -53,24 +64,24 @@ public class TestUtilities extends AndroidTestCase {
     // default movie values
     static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, TITLE);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, POSTER_PATH);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, RATING);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, RELEASE);
-        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, FAVORITE);
+        movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
+        movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, POSTER_PATH);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
+        movieValues.put(MovieEntry.COLUMN_RATING, RATING);
+        movieValues.put(MovieEntry.COLUMN_RELEASE, RELEASE);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, FAVORITE);
         return movieValues;
     }
 
     // default review values
     static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, REVIEW_ID);
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, "David S");
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_CONTENT, "Great movie :)");
-        reviewValues.put(MovieContract.ReviewEntry.COLUMN_URL, "www.example.com");
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
+        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, REVIEW_ID);
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "David S");
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
+        reviewValues.put(ReviewEntry.COLUMN_URL, "www.example.com");
         return reviewValues;
     }
 
@@ -81,10 +92,10 @@ public class TestUtilities extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues testValues = TestUtilities.createMovieValues();
 
-        long moviesRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, testValues);
+        long moviesRowId = db.insert(MovieEntry.TABLE_NAME, null, testValues);
 
         // Verify we got a row back.
-        assertTrue("Error: Failure to insert movie values", moviesRowId != -1);
+        assertTrue("Error: Failure inserting movie values", moviesRowId != -1);
 
         return moviesRowId;
     }
@@ -94,18 +105,16 @@ public class TestUtilities extends AndroidTestCase {
 
         for (int i = 0; i < BULK_INSERT_SIZE; i++) {
             ContentValues movieValues = new ContentValues();
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, i + 1000);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "title " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "posterPath " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "overview " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, i + 0.99);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, "release " + i);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, i % 1);
+            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, i + 1000);
+            movieValues.put(MovieEntry.COLUMN_TITLE, "title " + i);
+            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, "posterPath " + i);
+            movieValues.put(MovieEntry.COLUMN_OVERVIEW, "overview " + i);
+            movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
+            movieValues.put(MovieEntry.COLUMN_RELEASE, "release " + i);
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 1);
 
             returnContentValues[i] = movieValues;
         }
-
-        // TODO try adding a movie with the same movie_id
 
         return returnContentValues;
     }
@@ -117,7 +126,7 @@ public class TestUtilities extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
 
-        long reviewRowId = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, testValues);
+        long reviewRowId = db.insert(ReviewEntry.TABLE_NAME, null, testValues);
 
         // Verify we got a row back.
         assertTrue("Error: Failure to insert review values", reviewRowId != -1);
@@ -132,6 +141,7 @@ public class TestUtilities extends AndroidTestCase {
          Note that this only tests that the onChange function is called; it does not test that the
          correct Uri is returned.
       */
+    // TODO improve understanding
     static class TestContentObserver extends ContentObserver {
         final HandlerThread mHT;
         boolean mContentChanged;

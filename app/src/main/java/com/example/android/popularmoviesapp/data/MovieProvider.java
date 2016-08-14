@@ -10,8 +10,11 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
+
 /**
  * Created by David on 13/07/16.
+ * Retrieves and modifies the data in the database.
  */
 public class MovieProvider extends ContentProvider {
 
@@ -29,16 +32,15 @@ public class MovieProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
 
-        // use Uri Matcher to determine kind of URI
         final int match = URI_MATCHER.match(uri);
 
         switch (match) {
-            case MovieUriMatcher.MOVIES:
-                return MovieContract.MovieEntry.CONTENT_TYPE;
-            case MovieUriMatcher.REVIEWS:
-                return MovieContract.ReviewEntry.CONTENT_TYPE;
-            case MovieUriMatcher.MOVIE:
-                return MovieContract.ReviewEntry.CONTENT_ITEM_TYPE;
+            case MovieUriMatcher.MOVIES_CODE:
+                return MovieEntry.CONTENT_TYPE;
+            case MovieUriMatcher.REVIEWS_CODE:
+                return ReviewEntry.CONTENT_TYPE;
+            case MovieUriMatcher.SINGLE_MOVIE_CODE:
+                return MovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -46,26 +48,31 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection,
+                        String selection, String[] selectionArgs, String sortOrder) {
 
-        // determine kind of request and query database
+        final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
+
         Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
-            case MovieUriMatcher.MOVIES: {
-                cursor = getCursorForMovies(projection, selection, selectionArgs, sortOrder);
+            case MovieUriMatcher.MOVIES_CODE: {
+                cursor = readableDatabase.query(MovieEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
-            case MovieUriMatcher.REVIEWS: {
-                cursor = getCursorForReviews(projection, selection, selectionArgs, sortOrder);
+            case MovieUriMatcher.REVIEWS_CODE: {
+                cursor = readableDatabase.query(ReviewEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
-            case MovieUriMatcher.MOVIE: {
+            case MovieUriMatcher.SINGLE_MOVIE_CODE: {
                 cursor = getCursorForSingleMovie(uri, projection, sortOrder);
                 break;
             }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        // register to watch a content URI for changes
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
@@ -74,25 +81,16 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
 
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = URI_MATCHER.match(uri);
         Uri returnUri;
 
         switch (match) {
-            case MovieUriMatcher.MOVIES: {
-                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+            case MovieUriMatcher.MOVIES_CODE: {
+                returnUri = getMoviesInsertUri(uri, values);
                 break;
             }
-            case MovieUriMatcher.REVIEWS: {
-                long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = MovieContract.ReviewEntry.buildReviewUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+            case MovieUriMatcher.REVIEWS_CODE: {
+                returnUri = getReviewsInsertUri(uri, values);
                 break;
             }
             default:
@@ -102,27 +100,53 @@ public class MovieProvider extends ContentProvider {
         return returnUri;
     }
 
+    private Uri getMoviesInsertUri(Uri uri, ContentValues values) {
+
+        Uri returnUri;
+        final long _id = movieDbHelper.getWritableDatabase().
+                insert(MovieEntry.TABLE_NAME, null, values);
+        if (_id > 0)
+            returnUri = MovieEntry.buildMovieUri(_id);
+        else
+            throw new android.database.SQLException("Failed to insert row into " + uri);
+        return returnUri;
+    }
+
+    private Uri getReviewsInsertUri(Uri uri, ContentValues values) {
+
+        Uri returnUri;
+        final long _id = movieDbHelper.getWritableDatabase().
+                insert(ReviewEntry.TABLE_NAME, null, values);
+        if (_id > 0)
+            returnUri = ReviewEntry.buildReviewUri(_id);
+        else
+            throw new android.database.SQLException("Failed to insert row into " + uri);
+        return returnUri;
+    }
+
     @Override
+    // delete returns the number of rows affected if a whereClause is passed in, 0
+    // otherwise. To remove all rows and get a count pass "1" as the whereClause.
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+
+        final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
+        if (null == selection) selection = "1";
+
         final int match = URI_MATCHER.match(uri);
         int rowsDeleted;
-        // this makes delete all rows return the number of rows deleted
-        if ( null == selection ) selection = "1";
+
         switch (match) {
-            case MovieUriMatcher.MOVIES:
-                rowsDeleted = db.delete(
-                        MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+            case MovieUriMatcher.MOVIES_CODE:
+                rowsDeleted = writableDatabase.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-            case MovieUriMatcher.REVIEWS:
-                rowsDeleted = db.delete(
-                        MovieContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
+            case MovieUriMatcher.REVIEWS_CODE:
+                rowsDeleted = writableDatabase.delete(ReviewEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Because a null deletes all rows
         if (rowsDeleted != 0) {
+            // sync changes to the network
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;
@@ -130,24 +154,26 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+
+        final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
+
         final int match = URI_MATCHER.match(uri);
         int rowsUpdated;
 
         switch (match) {
-            case MovieUriMatcher.MOVIES:
-                rowsUpdated = db.update(
-                        MovieContract.MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+            case MovieUriMatcher.MOVIES_CODE:
+                rowsUpdated = writableDatabase.update(MovieEntry.TABLE_NAME,
+                        values, selection, selectionArgs);
                 break;
-            case MovieUriMatcher.REVIEWS:
-                rowsUpdated = db.update(
-                        MovieContract.ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
+            case MovieUriMatcher.REVIEWS_CODE:
+                rowsUpdated = writableDatabase.update(ReviewEntry.TABLE_NAME,
+                        values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Because a null deletes all rows
         if (rowsUpdated != 0) {
+            // sync changes to the network
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
@@ -155,30 +181,39 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
+
         final int match = URI_MATCHER.match(uri);
+
         switch (match) {
-            case MovieUriMatcher.MOVIES:
-                db.beginTransaction();
-                int returnCount = 0;
-                try {
-                    for (ContentValues value : values) {
-                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
-                        }
-                    }
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
-                getContext().getContentResolver().notifyChange(uri, null);
-                return returnCount;
+            case MovieUriMatcher.MOVIES_CODE:
+                return bulkInsertEntries(MovieEntry.TABLE_NAME, uri, values);
             // TODO reviews
             // TODO videos
             default:
                 return super.bulkInsert(uri, values);
         }
+    }
+
+    private int bulkInsertEntries(String tableName, Uri uri, ContentValues[] values) {
+
+        final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
+
+        writableDatabase.beginTransaction();
+
+        int returnCount = 0;
+        try {
+            for (ContentValues value : values) {
+                long _id = writableDatabase.insert(tableName, null, value);
+                if (_id != -1) {
+                    returnCount++;
+                }
+            }
+            writableDatabase.setTransactionSuccessful();
+        } finally {
+            writableDatabase.endTransaction();
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnCount;
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing
@@ -191,20 +226,12 @@ public class MovieProvider extends ContentProvider {
         super.shutdown();
     }
 
-    private Cursor getCursorForMovies(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return movieDbHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
-                projection, selection, selectionArgs, null, null, sortOrder);
-    }
-
-    private Cursor getCursorForReviews(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return movieDbHelper.getReadableDatabase().query(MovieContract.ReviewEntry.TABLE_NAME,
-                projection, selection, selectionArgs, null, null, sortOrder);
-    }
-
     private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
-        final int movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
 
-        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(movieDbHelper.getReadableDatabase(),
+        final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
+        final int movieId = MovieEntry.getMovieIdFromUri(uri);
+
+        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
                 projection,
                 SINGLE_MOVIE_SELECTION,
                 new String[]{Integer.toString(movieId)},
@@ -221,25 +248,26 @@ public class MovieProvider extends ContentProvider {
 
         // reviews INNER JOIN movies ON reviews.movie_key = movies._id
         REVIEWS_BY_MOVIE_QUERY_BUILDER.setTables(
-                MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
-                        MovieContract.ReviewEntry.TABLE_NAME +
-                        " ON " + MovieContract.ReviewEntry.TABLE_NAME +
-                        "." + MovieContract.ReviewEntry.COLUMN_MOVIE_KEY +
-                        " = " + MovieContract.MovieEntry.TABLE_NAME +
-                        "." + MovieContract.MovieEntry._ID);
+                MovieEntry.TABLE_NAME + " INNER JOIN " +
+                        ReviewEntry.TABLE_NAME +
+                        " ON " + ReviewEntry.TABLE_NAME +
+                        "." + ReviewEntry.COLUMN_MOVIE_KEY +
+                        " = " + MovieEntry.TABLE_NAME +
+                        "." + MovieEntry._ID);
     }
 
     // movies.movie_id = ?
     private static final String SINGLE_MOVIE_SELECTION =
-            MovieContract.MovieEntry.TABLE_NAME + "." +
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
+            MovieEntry.TABLE_NAME + "." +
+                    MovieEntry.COLUMN_MOVIE_ID + " = ?";
 
     // movies.movie_id = ? AND reviews.review_id = ?
+    // TODO not in use yet
     private static final String SINGLE_REVIEW_SELECTION =
-            MovieContract.ReviewEntry.TABLE_NAME + "." +
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
-                    MovieContract.ReviewEntry.TABLE_NAME + "." +
-                    MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " = ?";
+            ReviewEntry.TABLE_NAME + "." +
+                    MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
+                    ReviewEntry.TABLE_NAME + "." +
+                    ReviewEntry.COLUMN_REVIEW_ID + " = ?";
 }
 
 

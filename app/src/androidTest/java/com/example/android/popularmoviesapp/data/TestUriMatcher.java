@@ -18,10 +18,10 @@ public class TestUriMatcher extends AndroidTestCase {
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int movies = MovieUriMatcher.MOVIES;
+        final int movies = MovieUriMatcher.MOVIES_CODE;
 
         // THEN
-        assertEquals("Error: The MOVIES URI was matched incorrectly.",
+        assertEquals("Error: The MOVIES_CODE URI was matched incorrectly.",
                 testMatcher.match(moviesDir), movies);
     }
 
@@ -34,10 +34,10 @@ public class TestUriMatcher extends AndroidTestCase {
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.REVIEWS;
+        final int reviews = MovieUriMatcher.REVIEWS_CODE;
 
         // THEN
-        assertEquals("Error: The REVIEWS URI was matched incorrectly.",
+        assertEquals("Error: The REVIEWS_CODE URI was matched incorrectly.",
                 testMatcher.match(reviewsDir), reviews);
     }
 
@@ -47,14 +47,14 @@ public class TestUriMatcher extends AndroidTestCase {
         final int movieId = 565545;
 
         // content://com.example.android.popularmoviesapp/movies/movie_id/"
-        final Uri movieItem = MovieContract.MovieEntry.buildSingleMovie(movieId);
+        final Uri movieItem = MovieContract.MovieEntry.buildSingleMovieUri(movieId);
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.MOVIE;
+        final int reviews = MovieUriMatcher.SINGLE_MOVIE_CODE;
 
         // THEN
-        assertEquals("Error: The MOVIE URI was matched incorrectly.",
+        assertEquals("Error: The SINGLE_MOVIE_CODE URI was matched incorrectly.",
                 testMatcher.match(movieItem), reviews);
 
     }

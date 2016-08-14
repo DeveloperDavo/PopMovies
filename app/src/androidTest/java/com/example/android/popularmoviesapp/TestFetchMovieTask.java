@@ -4,22 +4,31 @@ import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
-import com.example.android.popularmoviesapp.data.MovieContract;
 import com.example.android.popularmoviesapp.data.TestUtilities;
+
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 /**
  * Created by David on 04/08/16.
  */
 public class TestFetchMovieTask extends AndroidTestCase {
 
+    /**
+     * Adds a movie entry to movies.
+     * Queries each column to see if it matches what was inserted.
+     * Inserts the same movie entry to see if it returns the same row id.
+     * At the end of the test the entry is deleted.
+     * TODO needs to consider updating if id already exists
+     * TODO test case has too much responsibility
+     */
     @TargetApi(11)
-    public void testAddMovie() {
+    public void test_addMovie() {
         // start from a clean state
-        getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+        getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,
+                MovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{Long.toString(TestUtilities.MOVIE_ID)});
 
-        FetchMovieTask fetchMovieTask = new FetchMovieTask(getContext(), null);
+        final FetchMovieTask fetchMovieTask = new FetchMovieTask(getContext(), null);
         final long movieRowId = fetchMovieTask.addMovie(
                 TestUtilities.MOVIE_ID,
                 TestUtilities.TITLE,
@@ -37,27 +46,27 @@ public class TestFetchMovieTask extends AndroidTestCase {
         for (int i = 0; i < 2; i++) {
 
             // does the ID point to our movie?
-            Cursor movieCursor = getContext().getContentResolver().query(
-                    MovieContract.MovieEntry.CONTENT_URI,
+            final Cursor movieCursor = getContext().getContentResolver().query(
+                    MovieEntry.CONTENT_URI,
                     new String[]{
-                            MovieContract.MovieEntry._ID,
-                            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
-                            MovieContract.MovieEntry.COLUMN_TITLE,
-                            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
-                            MovieContract.MovieEntry.COLUMN_OVERVIEW,
-                            MovieContract.MovieEntry.COLUMN_RATING,
-                            MovieContract.MovieEntry.COLUMN_RELEASE,
-                            MovieContract.MovieEntry.COLUMN_FAVORITE,
+                            MovieEntry._ID,
+                            MovieEntry.COLUMN_MOVIE_ID,
+                            MovieEntry.COLUMN_TITLE,
+                            MovieEntry.COLUMN_POSTER_PATH,
+                            MovieEntry.COLUMN_OVERVIEW,
+                            MovieEntry.COLUMN_RATING,
+                            MovieEntry.COLUMN_RELEASE,
+                            MovieEntry.COLUMN_FAVORITE,
                     },
-                    MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                    MovieEntry.COLUMN_MOVIE_ID + " = ?",
                     new String[]{Long.toString(TestUtilities.MOVIE_ID)},
                     null);
 
             // these match the indices of the projection
             if (movieCursor.moveToFirst()) {
                 final long expectedMovieRowId = movieCursor.getLong(0);
-                assertEquals("Error: the queried value of movieRowId does not match the returned value" +
-                        "from addMovie", expectedMovieRowId, movieRowId);
+                assertEquals("Error: the queried value of movieRowId does not " +
+                        "match the returned value from addMovie", expectedMovieRowId, movieRowId);
 
                 final long movieId = movieCursor.getLong(1);
                 final String title = movieCursor.getString(2);
@@ -105,13 +114,13 @@ public class TestFetchMovieTask extends AndroidTestCase {
         }
 
         // reset our state back to normal
-        getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+        getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,
+                MovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{Long.toString(TestUtilities.MOVIE_ID)});
 
         // clean up the test so that other tests can use the content provider
         getContext().getContentResolver().
-                acquireContentProviderClient(MovieContract.MovieEntry.CONTENT_URI).
+                acquireContentProviderClient(MovieEntry.CONTENT_URI).
                 getLocalContentProvider().shutdown();
     }
 }

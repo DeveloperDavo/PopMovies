@@ -3,6 +3,8 @@ package com.example.android.popularmoviesapp.data;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
+
 /**
  * Created by David on 04/08/16.
  */
@@ -16,12 +18,12 @@ public class TestMovieContract extends AndroidTestCase {
         final int id = 14;
 
         // WHEN
-        final Uri movieUri = MovieContract.MovieEntry.buildMovieUri(id);
+        final Uri movieUri = MovieEntry.buildMovieUri(id);
 
         // THEN
         assertNotNull(movieUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + MovieContract.PATH_MOVIES + "/" + id,
+                BASE_URL + PATH_MOVIES + "/" + id,
                 movieUri.toString());
     }
 
@@ -31,31 +33,28 @@ public class TestMovieContract extends AndroidTestCase {
         final int id = 3;
 
         // WHEN
-        final Uri reviewUri = MovieContract.ReviewEntry.buildReviewUri(id);
+        final Uri reviewUri = ReviewEntry.buildReviewUri(id);
 
         // THEN
         assertNotNull(reviewUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + MovieContract.PATH_REVIEWS + "/" + id,
+                BASE_URL + PATH_REVIEWS + "/" + id,
                 reviewUri.toString());
     }
 
     public void test_buildSingleReview() {
 
         // GIVEN
-        final int movieId = 3;
         final int reviewId = 10;
 
         // WHEN
-        final Uri reviewUri = MovieContract.MovieEntry.buildSingleReview(movieId, reviewId);
+        final Uri reviewUri = ReviewEntry.buildSingleReviewUri(reviewId);
 
         // THEN
         assertNotNull(reviewUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId + "/" +
-                        MovieContract.PATH_REVIEWS + "/" + reviewId,
+                BASE_URL + PATH_REVIEWS + "/" + reviewId,
                 reviewUri.toString());
-
     }
 
     public void test_buildSingleMovie() {
@@ -64,12 +63,12 @@ public class TestMovieContract extends AndroidTestCase {
         final int movieId = 3;
 
         // WHEN
-        final Uri movieUri = MovieContract.MovieEntry.buildSingleMovie(movieId);
+        final Uri movieUri = MovieEntry.buildSingleMovieUri(movieId);
 
         // THEN
         assertNotNull(movieUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + MovieContract.PATH_MOVIES + "/" + movieId, movieUri.toString());
+                BASE_URL + PATH_MOVIES + "/" + movieId, movieUri.toString());
 
     }
 }

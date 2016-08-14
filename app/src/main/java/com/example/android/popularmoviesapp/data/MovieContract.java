@@ -7,6 +7,8 @@ import android.provider.BaseColumns;
 
 /**
  * Created by David on 10/07/16.
+ * Defines the uri parameters for the Content Provider.
+ *
  */
 public class MovieContract {
 
@@ -17,7 +19,9 @@ public class MovieContract {
     public static final String PATH_MOVIES = "movies";
     public static final String PATH_REVIEWS = "reviews";
 
+    // movies uri
     public static final class MovieEntry implements BaseColumns {
+
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
 
@@ -40,16 +44,7 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        // build URI with specific movie id and specific review
-        public static Uri buildSingleReview(long movieId, long reviewId) {
-            return CONTENT_URI.buildUpon().
-                    appendPath(Long.toString(movieId)).
-                    appendPath(PATH_REVIEWS).
-                    appendPath(Long.toString(reviewId)).
-                    build();
-        }
-        // build URI with specific movie id and its reviews
-        public static Uri buildSingleMovie(long movieId) {
+        public static Uri buildSingleMovieUri(long movieId) {
             return CONTENT_URI.buildUpon().
                     appendPath(Long.toString(movieId)).
                     build();
@@ -61,7 +56,9 @@ public class MovieContract {
 
     }
 
+    // reviews uri
     public static final class ReviewEntry implements BaseColumns {
+
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEWS).build();
 
@@ -81,5 +78,13 @@ public class MovieContract {
         public static Uri buildReviewUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        // TODO not in use yet
+        public static Uri buildSingleReviewUri(long reviewId) {
+            return CONTENT_URI.buildUpon().
+                    appendPath(Long.toString(reviewId)).
+                    build();
+        }
+
     }
 }

@@ -4,8 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
+
 /**
  * Created by David on 10/07/16.
+ * Manages database creation and version management.
+ *
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
 
@@ -19,31 +23,31 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        createMovieTable(db);
+        createTables(db);
     }
 
-    private void createMovieTable(SQLiteDatabase db) {
+    private void createTables(SQLiteDatabase db) {
 
-        final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
-                MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY, " +
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
+        final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
+                MovieEntry._ID + " INTEGER PRIMARY KEY, " +
+                MovieEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
+                MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
         // TODO: make movie_id a foreign key
-        final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + MovieContract.ReviewEntry.TABLE_NAME + " (" +
-                MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
-                MovieContract.ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " INTEGER UNIQUE NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_URL + " TEXT NOT NULL);";
+        final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
+                ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
+                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                ReviewEntry.COLUMN_REVIEW_ID + " INTEGER UNIQUE NOT NULL, " +
+                ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
+                ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+                ReviewEntry.COLUMN_URL + " TEXT NOT NULL);";
 
-        db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);
     }
 
@@ -55,8 +59,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
-        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.ReviewEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         onCreate(db);
     }
 }
