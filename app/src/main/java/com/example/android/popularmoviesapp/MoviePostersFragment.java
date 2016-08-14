@@ -3,6 +3,9 @@ package com.example.android.popularmoviesapp;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,8 +18,9 @@ import android.widget.GridView;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
-public class MoviePostersFragment extends Fragment {
+public class MoviePostersFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = MoviePostersFragment.class.getSimpleName();
+    private static final int MOVIES_LOADER = 0;
     private MoviePosterAdapter posterAdapter;
 
 
@@ -41,7 +45,7 @@ public class MoviePostersFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
 
-        test();
+        posterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -72,25 +76,41 @@ public class MoviePostersFragment extends Fragment {
 
         if (id == R.id.action_sort_by_popularity) {
             (new FetchMovieTask(getContext())).execute(getString(R.string.pref_sort_by_popularity));
-            test();
             return true;
         } else if (id == R.id.action_sort_by_rating) {
             (new FetchMovieTask(getContext())).execute(getString(R.string.pref_sort_by_rating));
-            test();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    // TODO does not update the adapter
-    private void test() {
-        // TODO sortOrder
-        final String sortOrder = null;
-        final Cursor cursor = getActivity().getContentResolver().query(MovieEntry.CONTENT_URI,
-                null, null, null, sortOrder);
-
-        posterAdapter = new MoviePosterAdapter(getActivity(), cursor, 0);
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        // TODO sortOrder
+        final String sortOrder = null;
+        return new CursorLoader(getActivity(),
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        posterAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        posterAdapter.swapCursor(null);
+    }
 }
