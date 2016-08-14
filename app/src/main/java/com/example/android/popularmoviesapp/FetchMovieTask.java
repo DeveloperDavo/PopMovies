@@ -4,13 +4,10 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-
-import com.example.android.popularmoviesapp.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,19 +21,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Vector;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+
 /**
  * Gets movie data with a http request.
  * Parses data as a JSON string on background thread and
  * publishes the result on the UI.
  */
-public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private ArrayAdapter<String> posterAdapter;
     private final Context context;
     private String movieJsonStr;
     private MovieInfoParser movieInfoParser;
 
-    public FetchMovieTask(Context context, ArrayAdapter<String> posterAdapter) {
+    public FetchMovieTask(Context context) {
         this.context = context;
         this.posterAdapter = posterAdapter;
     }
@@ -48,7 +47,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
      * @return array of poster URLs
      */
     @Override
-    protected String[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
 
         // if there is no preference, there is nothing to look up
         if (params.length == 0) {
@@ -101,11 +100,15 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             }
             movieJsonStr = buffer.toString();
 //                Log.d(LOG_TAG, "movieJsonStr: " + movieJsonStr);
+            parseAndPersistMovieData(movieJsonStr);
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // no movie data found
             return null;
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -119,8 +122,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
             }
         }
 
-        try {
-            return persistMovies(movieJsonStr);
 //            movieInfoParser = new MovieInfoParser(movieJsonStr);
 
             // log posterUrls
@@ -130,15 +131,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 //                }
 
 //            return movieInfoParser.getPosterUrls();
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
-
         return null;
     }
 
-    private String[] persistMovies(String movieJsonStr) throws JSONException {
+    private void parseAndPersistMovieData(String movieJsonStr) throws JSONException {
 
         final String MD_RESULTS = "results";
         final String MD_ID = "id";
@@ -173,13 +169,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
             ContentValues movieValues = new ContentValues();
 
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, release);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, favorite);
+            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+            movieValues.put(MovieEntry.COLUMN_TITLE, title);
+            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+            movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+            movieValues.put(MovieEntry.COLUMN_RATING, rating);
+            movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
 
             contentValuesVector.add(movieValues);
 
@@ -188,29 +184,11 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
         // bulk insert into database
         // TODO not to be used so often in final version
         bulkInsertAndDelete(contentValuesVector);
-
-        // TODO sortOrder
-        final String sortOrder = null;
-        final Cursor cursor = context.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
-                null, null, null, sortOrder);
-
-        contentValuesVector = new Vector<>(cursor.getCount());
-        if (cursor.moveToFirst()) {
-            do {
-                ContentValues contentValues = new ContentValues();
-                DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
-                contentValuesVector.add(contentValues);
-            } while (cursor.moveToNext());
-        }
-
-        Log.d(LOG_TAG, "FetchMovieTask Complete. " + contentValuesVector.size() + " Inserted");
-
-        return getPosterUrls(contentValuesVector);
     }
 
     private void bulkInsertAndDelete(Vector<ContentValues> contentValuesVector) {
         if (contentValuesVector.size() > 0) {
-            Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+            Uri uri = MovieEntry.CONTENT_URI;
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
             deleteOldMovieData();
@@ -222,32 +200,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
     private void deleteOldMovieData() {
 
         int deleted = context.getContentResolver().delete(
-                MovieContract.MovieEntry.CONTENT_URI, null, null);
+                MovieEntry.CONTENT_URI, null, null);
         Log.d(LOG_TAG, "delete complete. " + deleted + " deleted");
-    }
-
-    private String[] getPosterUrls(Vector<ContentValues> contentValuesVector) {
-        String[] posterUrls = new String[contentValuesVector.size()];
-        for (int i = 0; i < contentValuesVector.size(); i++) {
-            final ContentValues movieValues = contentValuesVector.elementAt(i);
-            posterUrls[i] = movieValues.getAsString(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
-        }
-        return posterUrls;
-    }
-
-    /**
-     * Updates the UI after using AsyncTask.
-     *
-     * @param result returned from AsyncTask
-     */
-    @Override
-    protected void onPostExecute(String[] result) {
-        if (result != null) {
-            posterAdapter.clear();
-            for (String posterUrl : result) {
-                posterAdapter.add(MovieInfoParser.POSTER_URL_BASE + posterUrl);
-            }
-        }
     }
 
     // TODO update instead of insert if movie_id already exists
@@ -257,29 +211,29 @@ public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
         // check if movie_id already exists
         Cursor movieCursor = context.getContentResolver().query(
-                MovieContract.MovieEntry.CONTENT_URI, // uri
-                new String[]{MovieContract.MovieEntry._ID}, // projection
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?", // selection
+                MovieEntry.CONTENT_URI, // uri
+                new String[]{MovieEntry._ID}, // projection
+                MovieEntry.COLUMN_MOVIE_ID + " = ?", // selection
                 new String[]{Long.toString(movieId)}, // selectionArgs
                 null); // sortOrder
 
         if (movieCursor.moveToFirst()) {
-            int locationIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
+            int locationIdIndex = movieCursor.getColumnIndex(MovieEntry._ID);
             movieRowId = movieCursor.getLong(locationIdIndex);
         } else {
             ContentValues movieValues = new ContentValues();
 
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, overview);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE, release);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, favorite);
+            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+            movieValues.put(MovieEntry.COLUMN_TITLE, title);
+            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+            movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+            movieValues.put(MovieEntry.COLUMN_RATING, rating);
+            movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
 
             // insert movieValues into db
             Uri insertedUri = context.getContentResolver().insert(
-                    MovieContract.MovieEntry.CONTENT_URI, movieValues);
+                    MovieEntry.CONTENT_URI, movieValues);
 
             // extract movieRowId from URI
             movieRowId = ContentUris.parseId(insertedUri);
