@@ -2,6 +2,7 @@ package com.example.android.popularmoviesapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,6 +25,15 @@ public class DetailActivity extends AppCompatActivity {
 
     private MovieInfoParser movieInfoParser;
 
+    public static Intent newIntent(Context context, Uri uri) {
+        Log.d(LOG_TAG, "newIntent");
+        Intent intent = new Intent(context, DetailActivity.class);
+//        intent.putExtra(Intent.EXTRA_TEXT, movieJsonStr);
+//        intent.putExtra("position", position);
+        intent.setData(uri);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -32,9 +42,18 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        parseMovieInfo();
+        Intent intent = this.getIntent();
+        String uri;
+        if (null != intent) {
+            uri = intent.getDataString();
+        } else {
+            uri = null;
+        }
+//        parseMovieInfo();
 
-        loadViews();
+//        loadViews();
+        TextView titleView = (TextView) findViewById(R.id.title);
+        titleView.setText(uri);
 
     }
 
@@ -120,11 +139,4 @@ public class DetailActivity extends AppCompatActivity {
         return null;
     }
 
-    public static Intent newIntent(Context context, String movieJsonStr, int position) {
-        Log.d(LOG_TAG, "newIntent");
-        Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra(Intent.EXTRA_TEXT, movieJsonStr);
-        intent.putExtra("position", position);
-        return intent;
-    }
 }

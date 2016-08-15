@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesapp;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -67,6 +69,26 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
         // attach adapter to GridView
         GridView gridView = (GridView) rootView.findViewById(R.id.grid_view_posters);
         gridView.setAdapter(posterAdapter);
+
+        // invoke when an item in the list has been clicked
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Enter detail activity upon clicking on the item in the list
+             *
+             * @param parent the AdapterView where the click happened
+             * @param view the view within the AdapterView that was clicked
+             *             (this will be a view provided by the adapter)
+             * @param position the position of the view in the adapter
+             * @param id the row id of the item that was clicked
+             */
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
+                // TODO get movie_id at position and buildSingleMovieUri
+                Uri uri = MovieEntry.CONTENT_URI;
+                startActivity(DetailActivity.newIntent(getContext(), uri));
+            }
+        });
 
         return rootView;
     }
