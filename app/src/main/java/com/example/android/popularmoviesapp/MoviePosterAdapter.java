@@ -10,8 +10,6 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
-
 /**
  * Created by David on 04/04/16.
  */
@@ -35,8 +33,7 @@ public class MoviePosterAdapter extends CursorAdapter {
     }
 
     private String getPosterUrlFrom(Cursor cursor) {
-        int index = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH);
-        return cursor.getString(index);
+        return cursor.getString(MoviePostersFragment.COL_MOVIE_POSTER_PATH);
     }
 
 }

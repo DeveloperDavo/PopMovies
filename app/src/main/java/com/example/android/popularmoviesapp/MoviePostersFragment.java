@@ -19,8 +19,23 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 
 
 public class MoviePostersFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     private static final String LOG_TAG = MoviePostersFragment.class.getSimpleName();
+
+    /**********************************************************************************************/
+
     private static final int MOVIES_LOADER = 0;
+    private static final String[] MOVIE_COLUMNS = {
+            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+            MovieEntry.COLUMN_POSTER_PATH
+    };
+
+    static final int COL_MOVIE_ID = 0;
+    static final int COL_MOVIE_POSTER_PATH = 1;
+
+    /**********************************************************************************************/
+
+
     private MoviePosterAdapter posterAdapter;
 
 
@@ -98,7 +113,7 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
         final String sortOrder = null;
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
-                null,
+                MOVIE_COLUMNS,
                 null,
                 null,
                 sortOrder);
