@@ -23,11 +23,12 @@ public class DetailActivity extends AppCompatActivity {
     private static final String RATING = "rating";
     private static final String RELEASE = "release";
 
+    private Uri singleMovieUri;
     private MovieInfoParser movieInfoParser;
 
     public static Intent newIntent(Context context, Uri uri) {
         Log.d(LOG_TAG, "newIntent");
-        Intent intent = new Intent(context, DetailActivity.class);
+        final Intent intent = new Intent(context, DetailActivity.class);
 //        intent.putExtra(Intent.EXTRA_TEXT, movieJsonStr);
 //        intent.putExtra("position", position);
         intent.setData(uri);
@@ -42,27 +43,29 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Intent intent = this.getIntent();
-        String uri;
-        if (null != intent) {
-            uri = intent.getDataString();
-        } else {
-            uri = null;
-        }
+        extractUriFromIntent();
+        TextView titleView = (TextView) findViewById(R.id.title);
+        titleView.setText(singleMovieUri.toString());
+
 //        parseMovieInfo();
 
 //        loadViews();
-        TextView titleView = (TextView) findViewById(R.id.title);
-        titleView.setText(uri);
-
     }
+
+    private void extractUriFromIntent() {
+        final Intent intent = this.getIntent();
+        if (null != intent) {
+            singleMovieUri = intent.getData();
+        }
+    }
+
 
     private void parseMovieInfo() {
 
-        Intent intent = this.getIntent();
+        final Intent intent = this.getIntent();
 
         // get position of movie in grid (default to -1)
-        int position = intent.getIntExtra("position", -1);
+        final int position = intent.getIntExtra("position", -1);
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             String dataJsonStr = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -85,35 +88,36 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadPosterIntoView() {
-        ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
-        String posterUrl = parse(POSTER);
+        final ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
+        final String posterUrl = parse(POSTER);
+
         if (posterUrl != null) {
             Picasso.with(this).load(posterUrl).into(imageView);
         }
     }
 
     private void loadTitleIntoView() {
-        String title = parse(TITLE);
-        TextView titleView = (TextView) findViewById(R.id.title);
+        final String title = parse(TITLE);
+        final TextView titleView = (TextView) findViewById(R.id.title);
         titleView.setText(title);
     }
 
     private void loadOverviewIntoView() {
-        String overview = parse(OVERVIEW);
-        TextView overviewView = (TextView) findViewById(R.id.overview);
+        final String overview = parse(OVERVIEW);
+        final TextView overviewView = (TextView) findViewById(R.id.overview);
         overviewView.setText(overview);
 
     }
 
     private void loadRatingIntoView() {
-        String userRating = parse(RATING);
-        TextView userRatingView = (TextView) findViewById(R.id.rating);
+        final String userRating = parse(RATING);
+        final TextView userRatingView = (TextView) findViewById(R.id.rating);
         userRatingView.setText(userRating);
     }
 
     private void loadReleaseIntoView() {
-        String releaseDate = parse(RELEASE);
-        TextView releaseDateView = (TextView) findViewById(R.id.release);
+        final String releaseDate = parse(RELEASE);
+        final TextView releaseDateView = (TextView) findViewById(R.id.release);
         releaseDateView.setText(releaseDate);
     }
 
@@ -138,5 +142,4 @@ public class DetailActivity extends AppCompatActivity {
         }
         return null;
     }
-
 }

@@ -85,8 +85,12 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
                 // TODO get movie_id at position and buildSingleMovieUri
-                Uri uri = MovieEntry.CONTENT_URI;
-                startActivity(DetailActivity.newIntent(getContext(), uri));
+                final Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    final Long movieRowId = cursor.getLong(COL_MOVIE_ID);
+                    final Uri singleMovieUri = MovieEntry.buildSingleMovieUri(movieRowId);
+                    startActivity(DetailActivity.newIntent(getContext(), singleMovieUri));
+                }
             }
         });
 

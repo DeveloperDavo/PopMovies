@@ -44,13 +44,13 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildSingleMovieUri(long movieId) {
+        public static Uri buildSingleMovieUri(long movieRowId) {
             return CONTENT_URI.buildUpon().
-                    appendPath(Long.toString(movieId)).
+                    appendPath(Long.toString(movieRowId)).
                     build();
         }
 
-        public static int getMovieIdFromUri(Uri uri) {
+        public static int getMovieRowIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
         }
 

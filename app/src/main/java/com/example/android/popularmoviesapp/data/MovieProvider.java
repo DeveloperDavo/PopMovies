@@ -229,7 +229,7 @@ public class MovieProvider extends ContentProvider {
     private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
-        final int movieId = MovieEntry.getMovieIdFromUri(uri);
+        final int movieId = MovieEntry.getMovieRowIdFromUri(uri);
 
         return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
                 projection,
