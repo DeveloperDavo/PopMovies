@@ -23,6 +23,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
  */
 public class TestUtilities extends AndroidTestCase {
 
+    public final static long MOVIE_ROW_ID = 1;
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
     public static final String POSTER_PATH = "path_to_poster";

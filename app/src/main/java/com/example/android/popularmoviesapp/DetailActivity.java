@@ -1,8 +1,12 @@
 package com.example.android.popularmoviesapp;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +15,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -36,19 +45,47 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detail);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
     }
 
-    public static class DetailFragment extends Fragment {
+    // TODO "this" only recognises non support version of LoaderCallbacks
+    public static class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
         private Uri singleMovieUri;
-        private MovieInfoParser movieInfoParser;
+//        private MovieInfoParser movieInfoParser;
 
+
+        /**********************************************************************************************/
+
+        private static final int DETAIL_LOADER = 0;
+        private static final String[] MOVIE_COLUMNS = {
+                MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+                MovieEntry.COLUMN_TITLE,
+                MovieEntry.COLUMN_POSTER_PATH,
+                MovieEntry.COLUMN_OVERVIEW,
+                MovieEntry.COLUMN_RATING,
+                MovieEntry.COLUMN_RELEASE
+        };
+
+        static final int COL__ID = 0;
+        static final int COL_MOVIE_TITLE = 1;
+        static final int COL_MOVIE_POSTER_PATH = 2;
+        static final int COL_MOVIE_OVERVIEW = 3;
+        static final int COL_MOVIE_RATING = 4;
+        static final int COL_MOVIE_RELEASE = 5;
+
+        /**********************************************************************************************/
+
+        private ImageView posterView;
+        private TextView titleView;
+        private TextView overviewView;
+        private TextView userRatingView;
+        private TextView releaseDateView;
 
         public static DetailFragment newInstance() {
             Log.d(LOG_TAG, "newInstance");
@@ -64,26 +101,85 @@ public class DetailActivity extends AppCompatActivity {
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            extractUriFromIntent();
 
-            final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-            final TextView titleView = (TextView) rootView.findViewById(R.id.title);
-            titleView.setText(singleMovieUri.toString());
+            posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
+            titleView = (TextView) rootView.findViewById(R.id.title);
+            overviewView = (TextView) rootView.findViewById(R.id.overview);
+            userRatingView = (TextView) rootView.findViewById(R.id.rating);
+            releaseDateView = (TextView) rootView.findViewById(R.id.release);
 
 //        parseMovieInfo();
 
 //        loadViews();
 
             return rootView;
+
         }
 
-        private void extractUriFromIntent() {
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            getLoaderManager().initLoader(DETAIL_LOADER, // uniqueId that identifies the loader
+                    null, // optional arguments to supply the loader at construction
+                    this); // LoaderManger.LoaderCallbacks implementation
+            super.onActivityCreated(savedInstanceState);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             final Intent intent = getActivity().getIntent();
-            if (null != intent) {
-                singleMovieUri = intent.getData();
+
+            return new CursorLoader(getActivity(),
+                    intent.getData(),
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            loadPosterIntoView(data);
+            loadTitleIntoView(data);
+            loadOverviewIntoView(data);
+            loadRatingIntoView(data);
+            loadReleaseIntoView(data);
+        }
+
+        private void loadPosterIntoView(Cursor cursor) {
+            final String posterUrl = cursor.getString(COL_MOVIE_POSTER_PATH);
+
+            if (posterUrl != null) {
+                Picasso.with(getActivity()).load(posterUrl).into(posterView);
             }
         }
+
+        private void loadTitleIntoView(Cursor cursor) {
+            final String title = cursor.getString(COL_MOVIE_TITLE);
+            titleView.setText(title);
+        }
+
+        private void loadOverviewIntoView(Cursor cursor) {
+            final String overview = cursor.getString(COL_MOVIE_OVERVIEW);
+            overviewView.setText(overview);
+        }
+
+        private void loadRatingIntoView(Cursor cursor) {
+            final double userRating = cursor.getDouble(COL_MOVIE_RATING);
+            userRatingView.setText(Double.toString(userRating));
+        }
+
+        private void loadReleaseIntoView(Cursor cursor) {
+            final String releaseDate = cursor.getString(COL_MOVIE_RELEASE);
+            releaseDateView.setText(releaseDate);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+
 
 /*        private void parseMovieInfo() {
 

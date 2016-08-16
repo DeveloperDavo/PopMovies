@@ -86,11 +86,11 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MovieUriMatcher.MOVIES_CODE: {
-                returnUri = getMoviesInsertUri(uri, values);
+                returnUri = insertMovieEntries(uri, values);
                 break;
             }
             case MovieUriMatcher.REVIEWS_CODE: {
-                returnUri = getReviewsInsertUri(uri, values);
+                returnUri = insertReviewEntries(uri, values);
                 break;
             }
             default:
@@ -100,7 +100,7 @@ public class MovieProvider extends ContentProvider {
         return returnUri;
     }
 
-    private Uri getMoviesInsertUri(Uri uri, ContentValues values) {
+    private Uri insertMovieEntries(Uri uri, ContentValues values) {
 
         Uri returnUri;
         final long _id = movieDbHelper.getWritableDatabase().
@@ -112,7 +112,7 @@ public class MovieProvider extends ContentProvider {
         return returnUri;
     }
 
-    private Uri getReviewsInsertUri(Uri uri, ContentValues values) {
+    private Uri insertReviewEntries(Uri uri, ContentValues values) {
 
         Uri returnUri;
         final long _id = movieDbHelper.getWritableDatabase().
@@ -229,12 +229,14 @@ public class MovieProvider extends ContentProvider {
     private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
-        final int movieId = MovieEntry.getMovieRowIdFromUri(uri);
+        final int movieRowId = MovieEntry.getMovieRowIdFromUri(uri);
 
+        // TODO use join when ready
+//        return readableDatabase.query(MovieEntry.TABLE_NAME,
         return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
                 projection,
                 SINGLE_MOVIE_SELECTION,
-                new String[]{Integer.toString(movieId)},
+                new String[]{Integer.toString(movieRowId)},
                 null,
                 null,
                 sortOrder
@@ -256,18 +258,18 @@ public class MovieProvider extends ContentProvider {
                         "." + MovieEntry._ID);
     }
 
-    // movies.movie_id = ?
+    // movies._id = ?
     private static final String SINGLE_MOVIE_SELECTION =
             MovieEntry.TABLE_NAME + "." +
-                    MovieEntry.COLUMN_MOVIE_ID + " = ?";
+                    MovieEntry._ID + " = ?";
 
-    // movies.movie_id = ? AND reviews.review_id = ?
+    // movies._id = ? AND reviews._id = ?
     // TODO not in use yet
     private static final String SINGLE_REVIEW_SELECTION =
             ReviewEntry.TABLE_NAME + "." +
-                    MovieEntry.COLUMN_MOVIE_ID + " = ? AND " +
+                    MovieEntry._ID + " = ? AND " +
                     ReviewEntry.TABLE_NAME + "." +
-                    ReviewEntry.COLUMN_REVIEW_ID + " = ?";
+                    ReviewEntry._ID + " = ?";
 }
 
 

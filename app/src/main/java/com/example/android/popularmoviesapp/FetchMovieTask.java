@@ -183,10 +183,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
         // bulk insert into database
         // TODO not to be used so often in final version
-        bulkInsertAndDelete(contentValuesVector);
+        deleteAndBulkInsert(contentValuesVector);
     }
 
-    private void bulkInsertAndDelete(Vector<ContentValues> contentValuesVector) {
+    private void deleteAndBulkInsert(Vector<ContentValues> contentValuesVector) {
         if (contentValuesVector.size() > 0) {
             Uri uri = MovieEntry.CONTENT_URI;
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];

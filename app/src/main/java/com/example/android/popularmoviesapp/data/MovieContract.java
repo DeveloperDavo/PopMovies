@@ -44,12 +44,6 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildSingleMovieUri(long movieRowId) {
-            return CONTENT_URI.buildUpon().
-                    appendPath(Long.toString(movieRowId)).
-                    build();
-        }
-
         public static int getMovieRowIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
         }
@@ -78,13 +72,5 @@ public class MovieContract {
         public static Uri buildReviewUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        // TODO not in use yet
-        public static Uri buildSingleReviewUri(long reviewId) {
-            return CONTENT_URI.buildUpon().
-                    appendPath(Long.toString(reviewId)).
-                    build();
-        }
-
     }
 }

@@ -26,17 +26,16 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
 
     /**********************************************************************************************/
 
-    private static final int MOVIES_LOADER = 0;
+    private static final int MOVIE_POSTERS_LOADER = 0;
     private static final String[] MOVIE_COLUMNS = {
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
             MovieEntry.COLUMN_POSTER_PATH
     };
 
-    static final int COL_MOVIE_ID = 0;
+    static final int COL_ID = 0;
     static final int COL_MOVIE_POSTER_PATH = 1;
 
     /**********************************************************************************************/
-
 
     private MoviePosterAdapter posterAdapter;
 
@@ -84,11 +83,10 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
-                // TODO get movie_id at position and buildSingleMovieUri
                 final Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    final Long movieRowId = cursor.getLong(COL_MOVIE_ID);
-                    final Uri singleMovieUri = MovieEntry.buildSingleMovieUri(movieRowId);
+                    final Long _id = cursor.getLong(COL_ID);
+                    final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
                     startActivity(DetailActivity.newIntent(getContext(), singleMovieUri));
                 }
             }
@@ -128,7 +126,7 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        getLoaderManager().initLoader(MOVIE_POSTERS_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 

@@ -44,18 +44,18 @@ public class TestUriMatcher extends AndroidTestCase {
     public void test_match_movie() {
 
         // GIVEN
-        final int movieId = 565545;
+        final int _id = 17;
 
-        // content://com.example.android.popularmoviesapp/movies/movie_id/"
-        final Uri movieItem = MovieContract.MovieEntry.buildSingleMovieUri(movieId);
+        // content://com.example.android.popularmoviesapp/movies/_id/"
+        final Uri movieItem = MovieContract.MovieEntry.buildMovieUri(_id);
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
-        final int reviews = MovieUriMatcher.SINGLE_MOVIE_CODE;
+        final int singleMovie = MovieUriMatcher.SINGLE_MOVIE_CODE;
 
         // THEN
         assertEquals("Error: The SINGLE_MOVIE_CODE URI was matched incorrectly.",
-                testMatcher.match(movieItem), reviews);
+                testMatcher.match(movieItem), singleMovie);
 
     }
 

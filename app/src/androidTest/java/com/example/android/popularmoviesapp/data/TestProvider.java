@@ -78,12 +78,12 @@ public class TestProvider extends AndroidTestCase {
     public void test_getType_movie() {
 
         // GIVEN
-        final int movieId = 789;
+        final int _id = 12;
 
         // WHEN
-        // content://com.example.android.popularmoviesapp/movies/789/
+        // content://com.example.android.popularmoviesapp/movies/12/
         final String type = mContext.getContentResolver().
-                getType(MovieEntry.buildSingleMovieUri(movieId));
+                getType(MovieEntry.buildMovieUri(_id));
 
         // THEN
         // vnd.android.cursor.dir/com.example.android.popularmoviesapp/movies/789
@@ -178,13 +178,13 @@ public class TestProvider extends AndroidTestCase {
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
         mContext.getContentResolver().
                 registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
-        Uri movieUri = mContext.getContentResolver().
+        Uri movieInsertUri = mContext.getContentResolver().
                 insert(MovieEntry.CONTENT_URI, testMovieValues);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
-        long movieRowId = ContentUris.parseId(movieUri);
+        long movieRowId = ContentUris.parseId(movieInsertUri);
         assertTrue(movieRowId != -1);
 
         final Cursor moviesCursor = mContext.getContentResolver().query(
@@ -226,7 +226,7 @@ public class TestProvider extends AndroidTestCase {
 
         // joined data
         final Cursor singleMovieCursor = mContext.getContentResolver().query(
-                MovieEntry.buildSingleMovieUri(TestUtilities.MOVIE_ID),
+                MovieEntry.buildMovieUri(TestUtilities.MOVIE_ROW_ID),
                 null,
                 null,
                 null,
