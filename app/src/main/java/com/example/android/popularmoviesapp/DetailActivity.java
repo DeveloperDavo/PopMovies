@@ -1,15 +1,15 @@
 package com.example.android.popularmoviesapp;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,9 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
-
-import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -52,7 +51,6 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    // TODO "this" only recognises non support version of LoaderCallbacks
     public static class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
@@ -63,7 +61,7 @@ public class DetailActivity extends AppCompatActivity {
         /**********************************************************************************************/
 
         private static final int DETAIL_LOADER = 0;
-        private static final String[] MOVIE_COLUMNS = {
+        private static final String[] MOVIE_COLUMNS = new String[]{
                 MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
                 MovieEntry.COLUMN_TITLE,
                 MovieEntry.COLUMN_POSTER_PATH,
@@ -86,6 +84,7 @@ public class DetailActivity extends AppCompatActivity {
         private TextView overviewView;
         private TextView userRatingView;
         private TextView releaseDateView;
+        private Cursor detailCursor;
 
         public static DetailFragment newInstance() {
             Log.d(LOG_TAG, "newInstance");
@@ -129,9 +128,14 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             final Intent intent = getActivity().getIntent();
+            final Uri uri = intent.getData();
+
+            if (null == uri) {
+                return null;
+            }
 
             return new CursorLoader(getActivity(),
-                    intent.getData(),
+                    uri,
                     MOVIE_COLUMNS,
                     null,
                     null,
@@ -139,68 +143,13 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            loadPosterIntoView(data);
-            loadTitleIntoView(data);
-            loadOverviewIntoView(data);
-            loadRatingIntoView(data);
-            loadReleaseIntoView(data);
-        }
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            detailCursor = cursor;
 
-        private void loadPosterIntoView(Cursor cursor) {
-            final String posterUrl = cursor.getString(COL_MOVIE_POSTER_PATH);
-
-            if (posterUrl != null) {
-                Picasso.with(getActivity()).load(posterUrl).into(posterView);
+            if (!detailCursor.moveToFirst()) {
+                return;
             }
-        }
 
-        private void loadTitleIntoView(Cursor cursor) {
-            final String title = cursor.getString(COL_MOVIE_TITLE);
-            titleView.setText(title);
-        }
-
-        private void loadOverviewIntoView(Cursor cursor) {
-            final String overview = cursor.getString(COL_MOVIE_OVERVIEW);
-            overviewView.setText(overview);
-        }
-
-        private void loadRatingIntoView(Cursor cursor) {
-            final double userRating = cursor.getDouble(COL_MOVIE_RATING);
-            userRatingView.setText(Double.toString(userRating));
-        }
-
-        private void loadReleaseIntoView(Cursor cursor) {
-            final String releaseDate = cursor.getString(COL_MOVIE_RELEASE);
-            releaseDateView.setText(releaseDate);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-        }
-
-
-/*        private void parseMovieInfo() {
-
-            final Intent intent = this.getIntent();
-
-            // get position of movie in grid (default to -1)
-            final int position = intent.getIntExtra("position", -1);
-
-            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                String dataJsonStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-
-                try {
-                    movieInfoParser = new MovieInfoParser(dataJsonStr, position);
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, e.getMessage(), e);
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private void loadViews() {
             loadPosterIntoView();
             loadTitleIntoView();
             loadOverviewIntoView();
@@ -208,60 +157,37 @@ public class DetailActivity extends AppCompatActivity {
             loadReleaseIntoView();
         }
 
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            detailCursor = null;
+        }
+
         private void loadPosterIntoView() {
-            final ImageView imageView = (ImageView) findViewById(R.id.detail_image_view);
-            final String posterUrl = parse(POSTER);
+            final String posterUrl = detailCursor.getString(COL_MOVIE_POSTER_PATH);
 
             if (posterUrl != null) {
-                Picasso.with(this).load(posterUrl).into(imageView);
+                Picasso.with(getActivity()).load(posterUrl).into(posterView);
             }
         }
 
         private void loadTitleIntoView() {
-            final String title = parse(TITLE);
-            final TextView titleView = (TextView) findViewById(R.id.title);
+            final String title = detailCursor.getString(COL_MOVIE_TITLE);
             titleView.setText(title);
         }
 
         private void loadOverviewIntoView() {
-            final String overview = parse(OVERVIEW);
-            final TextView overviewView = (TextView) findViewById(R.id.overview);
+            final String overview = detailCursor.getString(COL_MOVIE_OVERVIEW);
             overviewView.setText(overview);
-
         }
 
         private void loadRatingIntoView() {
-            final String userRating = parse(RATING);
-            final TextView userRatingView = (TextView) findViewById(R.id.rating);
-            userRatingView.setText(userRating);
+            final double userRating = detailCursor.getDouble(COL_MOVIE_RATING);
+            userRatingView.setText(Double.toString(userRating));
         }
 
         private void loadReleaseIntoView() {
-            final String releaseDate = parse(RELEASE);
-            final TextView releaseDateView = (TextView) findViewById(R.id.release);
+            final String releaseDate = detailCursor.getString(COL_MOVIE_RELEASE);
             releaseDateView.setText(releaseDate);
         }
-
-
-        private String parse(String movieInfoAttribute) {
-            try {
-                if (movieInfoAttribute == POSTER) {
-                    return movieInfoParser.parsePosterUrl();
-                } else if (movieInfoAttribute == TITLE) {
-                    return movieInfoParser.parseOriginalTitle();
-                } else if (movieInfoAttribute == OVERVIEW) {
-                    return movieInfoParser.parseOverview();
-                } else if (movieInfoAttribute == RATING) {
-                    return movieInfoParser.parseRating();
-                } else if (movieInfoAttribute == RELEASE) {
-                    return movieInfoParser.parseRelease();
-                }
-
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-            return null;
-        }*/
     }
 }

@@ -3,8 +3,10 @@ package com.example.android.popularmoviesapp.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
 /**
  * Created by David on 10/07/16.
@@ -12,6 +14,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.*;
  *
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
+    public static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
     private static final int DATABASE_VERSION = 1;
 
@@ -53,11 +56,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        // Note that this only fires if you change the version number for your database.
-        // It does NOT depend on the version number for your application.
-        // If you want to update the schema without wiping data, commenting out the next 2 lines
+        Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
+                newVersion + ". OLD DATA WILL BE DESTROYED");
         // should be your top priority before modifying this method.
         db.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);

@@ -22,11 +22,15 @@ public class MovieContract {
     // movies uri
     public static final class MovieEntry implements BaseColumns {
 
+        // create content uri
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
 
+        // create cursor of base type directory for multiple entries
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
+
+        // create cursor of base type item for single entry
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
 
@@ -43,11 +47,6 @@ public class MovieContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        public static int getMovieRowIdFromUri(Uri uri) {
-            return Integer.parseInt(uri.getPathSegments().get(1));
-        }
-
     }
 
     // reviews uri

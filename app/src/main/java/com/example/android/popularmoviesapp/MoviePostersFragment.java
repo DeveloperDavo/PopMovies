@@ -29,7 +29,7 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     private static final int MOVIE_POSTERS_LOADER = 0;
     private static final String[] MOVIE_COLUMNS = {
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
-            MovieEntry.COLUMN_POSTER_PATH
+            MovieEntry.COLUMN_POSTER_PATH,
     };
 
     static final int COL_ID = 0;
@@ -83,12 +83,13 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
-                final Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (cursor != null) {
-                    final Long _id = cursor.getLong(COL_ID);
-                    final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
-                    startActivity(DetailActivity.newIntent(getContext(), singleMovieUri));
-                }
+
+                // increment the position to match Database Ids indexed starting at 1
+                final long _id = position + 1;
+
+                // append Id to uri
+                final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
+                startActivity(DetailActivity.newIntent(getContext(), singleMovieUri));
             }
         });
 

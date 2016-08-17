@@ -2,15 +2,19 @@ package com.example.android.popularmoviesapp.data;
 
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
 /**
  * Created by David on 13/07/16.
@@ -18,6 +22,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.*;
  */
 public class MovieProvider extends ContentProvider {
 
+    private static final String LOG_TAG = MovieProvider.class.getSimpleName();
     private MovieDbHelper movieDbHelper;
 
     private static final UriMatcher URI_MATCHER = MovieUriMatcher.buildUriMatcher();
@@ -200,20 +205,39 @@ public class MovieProvider extends ContentProvider {
 
         writableDatabase.beginTransaction();
 
-        int returnCount = 0;
+        int rowsInserted = 0;
         try {
             for (ContentValues value : values) {
-                long _id = writableDatabase.insert(tableName, null, value);
+                if (value == null) {
+                    throw new IllegalArgumentException("Cannot have null content values");
+                }
+                long _id = -1;
+                try {
+                    _id = writableDatabase.insertOrThrow(tableName, null, value);
+                } catch (SQLiteConstraintException e) {
+                    Log.w(LOG_TAG, "Attempting to insert " +
+                            value.getAsString(MovieEntry.COLUMN_TITLE)
+                            + " but value is already in database.");
+                }
                 if (_id != -1) {
-                    returnCount++;
+                    rowsInserted++;
                 }
             }
-            writableDatabase.setTransactionSuccessful();
+            if (rowsInserted > 0) {
+                // If no errors, declare a successful transaction.
+                // database will not populate if this is not called
+                writableDatabase.setTransactionSuccessful();
+            }
         } finally {
             writableDatabase.endTransaction();
         }
-        getContext().getContentResolver().notifyChange(uri, null);
-        return returnCount;
+        if (rowsInserted > 0) {
+            // if there was successful insertion, notify the content resolver that there
+            // was a change
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsInserted;
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing
@@ -229,14 +253,13 @@ public class MovieProvider extends ContentProvider {
     private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
-        final int movieRowId = MovieEntry.getMovieRowIdFromUri(uri);
 
         // TODO use join when ready
-//        return readableDatabase.query(MovieEntry.TABLE_NAME,
-        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
+        return readableDatabase.query(MovieEntry.TABLE_NAME,
+//        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
                 projection,
                 SINGLE_MOVIE_SELECTION,
-                new String[]{Integer.toString(movieRowId)},
+                new String[]{String.valueOf(ContentUris.parseId(uri))},
                 null,
                 null,
                 sortOrder
