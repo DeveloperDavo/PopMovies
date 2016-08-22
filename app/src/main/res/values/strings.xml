@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Pop Movies</string>
     <string name="title_activity_detail">Details</string>
     <string name="action_sort_order">Sort By</string>
@@ -6,4 +6,8 @@
     <string name="action_sort_by_popularity">Popularity</string>
     <string name="pref_sort_by_popularity">popular</string>
     <string name="pref_sort_by_rating">top_rated</string>
+
+    <!-- user rating format -->
+    <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g></string>
+
 </resources>

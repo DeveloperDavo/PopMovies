@@ -183,7 +183,7 @@ public class DetailActivity extends AppCompatActivity {
 
         private void loadRatingIntoView() {
             final double userRating = detailCursor.getDouble(COL_MOVIE_RATING);
-            userRatingView.setText(String.format("%.1f/10", userRating));
+            userRatingView.setText(Utility.formatRating(getContext(), userRating));
         }
 
         private void loadReleaseIntoView() {
