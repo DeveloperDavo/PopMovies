@@ -8,6 +8,6 @@
     <string name="pref_sort_by_rating">top_rated</string>
 
     <!-- user rating format -->
-    <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g></string>
+    <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g>/10</string>
 
 </resources>
