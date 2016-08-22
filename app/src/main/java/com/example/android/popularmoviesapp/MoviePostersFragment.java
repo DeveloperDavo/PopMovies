@@ -100,7 +100,12 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     public void onStart() {
         Log.d(LOG_TAG, "onStart");
         super.onStart();
-        (new FetchMovieTask(getContext())).execute(getString(R.string.pref_sort_by_rating));
+//        updateMovies(R.string.pref_sort_by_rating);
+    }
+
+    private void updateMovies(int prefString) {
+        Log.d(LOG_TAG, "updateMovies");
+        (new FetchMovieTask(getContext())).execute(getString(prefString));
     }
 
     @Override
@@ -115,10 +120,10 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
         int id = item.getItemId();
 
         if (id == R.id.action_sort_by_popularity) {
-            (new FetchMovieTask(getContext())).execute(getString(R.string.pref_sort_by_popularity));
+            updateMovies(R.string.pref_sort_by_popularity);
             return true;
         } else if (id == R.id.action_sort_by_rating) {
-            (new FetchMovieTask(getContext())).execute(getString(R.string.pref_sort_by_rating));
+            updateMovies(R.string.pref_sort_by_rating);
             return true;
         }
 
