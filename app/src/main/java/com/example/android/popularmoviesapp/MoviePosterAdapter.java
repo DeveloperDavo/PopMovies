@@ -29,7 +29,8 @@ public class MoviePosterAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.findViewById(R.id.poster_image_view);
-        Picasso.with(context).load(getPosterUrlFrom(cursor)).into(imageView);
+        Picasso.with(context).load(R.drawable.suicide_squad).into(imageView);
+//        Picasso.with(context).load(getPosterUrlFrom(cursor)).into(imageView);
     }
 
     private String getPosterUrlFrom(Cursor cursor) {

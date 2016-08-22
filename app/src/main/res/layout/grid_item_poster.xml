@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/poster_image_view"
-        android:layout_width="185dp"
-        android:layout_height="277dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:scaleType="fitXY"
         tools:src="@drawable/interstellar" />
 

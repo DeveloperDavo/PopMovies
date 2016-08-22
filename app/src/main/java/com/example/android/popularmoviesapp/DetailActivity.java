@@ -166,7 +166,8 @@ public class DetailActivity extends AppCompatActivity {
             final String posterUrl = detailCursor.getString(COL_MOVIE_POSTER_PATH);
 
             if (posterUrl != null) {
-                Picasso.with(getActivity()).load(posterUrl).into(posterView);
+                Picasso.with(getActivity()).load(R.drawable.suicide_squad).into(posterView);
+//                Picasso.with(getActivity()).load(posterUrl).into(posterView);
             }
         }
 
@@ -182,12 +183,12 @@ public class DetailActivity extends AppCompatActivity {
 
         private void loadRatingIntoView() {
             final double userRating = detailCursor.getDouble(COL_MOVIE_RATING);
-            userRatingView.setText(Double.toString(userRating));
+            userRatingView.setText(String.format("%.1f/10", userRating));
         }
 
         private void loadReleaseIntoView() {
             final String releaseDate = detailCursor.getString(COL_MOVIE_RELEASE);
-            releaseDateView.setText(releaseDate);
+            releaseDateView.setText(releaseDate.substring(0, 4));
         }
     }
 }

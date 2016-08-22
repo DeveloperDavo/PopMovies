@@ -7,7 +7,7 @@
     <GridView
         android:id="@+id/grid_view_posters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:numColumns="auto_fit" />
 
 </FrameLayout>
