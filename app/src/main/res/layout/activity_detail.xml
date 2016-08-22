@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_detail"
-        android:name="com.example.android.popularmoviesapp.DetailActivity$DetailFragment"
+        android:name="com.example.android.popularmoviesapp.DetailFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_detail" />
