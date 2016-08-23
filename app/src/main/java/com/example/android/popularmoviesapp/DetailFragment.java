@@ -138,8 +138,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         final String posterUrl = detailCursor.getString(COL_MOVIE_POSTER_PATH);
 
         if (posterUrl != null) {
-            Picasso.with(getActivity()).load(R.drawable.suicide_squad).into(posterView);
-//                Picasso.with(getActivity()).load(posterUrl).into(posterView);
+//            Picasso.with(getActivity()).load(R.drawable.suicide_squad).into(posterView);
+            Picasso.with(getActivity()).load(posterUrl).into(posterView);
         }
     }
 

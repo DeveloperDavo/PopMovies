@@ -28,10 +28,11 @@
 
             <ImageView
                 android:id="@+id/detail_image_view"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dp"
-                tools:src="@drawable/interstellar" />
+                android:adjustViewBounds="true"
+                tools:src="@drawable/jason_bourne" />
 
             <LinearLayout
                 android:layout_width="match_parent"
