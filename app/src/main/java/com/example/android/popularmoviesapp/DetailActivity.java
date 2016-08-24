@@ -33,6 +33,19 @@ public class DetailActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_detail);
 
+        // if there is no previously saved stated
+        if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+
+            final DetailFragment detailFragment = DetailFragment.newInstance();
+            detailFragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction().
+                    add(R.id.movie_detail_container, detailFragment).
+                    commit();
+        }
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }

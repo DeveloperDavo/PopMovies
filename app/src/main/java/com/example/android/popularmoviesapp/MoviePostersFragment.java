@@ -89,7 +89,9 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
 
                 // append Id to uri
                 final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
-                startActivity(DetailActivity.newIntent(getContext(), singleMovieUri));
+
+                // call onItemSelected from MainActivity
+                ((Callback) getActivity()).onItemSelected(singleMovieUri);
             }
         });
 
@@ -157,5 +159,17 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         posterAdapter.swapCursor(null);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onItemSelected(Uri singleMovieUri);
     }
 }

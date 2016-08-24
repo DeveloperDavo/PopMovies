@@ -26,7 +26,9 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private Uri singleMovieUri;
+    public static final String DETAIL_URI = "detailUri";
+//    private Uri singleMovieUri;
+    private Uri detailUri;
 //        private MovieInfoParser movieInfoParser;
 
 
@@ -73,6 +75,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        final Bundle arguments = getArguments();
+        if (arguments != null) {
+            detailUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
@@ -99,15 +106,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final Intent intent = getActivity().getIntent();
-        final Uri uri = intent.getData();
 
-        if (null == uri) {
+        final Intent intent = getActivity().getIntent();
+
+        // if detail fragment is created without data (ie two pane layout)
+        if (null == detailUri) {
             return null;
         }
 
         return new CursorLoader(getActivity(),
-                uri,
+                detailUri,
                 MOVIE_COLUMNS,
                 null,
                 null,
