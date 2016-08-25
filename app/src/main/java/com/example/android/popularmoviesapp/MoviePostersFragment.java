@@ -38,6 +38,10 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     /**********************************************************************************************/
 
     private MoviePosterAdapter posterAdapter;
+    private GridView gridView;
+    private int selectedPosition = GridView.INVALID_POSITION;
+
+    private static final String SELECTED_KEY = "selected_position";
 
 
     public MoviePostersFragment() {
@@ -66,7 +70,7 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // attach adapter to GridView
-        GridView gridView = (GridView) rootView.findViewById(R.id.grid_view_posters);
+        gridView = (GridView) rootView.findViewById(R.id.grid_view_posters);
         gridView.setAdapter(posterAdapter);
 
         // invoke when an item in the list has been clicked
@@ -92,8 +96,13 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
 
                 // call onItemSelected from MainActivity
                 ((Callback) getActivity()).onItemSelected(singleMovieUri);
+                selectedPosition = position;
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
         return rootView;
     }
@@ -139,6 +148,14 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (selectedPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, selectedPosition);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         // TODO sortOrder
@@ -154,6 +171,9 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         posterAdapter.swapCursor(data);
+        if (selectedPosition != GridView.INVALID_POSITION) {
+            gridView.smoothScrollToPosition(selectedPosition);
+        }
     }
 
     @Override
