@@ -94,12 +94,13 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
                 // append Id to uri
                 final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
 
-                // call onItemSelected from MainActivity
+                // call onItemSelected, which is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(singleMovieUri);
                 selectedPosition = position;
             }
         });
 
+        // if a position has already been selected, get it
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
@@ -149,6 +150,7 @@ public class MoviePostersFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        // keep selected position upon screen saving state
         if (selectedPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, selectedPosition);
         }

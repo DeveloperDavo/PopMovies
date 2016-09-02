@@ -6,12 +6,15 @@ import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
+import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
 /**
  * Created by David on 13/07/16.
@@ -154,8 +157,9 @@ public class TestProvider extends AndroidTestCase {
         TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
     }
 
+
     public void testInsertReadProvider() {
-        insertEntriesIntoContentProvider();
+        test_insert_and_query();
     }
 
     /**
@@ -170,7 +174,7 @@ public class TestProvider extends AndroidTestCase {
      *
      * TODO has too much responsibility
      */
-    public void insertEntriesIntoContentProvider() {
+    public void test_insert_and_query() {
 
         final ContentValues testMovieValues = TestUtilities.createMovieValues();
 
@@ -178,7 +182,8 @@ public class TestProvider extends AndroidTestCase {
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
         mContext.getContentResolver().
                 registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
-        Uri movieInsertUri = mContext.getContentResolver().
+
+        final Uri movieInsertUri = mContext.getContentResolver().
                 insert(MovieEntry.CONTENT_URI, testMovieValues);
 
         tco.waitForNotificationOrFail();
@@ -194,7 +199,7 @@ public class TestProvider extends AndroidTestCase {
                 null, // selection args
                 null  // sort order
         );
-        TestUtilities.validateCursor("insertEntriesIntoContentProvider. Error validating MovieEntry.",
+        TestUtilities.validateCursor("Error validating movie data",
                 moviesCursor, testMovieValues);
 
         final ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
@@ -218,7 +223,7 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null
         );
-        TestUtilities.validateCursor("insertEntriesIntoContentProvider. Error validating ReviewEntry insert.",
+        TestUtilities.validateCursor("Error validating review data",
                 reviewsCursor, testValues);
 
         // add expected movie values to review values
@@ -232,7 +237,8 @@ public class TestProvider extends AndroidTestCase {
                 null,
                 null
         );
-        TestUtilities.validateCursor("insertEntriesIntoContentProvider.  Error validating joined Movie and Review Data.",
+        Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(singleMovieCursor));
+        TestUtilities.validateCursor("Error validating joined movie and review data",
                 singleMovieCursor, testValues);
     }
 
@@ -282,10 +288,53 @@ public class TestProvider extends AndroidTestCase {
     }
 
     /**
+     * Ensures bulkInsert inserts the correct amount of review entries.
+     *
+     * Ensures each review entry can be validated by querying the reviews table.
+     *
+     * TODO too much responsibility
+     */
+    public void test_bulkInsert_reviews() {
+
+        ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertReviewValues();
+
+        // register content observer
+        TestUtilities.TestContentObserver reviewObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(
+                ReviewEntry.CONTENT_URI, true, reviewObserver);
+
+        int insertCount = mContext.getContentResolver().bulkInsert(
+                ReviewEntry.CONTENT_URI, bulkInsertContentValues);
+
+        reviewObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(reviewObserver);
+
+        assertEquals(TestUtilities.BULK_INSERT_SIZE_REVIEWS, insertCount);
+
+        String sortOrder = null;
+        Cursor cursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                sortOrder
+        );
+
+        assertEquals(cursor.getCount(), TestUtilities.BULK_INSERT_SIZE_REVIEWS);
+
+        cursor.moveToFirst();
+        for (int i = 0; i < TestUtilities.BULK_INSERT_SIZE_REVIEWS; i++, cursor.moveToNext()) {
+            TestUtilities.validateCurrentRecord("test_bulkInsert_reviews.  " +
+                    "Error validating ReviewEntry " + i, cursor, bulkInsertContentValues[i]);
+        }
+        cursor.close();
+    }
+
+    /**
      * Ensures all entries are deleted after being inserted
      */
     public void testDeleteRecords() {
-        insertEntriesIntoContentProvider();
+        test_insert_and_query();
 
         // Register a content observer for our movies delete.
         TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();

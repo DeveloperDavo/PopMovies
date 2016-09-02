@@ -11,17 +11,10 @@ public class DetailActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
-    private static final String POSTER = "poster";
-    private static final String TITLE = "title";
-    private static final String OVERVIEW = "overview";
-    private static final String RATING = "rating";
-    private static final String RELEASE = "release";
-
     public static Intent newIntent(Context context, Uri uri) {
         Log.d(LOG_TAG, "newIntent");
+
         final Intent intent = new Intent(context, DetailActivity.class);
-//        intent.putExtra(Intent.EXTRA_TEXT, movieJsonStr);
-//        intent.putExtra("position", position);
         intent.setData(uri);
         return intent;
     }
@@ -33,7 +26,7 @@ public class DetailActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_detail);
 
-        // if there is no previously saved stated
+        // if there is no previously saved stated, get the uri and put it in a bundle
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());

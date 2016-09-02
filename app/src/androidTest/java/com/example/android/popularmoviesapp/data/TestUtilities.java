@@ -34,6 +34,7 @@ public class TestUtilities extends AndroidTestCase {
 
     public final static long REVIEW_ID = 5;
     public static final int BULK_INSERT_SIZE = 10;
+    public static final int BULK_INSERT_SIZE_REVIEWS = 3;
 
     /**
      * Ensures an empty cursor is not returned.
@@ -120,6 +121,22 @@ public class TestUtilities extends AndroidTestCase {
         return returnContentValues;
     }
 
+    static ContentValues[] createBulkInsertReviewValues() {
+        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_SIZE_REVIEWS];
+
+        for (int i = 0; i < BULK_INSERT_SIZE_REVIEWS; i++) {
+            ContentValues reviewValues = new ContentValues();
+            reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, 1000);
+            reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, "abc" + i);
+            reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "author" + i);
+            reviewValues.put(ReviewEntry.COLUMN_CONTENT, "I give this review " + i + " out of 10");
+            reviewValues.put(ReviewEntry.COLUMN_URL, "www.examplereview.com");
+
+            returnContentValues[i] = reviewValues;
+        }
+
+        return returnContentValues;
+    }
     static long createAndInsertReviewValues(Context context, long movieRowId) {
 
         // insert our test records into the database

@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesapp;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmoviesapp.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -24,32 +24,34 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  * Created by David on 22/08/16.
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+
     public static final String DETAIL_URI = "detailUri";
-//    private Uri singleMovieUri;
     private Uri detailUri;
-//        private MovieInfoParser movieInfoParser;
 
 
     /**********************************************************************************************/
 
     private static final int DETAIL_LOADER = 0;
-    private static final String[] MOVIE_COLUMNS = new String[]{
+     static final String[] DETAIL_COLUMNS = new String[]{
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+            MovieEntry.COLUMN_MOVIE_ID,
             MovieEntry.COLUMN_TITLE,
             MovieEntry.COLUMN_POSTER_PATH,
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
-            MovieEntry.COLUMN_RELEASE
+            MovieEntry.COLUMN_RELEASE,
+            MovieContract.ReviewEntry.COLUMN_URL
     };
 
     static final int COL__ID = 0;
-    static final int COL_MOVIE_TITLE = 1;
-    static final int COL_MOVIE_POSTER_PATH = 2;
-    static final int COL_MOVIE_OVERVIEW = 3;
-    static final int COL_MOVIE_RATING = 4;
-    static final int COL_MOVIE_RELEASE = 5;
+    static final int COL_MOVIE_ID = 1;
+    static final int COL_MOVIE_TITLE = 2;
+    static final int COL_MOVIE_POSTER_PATH = 3;
+    static final int COL_MOVIE_OVERVIEW = 4;
+    static final int COL_MOVIE_RATING = 5;
+    static final int COL_MOVIE_RELEASE = 6;
+    static final int COL_REVIEW_URL = 7;
 
     /**********************************************************************************************/
 
@@ -88,6 +90,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         userRatingView = (TextView) rootView.findViewById(R.id.rating);
         releaseDateView = (TextView) rootView.findViewById(R.id.release);
 
+        // TODO: reviewsView
+
 //        parseMovieInfo();
 
 //        loadViews();
@@ -107,8 +111,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        final Intent intent = getActivity().getIntent();
-
         // if detail fragment is created without data (ie two pane layout)
         if (null == detailUri) {
             return null;
@@ -116,7 +118,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         return new CursorLoader(getActivity(),
                 detailUri,
-                MOVIE_COLUMNS,
+                DETAIL_COLUMNS,
                 null,
                 null,
                 null);
@@ -125,8 +127,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         detailCursor = cursor;
+//        Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
 
         if (!detailCursor.moveToFirst()) {
+            Log.d(LOG_TAG, "detailCursor.moveToFirst returned false");
             return;
         }
 
@@ -135,6 +139,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         loadOverviewIntoView();
         loadRatingIntoView();
         loadReleaseIntoView();
+
+        // TODO loadReviewIntoView();
     }
 
     @Override
@@ -146,7 +152,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         final String posterUrl = detailCursor.getString(COL_MOVIE_POSTER_PATH);
 
         if (posterUrl != null) {
-//            Picasso.with(getActivity()).load(R.drawable.suicide_squad).into(posterView);
             Picasso.with(getActivity()).load(posterUrl).into(posterView);
         }
     }

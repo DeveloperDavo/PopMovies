@@ -30,6 +30,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  */
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+
     private ArrayAdapter<String> posterAdapter;
     private final Context context;
     private String movieJsonStr;
@@ -44,7 +45,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
      * HTTP request on background thread.
      *
      * @param params is either top_rated or popular
-     * @return array of poster URLs
+     * @return nothing
      */
     @Override
     protected Void doInBackground(String... params) {
@@ -124,7 +125,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
 //            movieInfoParser = new MovieInfoParser(movieJsonStr);
 
-            // log posterUrls
+        // log posterUrls
 //                String[] posterUrls = movieInfoParser.getPosterUrls();
 //                for (String posterUrl : posterUrls) {
 //                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
@@ -164,7 +165,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
 //            addMovie(movieId, title, posterPath, overview, rating, release, favorite);
 
-            // TODO add reviews (later do it only when needed?)
+
             // TODO only poster_path and movie id is necessary for the main activity
 
             ContentValues movieValues = new ContentValues();
@@ -192,9 +193,36 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
             deleteOldMovieData();
-            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
-            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+//            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
+//            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+            for (ContentValues contentvalues : contentValuesArray) {
+                final Uri movieInsertUri = context.getContentResolver().insert(uri, contentvalues);
+                fetchReviews(movieInsertUri);
+            }
         }
+    }
+
+    // TODO: is there a better place for this? Does it make sense to put it in FRT?
+    private void fetchReviews(Uri movieInsertUri) {
+
+        final long movieKey = ContentUris.parseId(movieInsertUri);
+        final Uri movieUri = MovieEntry.CONTENT_URI;
+        final String[] columns = new String[]{MovieEntry.COLUMN_MOVIE_ID};
+        final int colMovieId = 0;
+        final String selection = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
+        final String[] selectionArgs = new String[]{Long.toString(movieKey)};
+        final String sortOrder = null;
+
+        final Cursor cursor = context.getContentResolver().query(
+                movieUri, columns, selection, selectionArgs, sortOrder
+        );
+//                Log.d(LOG_TAG, "movie query: " + DatabaseUtils.dumpCursorToString(cursor));
+        cursor.moveToFirst();
+
+        long movieId = cursor.getLong(colMovieId);
+
+        Log.d(LOG_TAG, "fetching reviews");
+        (new FetchReviewsTask(context, movieKey, movieId)).execute();
     }
 
     private void deleteOldMovieData() {

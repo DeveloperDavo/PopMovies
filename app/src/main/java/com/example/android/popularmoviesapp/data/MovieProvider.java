@@ -72,6 +72,7 @@ public class MovieProvider extends ContentProvider {
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
                 cursor = getCursorForSingleMovie(uri, projection, sortOrder);
+//                Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
             default:
@@ -192,7 +193,8 @@ public class MovieProvider extends ContentProvider {
         switch (match) {
             case MovieUriMatcher.MOVIES_CODE:
                 return bulkInsertEntries(MovieEntry.TABLE_NAME, uri, values);
-            // TODO reviews
+            case MovieUriMatcher.REVIEWS_CODE:
+                return bulkInsertEntries(ReviewEntry.TABLE_NAME, uri, values);
             // TODO videos
             default:
                 return super.bulkInsert(uri, values);
@@ -215,9 +217,7 @@ public class MovieProvider extends ContentProvider {
                 try {
                     _id = writableDatabase.insertOrThrow(tableName, null, value);
                 } catch (SQLiteConstraintException e) {
-                    Log.w(LOG_TAG, "Attempting to insert " +
-                            value.getAsString(MovieEntry.COLUMN_TITLE)
-                            + " but value is already in database.");
+                    Log.w(LOG_TAG, "Value is already in database.");
                 }
                 if (_id != -1) {
                     rowsInserted++;
@@ -254,9 +254,8 @@ public class MovieProvider extends ContentProvider {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
-        // TODO use join when ready
-        return readableDatabase.query(MovieEntry.TABLE_NAME,
-//        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
+//        return readableDatabase.query(MovieEntry.TABLE_NAME,
+        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
                 projection,
                 SINGLE_MOVIE_SELECTION,
                 new String[]{String.valueOf(ContentUris.parseId(uri))},
@@ -283,8 +282,7 @@ public class MovieProvider extends ContentProvider {
 
     // movies._id = ?
     private static final String SINGLE_MOVIE_SELECTION =
-            MovieEntry.TABLE_NAME + "." +
-                    MovieEntry._ID + " = ?";
+            MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
 
     // movies._id = ? AND reviews._id = ?
     // TODO not in use yet
