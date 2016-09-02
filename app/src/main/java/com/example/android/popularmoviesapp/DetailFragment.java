@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.popularmoviesapp.data.MovieContract;
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -41,7 +41,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
             MovieEntry.COLUMN_RELEASE,
-            MovieContract.ReviewEntry.COLUMN_URL
+            ReviewEntry.COLUMN_CONTENT
     };
 
     static final int COL__ID = 0;
@@ -51,7 +51,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_OVERVIEW = 4;
     static final int COL_MOVIE_RATING = 5;
     static final int COL_MOVIE_RELEASE = 6;
-    static final int COL_REVIEW_URL = 7;
+    static final int COL_REVIEW_CONTENT = 7;
 
     /**********************************************************************************************/
 
@@ -60,6 +60,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView overviewView;
     private TextView userRatingView;
     private TextView releaseDateView;
+    private TextView reviewsView;
     private Cursor detailCursor;
 
     public static DetailFragment newInstance() {
@@ -89,12 +90,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         overviewView = (TextView) rootView.findViewById(R.id.overview);
         userRatingView = (TextView) rootView.findViewById(R.id.rating);
         releaseDateView = (TextView) rootView.findViewById(R.id.release);
-
-        // TODO: reviewsView
-
-//        parseMovieInfo();
-
-//        loadViews();
+        reviewsView = (TextView) rootView.findViewById(R.id.review1);
 
         return rootView;
 
@@ -139,8 +135,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         loadOverviewIntoView();
         loadRatingIntoView();
         loadReleaseIntoView();
+        loadReview1IntoView();
 
-        // TODO loadReviewIntoView();
     }
 
     @Override
@@ -174,6 +170,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private void loadReleaseIntoView() {
         final String releaseDate = detailCursor.getString(COL_MOVIE_RELEASE);
         releaseDateView.setText(releaseDate.substring(0, 4));
+    }
+
+    private void loadReview1IntoView() {
+        final String review1 = detailCursor.getString(COL_REVIEW_CONTENT);
+        reviewsView.setText(review1);
     }
 }
 

@@ -1,417 +1,410 @@
 {
-  "page": 1,
-  "results": [
+  "page":1,
+  "results":[
     {
-      "poster_path": "\/6bCplVkhowCjTHXWv49UjRPn0eK.jpg",
-      "adult": false,
-      "overview": "Fearing the actions of a god-like Super Hero left unchecked, Gotham City’s own formidable, forceful vigilante takes on Metropolis’s most revered, modern-day savior, while the world wrestles with what sort of hero it really needs. And with Batman and Superman at war with one another, a new threat quickly arises, putting mankind in greater danger than it’s ever known before.",
-      "release_date": "2016-03-23",
-      "genre_ids": [
-        28,
-        12,
+      "poster_path":"\/e1mjopzAS2KNsvpbpahQ1a6SkSn.jpg",
+      "adult":false,
+      "overview":"From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
+      "release_date":"2016-08-03",
+      "genre_ids":[
         14,
-        878
-      ],
-      "id": 209112,
-      "original_title": "Batman v Superman: Dawn of Justice",
-      "original_language": "en",
-      "title": "Batman v Superman: Dawn of Justice",
-      "backdrop_path": "\/vsjBeMPZtyB7yNsYY56XYxifaQZ.jpg",
-      "popularity": 67.159895,
-      "vote_count": 1046,
-      "video": false,
-      "vote_average": 5.95
-    },
-    {
-      "poster_path": "\/vZpB8ezB1IqpxI9rx553TuGwDzJ.jpg",
-      "adult": false,
-      "overview": "Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers.",
-      "release_date": "2015-12-15",
-      "genre_ids": [
         28,
-        12,
-        878,
-        14
-      ],
-      "id": 140607,
-      "original_title": "Star Wars: The Force Awakens",
-      "original_language": "en",
-      "title": "Star Wars: The Force Awakens",
-      "backdrop_path": "\/njv65RTipNSTozFLuF85jL0bcQe.jpg",
-      "popularity": 39.250399,
-      "vote_count": 3588,
-      "video": false,
-      "vote_average": 7.69
-    },
-    {
-      "poster_path": "\/inVq3FRqcYIRl2la8iZikYYxFNR.jpg",
-      "adult": false,
-      "overview": "Based upon Marvel Comics’ most unconventional anti-hero, DEADPOOL tells the origin story of former Special Forces operative turned mercenary Wade Wilson, who after being subjected to a rogue experiment that leaves him with accelerated healing powers, adopts the alter ego Deadpool. Armed with his new abilities and a dark, twisted sense of humor, Deadpool hunts down the man who nearly destroyed his life.",
-      "release_date": "2016-02-09",
-      "genre_ids": [
-        28,
-        12,
-        35
-      ],
-      "id": 293660,
-      "original_title": "Deadpool",
-      "original_language": "en",
-      "title": "Deadpool",
-      "backdrop_path": "\/n1y094tVDFATSzkTnFxoGZ1qNsG.jpg",
-      "popularity": 30.77769,
-      "vote_count": 2539,
-      "video": false,
-      "vote_average": 7.18
-    },
-    {
-      "poster_path": "\/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg",
-      "adult": false,
-      "overview": "Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.",
-      "release_date": "2015-06-09",
-      "genre_ids": [
-        28,
-        12,
-        878,
-        53
-      ],
-      "id": 135397,
-      "original_title": "Jurassic World",
-      "original_language": "en",
-      "title": "Jurassic World",
-      "backdrop_path": "\/dkMD5qlogeRMiEixC4YNPUvax2T.jpg",
-      "popularity": 24.470081,
-      "vote_count": 4216,
-      "video": false,
-      "vote_average": 6.66
-    },
-    {
-      "poster_path": "\/w93GAiq860UjmgR6tU9h2T24vaV.jpg",
-      "adult": false,
-      "overview": "With the nation of Panem in a full scale war, Katniss confronts President Snow in the final showdown. Teamed with a group of her closest friends – including Gale, Finnick, and Peeta – Katniss goes off on a mission with the unit from District 13 as they risk their lives to stage an assassination attempt on President Snow who has become increasingly obsessed with destroying her. The mortal traps, enemies, and moral choices that await Katniss will challenge her more than any arena she faced in The Hunger Games.",
-      "release_date": "2015-11-18",
-      "genre_ids": [
-        28,
-        12,
-        18
-      ],
-      "id": 131634,
-      "original_title": "The Hunger Games: Mockingjay - Part 2",
-      "original_language": "en",
-      "title": "The Hunger Games: Mockingjay - Part 2",
-      "backdrop_path": "\/qjn3fzCAHGfl0CzeUlFbjrsmu4c.jpg",
-      "popularity": 24.118838,
-      "vote_count": 1444,
-      "video": false,
-      "vote_average": 6.73
-    },
-    {
-      "poster_path": "\/t5tGykRvvlLBULIPsAJEzGg1ylm.jpg",
-      "adult": false,
-      "overview": "A father is without the means to pay for his daughter's medical treatment. As a last resort, he partners with a greedy co-worker to rob a casino. When things go awry they're forced to hijack a city bus.",
-      "release_date": "2015-11-13",
-      "genre_ids": [
-        28,
-        53
-      ],
-      "id": 336004,
-      "original_title": "Heist",
-      "original_language": "en",
-      "title": "Heist",
-      "backdrop_path": "\/cBlnfR0n1GA2vPoUQNcbL9pb3VW.jpg",
-      "popularity": 21.025615,
-      "vote_count": 147,
-      "video": false,
-      "vote_average": 5.26
-    },
-    {
-      "poster_path": "\/kqjL17yufvn9OVLyXYpvtyrFfak.jpg",
-      "adult": false,
-      "overview": "An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland.",
-      "release_date": "2015-05-13",
-      "genre_ids": [
-        878,
-        53,
-        28,
-        12
-      ],
-      "id": 76341,
-      "original_title": "Mad Max: Fury Road",
-      "original_language": "en",
-      "title": "Mad Max: Fury Road",
-      "backdrop_path": "\/tbhdm8UJAb4ViCTsulYFL3lxMCd.jpg",
-      "popularity": 20.920803,
-      "vote_count": 4275,
-      "video": false,
-      "vote_average": 7.4
-    },
-    {
-      "poster_path": "\/5N20rQURev5CNDcMjHVUZhpoCNC.jpg",
-      "adult": false,
-      "overview": "Following the events of Age of Ultron, the collective governments of the world pass an act designed to regulate all superhuman activity. This polarizes opinion amongst the Avengers, causing two factions to side with Iron Man or Captain America, which causes an epic battle between former allies.",
-      "release_date": "2016-04-27",
-      "genre_ids": [
-        28,
-        878,
-        53
-      ],
-      "id": 271110,
-      "original_title": "Captain America: Civil War",
-      "original_language": "en",
-      "title": "Captain America: Civil War",
-      "backdrop_path": "\/imSjsW6QRkH7fvhnqhQgjnbBBtd.jpg",
-      "popularity": 19.692935,
-      "vote_count": 19,
-      "video": false,
-      "vote_average": 4.89
-    },
-    {
-      "poster_path": "\/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg",
-      "adult": false,
-      "overview": "In the 1820s, a frontiersman, Hugh Glass, sets out on a path of vengeance against those who left him for dead after a bear mauling.",
-      "release_date": "2015-12-25",
-      "genre_ids": [
-        37,
-        18,
-        12,
-        53
-      ],
-      "id": 281957,
-      "original_title": "The Revenant",
-      "original_language": "en",
-      "title": "The Revenant",
-      "backdrop_path": "\/uS1SkjVviraGfFNgkDwe7ohTm8B.jpg",
-      "popularity": 19.240969,
-      "vote_count": 2214,
-      "video": false,
-      "vote_average": 7.22
-    },
-    {
-      "poster_path": "\/hE24GYddaxB9MVZl1CaiI86M3kp.jpg",
-      "adult": false,
-      "overview": "A cryptic message from Bond’s past sends him on a trail to uncover a sinister organization. While M battles political forces to keep the secret service alive, Bond peels back the layers of deceit to reveal the terrible truth behind SPECTRE.",
-      "release_date": "2015-10-26",
-      "genre_ids": [
-        28,
-        12,
         80
       ],
-      "id": 206647,
-      "original_title": "Spectre",
-      "original_language": "en",
-      "title": "Spectre",
-      "backdrop_path": "\/wVTYlkKPKrljJfugXN7UlLNjtuJ.jpg",
-      "popularity": 17.969109,
-      "vote_count": 2441,
-      "video": false,
-      "vote_average": 6.24
+      "id":297761,
+      "original_title":"Suicide Squad",
+      "original_language":"en",
+      "title":"Suicide Squad",
+      "backdrop_path":"\/ndlQ2Cuc3cjTL7lTynw6I4boP4S.jpg",
+      "popularity":39.573181,
+      "vote_count":1590,
+      "video":false,
+      "vote_average":5.92
     },
     {
-      "poster_path": "\/cWERd8rgbw7bCMZlwP207HUXxym.jpg",
-      "adult": false,
-      "overview": "Katniss Everdeen reluctantly becomes the symbol of a mass rebellion against the autocratic Capitol.",
-      "release_date": "2014-11-18",
-      "genre_ids": [
-        878,
-        12,
+      "poster_path":"\/5N20rQURev5CNDcMjHVUZhpoCNC.jpg",
+      "adult":false,
+      "overview":"Following the events of Age of Ultron, the collective governments of the world pass an act designed to regulate all superhuman activity. This polarizes opinion amongst the Avengers, causing two factions to side with Iron Man or Captain America, which causes an epic battle between former allies.",
+      "release_date":"2016-04-27",
+      "genre_ids":[
+        28,
+        53,
+        878
+      ],
+      "id":271110,
+      "original_title":"Captain America: Civil War",
+      "original_language":"en",
+      "title":"Captain America: Civil War",
+      "backdrop_path":"\/rqAHkvXldb9tHlnbQDwOzRi0yVD.jpg",
+      "popularity":36.400279,
+      "vote_count":2630,
+      "video":false,
+      "vote_average":6.93
+    },
+    {
+      "poster_path":"\/lFSSLTlFozwpaGlO31OoUeirBgQ.jpg",
+      "adult":false,
+      "overview":"The most dangerous former operative of the CIA is drawn out of hiding to uncover hidden truths about his past.",
+      "release_date":"2016-07-27",
+      "genre_ids":[
+        28,
         53
       ],
-      "id": 131631,
-      "original_title": "The Hunger Games: Mockingjay - Part 1",
-      "original_language": "en",
-      "title": "The Hunger Games: Mockingjay - Part 1",
-      "backdrop_path": "\/83nHcz2KcnEpPXY50Ky2VldewJJ.jpg",
-      "popularity": 17.530573,
-      "vote_count": 2725,
-      "video": false,
-      "vote_average": 6.8
+      "id":324668,
+      "original_title":"Jason Bourne",
+      "original_language":"en",
+      "title":"Jason Bourne",
+      "backdrop_path":"\/AoT2YrJUJlg5vKE3iMOLvHlTd3m.jpg",
+      "popularity":34.937436,
+      "vote_count":706,
+      "video":false,
+      "vote_average":5.27
     },
     {
-      "poster_path": "\/fqe8JxDNO8B8QfOGTdjh6sPCdSC.jpg",
-      "adult": false,
-      "overview": "Bounty hunters seek shelter from a raging blizzard and get caught up in a plot of betrayal and deception.",
-      "release_date": "2015-12-25",
-      "genre_ids": [
+      "poster_path":"\/tgfRDJs5PFW20Aoh1orEzuxW8cN.jpg",
+      "adult":false,
+      "overview":"Arthur Bishop thought he had put his murderous past behind him when his most formidable foe kidnaps the love of his life. Now he is forced to travel the globe to complete three impossible assassinations, and do what he does best, make them look like accidents.",
+      "release_date":"2016-08-25",
+      "genre_ids":[
         80,
-        18,
-        9648,
-        53,
-        37
+        28,
+        53
       ],
-      "id": 273248,
-      "original_title": "The Hateful Eight",
-      "original_language": "en",
-      "title": "The Hateful Eight",
-      "backdrop_path": "\/sSvgNBeBNzAuKl8U8sP50ETJPgx.jpg",
-      "popularity": 16.834678,
-      "vote_count": 1368,
-      "video": false,
-      "vote_average": 7.3
+      "id":278924,
+      "original_title":"Mechanic: Resurrection",
+      "original_language":"en",
+      "title":"Mechanic: Resurrection",
+      "backdrop_path":"\/3oRHlbxMLBXHfMqUsx1emwqiuQ3.jpg",
+      "popularity":21.854566,
+      "vote_count":160,
+      "video":false,
+      "vote_average":4.66
     },
     {
-      "poster_path": "\/5JU9ytZJyR3zmClGmVm9q4Geqbd.jpg",
-      "adult": false,
-      "overview": "The year is 2029. John Connor, leader of the resistance continues the war against the machines. At the Los Angeles offensive, John's fears of the unknown future begin to emerge when TECOM spies reveal a new plot by SkyNet that will attack him from both fronts; past and future, and will ultimately change warfare forever.",
-      "release_date": "2015-06-23",
-      "genre_ids": [
+      "poster_path":"\/h28t2JNNGrZx0fIuAw8aHQFhIxR.jpg",
+      "adult":false,
+      "overview":"A recently cheated on married woman falls for a younger man who has moved in next door, but their torrid affair soon takes a dangerous turn.",
+      "release_date":"2015-01-23",
+      "genre_ids":[
+        53
+      ],
+      "id":241251,
+      "original_title":"The Boy Next Door",
+      "original_language":"en",
+      "title":"The Boy Next Door",
+      "backdrop_path":"\/vj4IhmH4HCMZYYjTMiYBybTWR5o.jpg",
+      "popularity":20.352394,
+      "vote_count":646,
+      "video":false,
+      "vote_average":4.13
+    },
+    {
+      "poster_path":"\/vOipe2myi26UDwP978hsYOrnUWC.jpg",
+      "adult":false,
+      "overview":"After a threat from the tiger Shere Khan forces him to flee the jungle, a man-cub named Mowgli embarks on a journey of self discovery with the help of panther, Bagheera, and free spirited bear, Baloo.",
+      "release_date":"2016-04-07",
+      "genre_ids":[
+        12,
+        18,
+        14
+      ],
+      "id":278927,
+      "original_title":"The Jungle Book",
+      "original_language":"en",
+      "title":"The Jungle Book",
+      "backdrop_path":"\/eIOTsGg9FCVrBc4r2nXaV61JF4F.jpg",
+      "popularity":17.092284,
+      "vote_count":1124,
+      "video":false,
+      "vote_average":6.41
+    },
+    {
+      "poster_path":"\/hU0E130tsGdsYa4K9lc3Xrn5Wyt.jpg",
+      "adult":false,
+      "overview":"One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet.",
+      "release_date":"2016-06-02",
+      "genre_ids":[
+        28,
+        12,
+        35,
+        80,
+        9648,
+        53
+      ],
+      "id":291805,
+      "original_title":"Now You See Me 2",
+      "original_language":"en",
+      "title":"Now You See Me 2",
+      "backdrop_path":"\/zrAO2OOa6s6dQMQ7zsUbDyIBrAP.jpg",
+      "popularity":16.446401,
+      "vote_count":730,
+      "video":false,
+      "vote_average":6.66
+    },
+    {
+      "poster_path":"\/cGOPbv9wA5gEejkUN892JrveARt.jpg",
+      "adult":false,
+      "overview":"Fearing the actions of a god-like Super Hero left unchecked, Gotham City’s own formidable, forceful vigilante takes on Metropolis’s most revered, modern-day savior, while the world wrestles with what sort of hero it really needs. And with Batman and Superman at war with one another, a new threat quickly arises, putting mankind in greater danger than it’s ever known before.",
+      "release_date":"2016-03-23",
+      "genre_ids":[
+        28,
+        12,
+        14
+      ],
+      "id":209112,
+      "original_title":"Batman v Superman: Dawn of Justice",
+      "original_language":"en",
+      "title":"Batman v Superman: Dawn of Justice",
+      "backdrop_path":"\/vsjBeMPZtyB7yNsYY56XYxifaQZ.jpg",
+      "popularity":13.391655,
+      "vote_count":3525,
+      "video":false,
+      "vote_average":5.53
+    },
+    {
+      "poster_path":"\/kqjL17yufvn9OVLyXYpvtyrFfak.jpg",
+      "adult":false,
+      "overview":"An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland.",
+      "release_date":"2015-05-13",
+      "genre_ids":[
+        28,
+        12,
+        878,
+        53
+      ],
+      "id":76341,
+      "original_title":"Mad Max: Fury Road",
+      "original_language":"en",
+      "title":"Mad Max: Fury Road",
+      "backdrop_path":"\/tbhdm8UJAb4ViCTsulYFL3lxMCd.jpg",
+      "popularity":13.369383,
+      "vote_count":5260,
+      "video":false,
+      "vote_average":7.26
+    },
+    {
+      "poster_path":"\/gj282Pniaa78ZJfbaixyLXnXEDI.jpg",
+      "adult":false,
+      "overview":"Katniss Everdeen reluctantly becomes the symbol of a mass rebellion against the autocratic Capitol.",
+      "release_date":"2014-11-18",
+      "genre_ids":[
+        878,
+        12,
+        53
+      ],
+      "id":131631,
+      "original_title":"The Hunger Games: Mockingjay - Part 1",
+      "original_language":"en",
+      "title":"The Hunger Games: Mockingjay - Part 1",
+      "backdrop_path":"\/83nHcz2KcnEpPXY50Ky2VldewJJ.jpg",
+      "popularity":12.572546,
+      "vote_count":3192,
+      "video":false,
+      "vote_average":6.7
+    },
+    {
+      "poster_path":"\/e3lBJCedHnZPfNfmBArKHZXXNC0.jpg",
+      "adult":false,
+      "overview":"Lorraine and Ed Warren travel to north London to help a single mother raising four children alone in a house plagued by malicious spirits.",
+      "release_date":"2016-06-08",
+      "genre_ids":[
+        27
+      ],
+      "id":259693,
+      "original_title":"The Conjuring 2",
+      "original_language":"en",
+      "title":"The Conjuring 2",
+      "backdrop_path":"\/w9ENTWwpVJYoUky0gg8szmiJuyx.jpg",
+      "popularity":11.881849,
+      "vote_count":597,
+      "video":false,
+      "vote_average":6.44
+    },
+    {
+      "poster_path":"\/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg",
+      "adult":false,
+      "overview":"Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.",
+      "release_date":"2015-06-09",
+      "genre_ids":[
+        28,
+        12,
+        878,
+        53
+      ],
+      "id":135397,
+      "original_title":"Jurassic World",
+      "original_language":"en",
+      "title":"Jurassic World",
+      "backdrop_path":"\/dkMD5qlogeRMiEixC4YNPUvax2T.jpg",
+      "popularity":11.739819,
+      "vote_count":4949,
+      "video":false,
+      "vote_average":6.59
+    },
+    {
+      "poster_path":"\/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
+      "adult":false,
+      "overview":"Interstellar chronicles the adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+      "release_date":"2014-11-05",
+      "genre_ids":[
+        12,
+        18,
+        878
+      ],
+      "id":157336,
+      "original_title":"Interstellar",
+      "original_language":"en",
+      "title":"Interstellar",
+      "backdrop_path":"\/xu9zaAevzQ5nnrsXN6JcahLnG4i.jpg",
+      "popularity":11.165431,
+      "vote_count":5619,
+      "video":false,
+      "vote_average":8.11
+    },
+    {
+      "poster_path":"\/inVq3FRqcYIRl2la8iZikYYxFNR.jpg",
+      "adult":false,
+      "overview":"Based upon Marvel Comics’ most unconventional anti-hero, DEADPOOL tells the origin story of former Special Forces operative turned mercenary Wade Wilson, who after being subjected to a rogue experiment that leaves him with accelerated healing powers, adopts the alter ego Deadpool. Armed with his new abilities and a dark, twisted sense of humor, Deadpool hunts down the man who nearly destroyed his life.",
+      "release_date":"2016-02-09",
+      "genre_ids":[
+        28,
+        12,
+        35,
+        10749
+      ],
+      "id":293660,
+      "original_title":"Deadpool",
+      "original_language":"en",
+      "title":"Deadpool",
+      "backdrop_path":"\/nbIrDhOtUpdD9HKDBRy02a8VhpV.jpg",
+      "popularity":10.488118,
+      "vote_count":4872,
+      "video":false,
+      "vote_average":7.16
+    },
+    {
+      "poster_path":"\/bWUeJHbKIyT306WtJFRHoSzX9nk.jpg",
+      "adult":false,
+      "overview":"A sorority moves in next door to the home of Mac and Kelly Radner who have a young child. The Radner's enlist their former nemeses from the fraternity to help battle the raucous sisters.",
+      "release_date":"2016-05-05",
+      "genre_ids":[
+        35
+      ],
+      "id":325133,
+      "original_title":"Neighbors 2: Sorority Rising",
+      "original_language":"en",
+      "title":"Neighbors 2: Sorority Rising",
+      "backdrop_path":"\/8HuO1RMDI3prfWDkF7t1y8EhLVO.jpg",
+      "popularity":10.30633,
+      "vote_count":434,
+      "video":false,
+      "vote_average":5.34
+    },
+    {
+      "poster_path":"\/dCgm7efXDmiABSdWDHBDBx2jwmn.jpg",
+      "adult":false,
+      "overview":"Deckard Shaw seeks revenge against Dominic Toretto and his family for his comatose brother.",
+      "release_date":"2015-04-01",
+      "genre_ids":[
+        28,
+        80,
+        53
+      ],
+      "id":168259,
+      "original_title":"Furious 7",
+      "original_language":"en",
+      "title":"Furious 7",
+      "backdrop_path":"\/ypyeMfKydpyuuTMdp36rMlkGDUL.jpg",
+      "popularity":9.84504,
+      "vote_count":2723,
+      "video":false,
+      "vote_average":7.39
+    },
+    {
+      "poster_path":"\/oDL2ryJ0sV2bmjgshVgJb3qzvwp.jpg",
+      "adult":false,
+      "overview":"The city needs heroes. Darkness has settled over New York City as Shredder and his evil Foot Clan have an iron grip on everything from the police to the politicians. The future is grim until four unlikely outcast brothers rise from the sewers and discover their destiny as Teenage Mutant Ninja Turtles. The Turtles must work with fearless reporter April and her wise-cracking cameraman Vern Fenwick to save the city and unravel Shredder's diabolical plan.",
+      "release_date":"2014-08-07",
+      "genre_ids":[
         878,
         28,
-        53,
-        12
-      ],
-      "id": 87101,
-      "original_title": "Terminator Genisys",
-      "original_language": "en",
-      "title": "Terminator Genisys",
-      "backdrop_path": "\/bIlYH4l2AyYvEysmS2AOfjO7Dn8.jpg",
-      "popularity": 16.597168,
-      "vote_count": 1932,
-      "video": false,
-      "vote_average": 6.03
-    },
-    {
-      "poster_path": "\/y31QB9kn3XSudA15tV7UWQ9XLuW.jpg",
-      "adult": false,
-      "overview": "Light years from Earth, 26 years after being abducted, Peter Quill finds himself the prime target of a manhunt after discovering an orb wanted by Ronan the Accuser.",
-      "release_date": "2014-07-30",
-      "genre_ids": [
-        878,
+        12,
         14,
-        12
+        35
       ],
-      "id": 118340,
-      "original_title": "Guardians of the Galaxy",
-      "original_language": "en",
-      "title": "Guardians of the Galaxy",
-      "backdrop_path": "\/bHarw8xrmQeqf3t8HpuMY7zoK4x.jpg",
-      "popularity": 15.646077,
-      "vote_count": 4391,
-      "video": false,
-      "vote_average": 8.02
+      "id":98566,
+      "original_title":"Teenage Mutant Ninja Turtles",
+      "original_language":"en",
+      "title":"Teenage Mutant Ninja Turtles",
+      "backdrop_path":"\/OqCXGt5nl1cHPeotxCDvXLLe6p.jpg",
+      "popularity":9.275461,
+      "vote_count":1646,
+      "video":false,
+      "vote_average":5.9
     },
     {
-      "poster_path": "\/aeiVxTSTeGJ2ICf1iSDXkF3ivZp.jpg",
-      "adult": false,
-      "overview": "Waking up from a car accident, a young woman finds herself in the basement of a man who says he's saved her life from a chemical attack that has left the outside uninhabitable.",
-      "release_date": "2016-03-10",
-      "genre_ids": [
-        18,
+      "poster_path":"\/y31QB9kn3XSudA15tV7UWQ9XLuW.jpg",
+      "adult":false,
+      "overview":"Light years from Earth, 26 years after being abducted, Peter Quill finds himself the prime target of a manhunt after discovering an orb wanted by Ronan the Accuser.",
+      "release_date":"2014-07-30",
+      "genre_ids":[
+        28,
+        878,
+        12
+      ],
+      "id":118340,
+      "original_title":"Guardians of the Galaxy",
+      "original_language":"en",
+      "title":"Guardians of the Galaxy",
+      "backdrop_path":"\/bHarw8xrmQeqf3t8HpuMY7zoK4x.jpg",
+      "popularity":8.901717,
+      "vote_count":5017,
+      "video":false,
+      "vote_average":7.96
+    },
+    {
+      "poster_path":"\/coss7RgL0NH6g4fC2s5atvf3dFO.jpg",
+      "adult":false,
+      "overview":"Set in a post-apocalyptic world, young Thomas is deposited in a community of boys after his memory is erased, soon learning they're all trapped in a maze that will require him to join forces with fellow \"runners\" for a shot at escape.",
+      "release_date":"2014-09-10",
+      "genre_ids":[
+        28,
         9648,
         878,
         53
       ],
-      "id": 333371,
-      "original_title": "10 Cloverfield Lane",
-      "original_language": "en",
-      "title": "10 Cloverfield Lane",
-      "backdrop_path": "\/qEu2EJBQUNFx5mSKOCItwZm74ZE.jpg",
-      "popularity": 14.107377,
-      "vote_count": 159,
-      "video": false,
-      "vote_average": 6.72
+      "id":198663,
+      "original_title":"The Maze Runner",
+      "original_language":"en",
+      "title":"The Maze Runner",
+      "backdrop_path":"\/yTbPPmLAn7DiiM0sPYfZduoAjB.jpg",
+      "popularity":8.882592,
+      "vote_count":3106,
+      "video":false,
+      "vote_average":7
     },
     {
-      "poster_path": "\/sM33SANp9z6rXW8Itn7NnG1GOEs.jpg",
-      "adult": false,
-      "overview": "In the animal city of Zootopia, a fast-talking fox who's trying to make it big goes on the run when he's framed for a crime he didn't commit. Zootopia's top cop, a self-righteous rabbit, is hot on his tail, but when both become targets of a conspiracy, they're forced to team up and discover even natural enemies can become best friends.",
-      "release_date": "2016-02-12",
-      "genre_ids": [
-        16,
-        12,
-        10751,
-        35
-      ],
-      "id": 269149,
-      "original_title": "Zootopia",
-      "original_language": "en",
-      "title": "Zootopia",
-      "backdrop_path": "\/mhdeE1yShHTaDbJVdWyTlzFvNkr.jpg",
-      "popularity": 13.963591,
-      "vote_count": 510,
-      "video": false,
-      "vote_average": 7.53
-    },
-    {
-      "poster_path": "\/5aGhaIHYuQbqlHWvWYqMCnj40y2.jpg",
-      "adult": false,
-      "overview": "During a manned mission to Mars, Astronaut Mark Watney is presumed dead after a fierce storm and left behind by his crew. But Watney has survived and finds himself stranded and alone on the hostile planet. With only meager supplies, he must draw upon his ingenuity, wit and spirit to subsist and find a way to signal to Earth that he is alive.",
-      "release_date": "2015-09-30",
-      "genre_ids": [
-        18,
-        12,
-        878
-      ],
-      "id": 286217,
-      "original_title": "The Martian",
-      "original_language": "en",
-      "title": "The Martian",
-      "backdrop_path": "\/sy3e2e4JwdAtd2oZGA2uUilZe8j.jpg",
-      "popularity": 13.924436,
-      "vote_count": 3159,
-      "video": false,
-      "vote_average": 7.58
-    },
-    {
-      "poster_path": "\/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
-      "adult": false,
-      "overview": "Interstellar chronicles the adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
-      "release_date": "2014-11-05",
-      "genre_ids": [
-        12,
-        18,
-        878
-      ],
-      "id": 157336,
-      "original_title": "Interstellar",
-      "original_language": "en",
-      "title": "Interstellar",
-      "backdrop_path": "\/xu9zaAevzQ5nnrsXN6JcahLnG4i.jpg",
-      "popularity": 13.922764,
-      "vote_count": 4688,
-      "video": false,
-      "vote_average": 8.21
-    },
-    {
-      "poster_path": "\/q0R4crx2SehcEEQEkYObktdeFy.jpg",
-      "adult": false,
-      "overview": "Minions Stuart, Kevin and Bob are recruited by Scarlet Overkill, a super-villain who, alongside her inventor husband Herb, hatches a plot to take over the world.",
-      "release_date": "2015-06-17",
-      "genre_ids": [
+      "poster_path":"\/q0R4crx2SehcEEQEkYObktdeFy.jpg",
+      "adult":false,
+      "overview":"Minions Stuart, Kevin and Bob are recruited by Scarlet Overkill, a super-villain who, alongside her inventor husband Herb, hatches a plot to take over the world.",
+      "release_date":"2015-06-17",
+      "genre_ids":[
         10751,
         16,
         12,
         35
       ],
-      "id": 211672,
-      "original_title": "Minions",
-      "original_language": "en",
-      "title": "Minions",
-      "backdrop_path": "\/uX7LXnsC7bZJZjn048UCOwkPXWJ.jpg",
-      "popularity": 13.667748,
-      "vote_count": 2379,
-      "video": false,
-      "vote_average": 6.6
-    },
-    {
-      "poster_path": "\/5TQ6YDmymBpnF005OyoB7ohZps9.jpg",
-      "adult": false,
-      "overview": "After the cataclysmic events in New York with The Avengers, Steve Rogers, aka Captain America is living quietly in Washington, D.C. and trying to adjust to the modern world. But when a S.H.I.E.L.D. colleague comes under attack, Steve becomes embroiled in a web of intrigue that threatens to put the world at risk. Joining forces with the Black Widow, Captain America struggles to expose the ever-widening conspiracy while fighting off professional assassins sent to silence him at every turn. When the full scope of the villainous plot is revealed, Captain America and the Black Widow enlist the help of a new ally, the Falcon. However, they soon find themselves up against an unexpected and formidable enemy—the Winter Soldier.",
-      "release_date": "2014-03-20",
-      "genre_ids": [
-        28,
-        12,
-        878
-      ],
-      "id": 100402,
-      "original_title": "Captain America: The Winter Soldier",
-      "original_language": "en",
-      "title": "Captain America: The Winter Soldier",
-      "backdrop_path": "\/4qfXT9BtxeFuamR4F49m2mpKQI1.jpg",
-      "popularity": 13.637293,
-      "vote_count": 3067,
-      "video": false,
-      "vote_average": 7.66
+      "id":211672,
+      "original_title":"Minions",
+      "original_language":"en",
+      "title":"Minions",
+      "backdrop_path":"\/uX7LXnsC7bZJZjn048UCOwkPXWJ.jpg",
+      "popularity":8.437366,
+      "vote_count":2705,
+      "video":false,
+      "vote_average":6.55
     }
   ],
-  "total_results": 19692,
-  "total_pages": 985
+  "total_results":19688,
+  "total_pages":985
 }

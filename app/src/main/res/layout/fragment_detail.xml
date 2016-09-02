@@ -71,5 +71,17 @@
             android:textAppearance="?android:textAppearanceSmall"
             tools:text="Overview: The quick brown fox jumps over the lazy dog" />
 
+        <TextView
+            android:id="@+id/review1"
+            android:linksClickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!--<ListView-->
+            <!--android:id="@+id/listview_reviews"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+        <!--</ListView>-->
+
     </LinearLayout>
 </ScrollView>
