@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -193,6 +195,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
             deleteOldMovieData();
+            deleteOldReviewData();
 //            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
 //            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
             for (ContentValues contentvalues : contentValuesArray) {
@@ -229,9 +232,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
         int deleted = context.getContentResolver().delete(
                 MovieEntry.CONTENT_URI, null, null);
-        Log.d(LOG_TAG, "delete complete. " + deleted + " deleted");
+        Log.d(LOG_TAG, deleted + "movies deleted");
     }
 
+    private void deleteOldReviewData() {
+
+        int deleted = context.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI, null, null);
+        Log.d(LOG_TAG, deleted + "reviews deleted");
+
+    }
     // TODO update instead of insert if movie_id already exists
     public long addMovie(long movieId, String title, String posterPath, String overview,
                          double rating, String release, int favorite) {

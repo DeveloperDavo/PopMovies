@@ -61,6 +61,7 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
 
             URL url = new URL(builtUri.toString());
 
+            Log.d(LOG_TAG, "movie_key: " + movie_key);
             Log.d(LOG_TAG, "reviews url: " + url);
 
             // create the request to TMDb, and open the connection
@@ -165,10 +166,4 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    private void deleteOldReviewData() {
-
-        int deleted = context.getContentResolver().delete(
-                ReviewEntry.CONTENT_URI, null, null);
-        Log.d(LOG_TAG, "delete complete. " + deleted + " deleted");
-    }
 }
