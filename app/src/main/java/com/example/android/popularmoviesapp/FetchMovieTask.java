@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -196,11 +197,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             contentValuesVector.toArray(contentValuesArray);
             deleteOldMovieData();
             deleteOldReviewData();
+            deleteOldVideoData();
 //            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
 //            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
             for (ContentValues contentvalues : contentValuesArray) {
                 final Uri movieInsertUri = context.getContentResolver().insert(uri, contentvalues);
                 fetchReviews(movieInsertUri);
+                fetchVideos(movieInsertUri);
             }
         }
     }
@@ -228,6 +231,29 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         (new FetchReviewsTask(context, movieKey, movieId)).execute();
     }
 
+    // TODO: is there a better place for this? Does it make sense to put it in FRT?
+    private void fetchVideos(Uri movieInsertUri) {
+
+        final long movieKey = ContentUris.parseId(movieInsertUri);
+        final Uri movieUri = MovieEntry.CONTENT_URI;
+        final String[] columns = new String[]{MovieEntry.COLUMN_MOVIE_ID};
+        final int colMovieId = 0;
+        final String selection = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
+        final String[] selectionArgs = new String[]{Long.toString(movieKey)};
+        final String sortOrder = null;
+
+        final Cursor cursor = context.getContentResolver().query(
+                movieUri, columns, selection, selectionArgs, sortOrder
+        );
+//                Log.d(LOG_TAG, "movie query: " + DatabaseUtils.dumpCursorToString(cursor));
+        cursor.moveToFirst();
+
+        long movieId = cursor.getLong(colMovieId);
+
+        Log.d(LOG_TAG, "fetching videos");
+        (new FetchVideosTask(context, movieKey, movieId)).execute();
+    }
+
     private void deleteOldMovieData() {
 
         int deleted = context.getContentResolver().delete(
@@ -242,6 +268,15 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         Log.d(LOG_TAG, deleted + "reviews deleted");
 
     }
+
+    private void deleteOldVideoData() {
+
+        int deleted = context.getContentResolver().delete(
+                VideoEntry.CONTENT_URI, null, null);
+        Log.d(LOG_TAG, deleted + "vidoes deleted");
+
+    }
+
     // TODO update instead of insert if movie_id already exists
     public long addMovie(long movieId, String title, String posterPath, String overview,
                          double rating, String release, int favorite) {
