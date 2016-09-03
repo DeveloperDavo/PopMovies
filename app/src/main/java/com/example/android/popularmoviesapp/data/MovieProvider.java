@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
@@ -44,6 +46,8 @@ public class MovieProvider extends ContentProvider {
                 return MovieEntry.CONTENT_TYPE;
             case MovieUriMatcher.REVIEWS_CODE:
                 return ReviewEntry.CONTENT_TYPE;
+            case MovieUriMatcher.VIDEOS_CODE:
+                return VideoEntry.CONTENT_TYPE;
             case MovieUriMatcher.SINGLE_MOVIE_CODE:
                 return MovieEntry.CONTENT_ITEM_TYPE;
             default:
@@ -67,6 +71,11 @@ public class MovieProvider extends ContentProvider {
             }
             case MovieUriMatcher.REVIEWS_CODE: {
                 cursor = readableDatabase.query(ReviewEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            }
+            case MovieUriMatcher.VIDEOS_CODE: {
+                cursor = readableDatabase.query(VideoEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
@@ -97,6 +106,10 @@ public class MovieProvider extends ContentProvider {
             }
             case MovieUriMatcher.REVIEWS_CODE: {
                 returnUri = insertReviewEntries(uri, values);
+                break;
+            }
+            case MovieUriMatcher.VIDEOS_CODE: {
+                returnUri = insertVideoEntries(uri, values);
                 break;
             }
             default:
@@ -130,6 +143,18 @@ public class MovieProvider extends ContentProvider {
         return returnUri;
     }
 
+    private Uri insertVideoEntries(Uri uri, ContentValues values) {
+
+        Uri returnUri;
+        final long _id = movieDbHelper.getWritableDatabase().
+                insert(VideoEntry.TABLE_NAME, null, values);
+        if (_id > 0)
+            returnUri = VideoEntry.buildVideoUri(_id);
+        else
+            throw new android.database.SQLException("Failed to insert row into " + uri);
+        return returnUri;
+    }
+
     @Override
     // delete returns the number of rows affected if a whereClause is passed in, 0
     // otherwise. To remove all rows and get a count pass "1" as the whereClause.
@@ -143,10 +168,16 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MovieUriMatcher.MOVIES_CODE:
-                rowsDeleted = writableDatabase.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = writableDatabase.delete(
+                        MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case MovieUriMatcher.REVIEWS_CODE:
-                rowsDeleted = writableDatabase.delete(ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = writableDatabase.delete(
+                        ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case MovieUriMatcher.VIDEOS_CODE:
+                rowsDeleted = writableDatabase.delete(
+                        VideoEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -254,8 +285,7 @@ public class MovieProvider extends ContentProvider {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
-//        return readableDatabase.query(MovieEntry.TABLE_NAME,
-        return REVIEWS_BY_MOVIE_QUERY_BUILDER.query(readableDatabase,
+        return JOIN_QUERY_BUILDER.query(readableDatabase,
                 projection,
                 SINGLE_MOVIE_SELECTION,
                 new String[]{String.valueOf(ContentUris.parseId(uri))},
@@ -265,17 +295,24 @@ public class MovieProvider extends ContentProvider {
         );
     }
 
-    private static final SQLiteQueryBuilder REVIEWS_BY_MOVIE_QUERY_BUILDER;
+    private static final SQLiteQueryBuilder JOIN_QUERY_BUILDER;
 
     static {
-        REVIEWS_BY_MOVIE_QUERY_BUILDER = new SQLiteQueryBuilder();
+        JOIN_QUERY_BUILDER = new SQLiteQueryBuilder();
 
-        // reviews INNER JOIN movies ON reviews.movie_key = movies._id
-        REVIEWS_BY_MOVIE_QUERY_BUILDER.setTables(
+        // movies INNER JOIN reviews ON reviews.movie_key = movies._id
+        // INNER JOIN videos ON videos.movie_key = movies._id
+        JOIN_QUERY_BUILDER.setTables(
                 MovieEntry.TABLE_NAME + " INNER JOIN " +
                         ReviewEntry.TABLE_NAME +
                         " ON " + ReviewEntry.TABLE_NAME +
                         "." + ReviewEntry.COLUMN_MOVIE_KEY +
+                        " = " + MovieEntry.TABLE_NAME +
+                        "." + MovieEntry._ID +
+                        " INNER JOIN " +
+                        VideoEntry.TABLE_NAME +
+                        " ON " + VideoEntry.TABLE_NAME +
+                        "." + VideoEntry.COLUMN_MOVIE_KEY +
                         " = " + MovieEntry.TABLE_NAME +
                         "." + MovieEntry._ID);
     }

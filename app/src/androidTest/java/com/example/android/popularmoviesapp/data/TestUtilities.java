@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.example.android.popularmoviesapp.utils.PollingCheck;
 
 import java.util.Map;
@@ -36,8 +37,12 @@ public class TestUtilities extends AndroidTestCase {
     public static final int BULK_INSERT_SIZE = 10;
     public static final int BULK_INSERT_SIZE_REVIEWS = 3;
 
+    public final static String VIDEO_ID = "videoId_ADFK";
+    public final static String VIDEO_KEY = "videoKey_ASFDJK";
+
     /**
      * Ensures an empty cursor is not returned.
+     *
      * @param error message that is different for each test case
      */
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
@@ -85,6 +90,15 @@ public class TestUtilities extends AndroidTestCase {
         reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
         reviewValues.put(ReviewEntry.COLUMN_URL, "www.example.com");
         return reviewValues;
+    }
+
+    // default video values
+    static ContentValues createVideoValues(long moviesRowId) {
+        ContentValues videoValues = new ContentValues();
+        videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, moviesRowId);
+        videoValues.put(VideoEntry.COLUMN_VIDEO_ID, VIDEO_ID);
+        videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, VIDEO_KEY);
+        return videoValues;
     }
 
     static long createAndInsertMovieValues(Context context) {
@@ -137,19 +151,33 @@ public class TestUtilities extends AndroidTestCase {
 
         return returnContentValues;
     }
+
     static long createAndInsertReviewValues(Context context, long movieRowId) {
 
         // insert our test records into the database
         MovieDbHelper dbHelper = new MovieDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+        final ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
 
-        long reviewRowId = db.insert(ReviewEntry.TABLE_NAME, null, testValues);
+        long reviewRowId = db.insert(ReviewEntry.TABLE_NAME, null, reviewValues);
 
-        // Verify we got a row back.
         assertTrue("Error: Failure to insert review values", reviewRowId != -1);
 
         return reviewRowId;
+    }
+
+    static long createAndInsertVideoValues(Context context, long movieRowId) {
+
+        // insert our test records into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final ContentValues videoValues = TestUtilities.createVideoValues(movieRowId);
+
+        long videoRowId = db.insert(VideoEntry.TABLE_NAME, null, videoValues);
+
+        assertTrue("Error: Failure to insert video values", videoRowId != -1);
+
+        return videoRowId;
     }
 
     /*

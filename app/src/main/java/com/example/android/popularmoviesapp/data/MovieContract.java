@@ -18,6 +18,7 @@ public class MovieContract {
 
     public static final String PATH_MOVIES = "movies";
     public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_VIDEOS = "videos";
 
     // movies uri
     public static final class MovieEntry implements BaseColumns {
@@ -69,6 +70,28 @@ public class MovieContract {
         public static final String COLUMN_URL = "url";
 
         public static Uri buildReviewUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    // videos uri
+    public static final class VideoEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_VIDEOS).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+
+        public static final String TABLE_NAME = "videos";
+
+        public static final String COLUMN_MOVIE_KEY = "movie_key";
+        public static final String COLUMN_VIDEO_ID = "video_id";
+        public static final String COLUMN_VIDEO_KEY = "video_key";
+
+        public static Uri buildVideoUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

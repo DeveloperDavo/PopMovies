@@ -25,8 +25,8 @@ public class TestDb extends AndroidTestCase {
 
     /**
      * Ensures database has been created
-     * Ensures movies and reviews tables exist
-     * Ensures movies and reviews table has the correct columns
+     * Ensures movies, reviews and videos tables exist
+     * Ensures movies, reviews and videos table has the correct columns
      *
      * @throws Throwable
      * TODO too much responsibility for one test
@@ -39,15 +39,15 @@ public class TestDb extends AndroidTestCase {
         final HashSet<String> tableNameHashSet = new HashSet<>();
         tableNameHashSet.add(MovieEntry.TABLE_NAME);
         tableNameHashSet.add(ReviewEntry.TABLE_NAME);
+        tableNameHashSet.add(VideoEntry.TABLE_NAME);
 
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
         SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
-        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        final Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
 
-        assertTrue("Error: Database has not been created correctly",
-                c.moveToFirst());
+        assertTrue("Error: Database has not been created correctly", c.moveToFirst());
 
         do {
             tableNameHashSet.remove(c.getString(0));
@@ -56,9 +56,10 @@ public class TestDb extends AndroidTestCase {
         assertTrue("Error: Databse was created without tables",
                 tableNameHashSet.isEmpty());
 
-        c = db.rawQuery("PRAGMA table_info(" + MovieEntry.TABLE_NAME + ")",
+        final Cursor movieCursor = db.rawQuery("PRAGMA table_info(" + MovieEntry.TABLE_NAME + ")",
                 null);
-        assertTrue("Error: Unable to query the database for table information.", c.moveToFirst());
+
+        assertTrue("Error: Unable to query the database for movie information.", movieCursor.moveToFirst());
 
         // movie entry columns
         final HashSet<String> movieColumnHashSet = new HashSet<>();
@@ -71,22 +72,19 @@ public class TestDb extends AndroidTestCase {
         movieColumnHashSet.add(MovieEntry.COLUMN_RELEASE);
         movieColumnHashSet.add(MovieEntry.COLUMN_FAVORITE);
 
-        int movieColumnIndex = c.getColumnIndex("name");
+        int movieColumnIndex = movieCursor.getColumnIndex("name");
         do {
-            String columnName = c.getString(movieColumnIndex);
+            String columnName = movieCursor.getString(movieColumnIndex);
             movieColumnHashSet.remove(columnName);
-        } while (c.moveToNext());
+        } while (movieCursor.moveToNext());
 
-        // if this fails, it means that your database doesn't contain all of the required movie
-        // entry columns
         assertTrue("Error: The database doesn't contain all of the required movie columns",
                 movieColumnHashSet.isEmpty());
 
-        // now, do our tables contain the correct columns?
-        c = db.rawQuery("PRAGMA table_info(" + ReviewEntry.TABLE_NAME + ")",
+        final Cursor reviewCursor = db.rawQuery("PRAGMA table_info(" + ReviewEntry.TABLE_NAME + ")",
                 null);
 
-        assertTrue("Error: Unable to query the database for table information.", c.moveToFirst());
+        assertTrue("Error: Unable to query the database for review information.", reviewCursor.moveToFirst());
 
         // review entry columns
         final HashSet<String> reviewColumnHashSet = new HashSet<>();
@@ -97,20 +95,40 @@ public class TestDb extends AndroidTestCase {
         reviewColumnHashSet.add(ReviewEntry.COLUMN_CONTENT);
         reviewColumnHashSet.add(ReviewEntry.COLUMN_URL);
 
-        int reviewColumnIndex = c.getColumnIndex("name");
+        int reviewColumnIndex = reviewCursor.getColumnIndex("name");
         do {
-            String columnName = c.getString(reviewColumnIndex);
+            String columnName = reviewCursor.getString(reviewColumnIndex);
             reviewColumnHashSet.remove(columnName);
-        } while (c.moveToNext());
+        } while (reviewCursor.moveToNext());
 
-        // if this fails, it means that your database doesn't contain all of the required location
-        // entry columns
         assertTrue("Error: The database doesn't contain all of the required reviews columns",
                 reviewColumnHashSet.isEmpty());
+
+        Cursor videoCursor = db.rawQuery("PRAGMA table_info(" + VideoEntry.TABLE_NAME + ")",
+                null);
+
+        assertTrue("Error: Unable to query the database for video information.", videoCursor.moveToFirst());
+
+        // video entry columns
+        final HashSet<String> videoColumnHashSet = new HashSet<>();
+        videoColumnHashSet.add(VideoEntry._ID);
+        videoColumnHashSet.add(VideoEntry.COLUMN_MOVIE_KEY);
+        videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_ID);
+        videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_KEY);
+
+        int videoColumnIndex = videoCursor.getColumnIndex("name");
+        do {
+            String columnName = videoCursor.getString(videoColumnIndex);
+            videoColumnHashSet.remove(columnName);
+        } while (videoCursor.moveToNext());
+
+        assertTrue("Error: The database doesn't contain all of the required videos columns",
+                videoColumnHashSet.isEmpty());
+
         db.close();
     }
 
-    public void testMovieTable() {
+    public void test_query_MovieEntry() {
         insertMovieEntry();
     }
 
@@ -118,7 +136,7 @@ public class TestDb extends AndroidTestCase {
      * Ensures a review entry can be inserted an queried using the movieRowId obtained from
      * inserting a movie entry.
      */
-    public void testReviewsTable() {
+    public void test_query_ReviewEntry() {
 
         long movieRowId = insertMovieEntry();
 
@@ -145,6 +163,43 @@ public class TestDb extends AndroidTestCase {
         TestUtilities.validateCurrentRecord("Error: Reviews Query Validation Failed", cursor, contentValues);
 
         assertFalse("Error: More than one record returned from reviews query",
+                cursor.moveToNext());
+
+        cursor.close();
+        db.close();
+    }
+
+    /**
+     * Ensures a video entry can be inserted an queried using the movieRowId obtained from
+     * inserting a movie entry.
+     */
+    public void test_query_VideoEntry() {
+
+        long movieRowId = insertMovieEntry();
+
+        final SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+
+        final ContentValues contentValues = TestUtilities.createVideoValues(movieRowId);
+
+        final long rowId = db.insert(VideoEntry.TABLE_NAME, null, contentValues);
+
+        assertTrue(rowId != -1);
+
+        final Cursor cursor = db.query(
+                VideoEntry.TABLE_NAME, // table
+                null, // all columns
+                null, // columns for the "where" clause
+                null, // values for the "where" clause
+                null, // columns to group by
+                null, // columns ot filter by row groups
+                null // sort order
+        );
+
+        assertTrue("Error: No Records returned from videos query", cursor.moveToFirst());
+
+        TestUtilities.validateCurrentRecord("Error: Videos Query Validation Failed", cursor, contentValues);
+
+        assertFalse("Error: More than one record returned from videos query",
                 cursor.moveToNext());
 
         cursor.close();

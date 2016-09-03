@@ -12,6 +12,7 @@ import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
 import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
@@ -65,19 +66,6 @@ public class TestProvider extends AndroidTestCase {
                 MovieEntry.CONTENT_TYPE, type);
     }
 
-    public void test_getType_reviews() {
-
-        // WHEN
-        // content://com.example.android.popularmoviesapp/reviews/
-        final String type = mContext.getContentResolver().
-                getType(ReviewEntry.CONTENT_URI);
-
-        // THEN
-        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
-        assertEquals("Error: the ReviewEntry CONTENT_URI should return ReviewEntry.CONTENT_TYPE",
-                ReviewEntry.CONTENT_TYPE, type);
-    }
-
     public void test_getType_movie() {
 
         // GIVEN
@@ -92,6 +80,32 @@ public class TestProvider extends AndroidTestCase {
         // vnd.android.cursor.dir/com.example.android.popularmoviesapp/movies/789
         assertEquals("Error: the MovieEntry CONTENT_URI with reviews should return MovieEntry.CONTENT_ITEM_TYPE",
                 MovieEntry.CONTENT_ITEM_TYPE, type);
+    }
+
+    public void test_getType_reviews() {
+
+        // WHEN
+        // content://com.example.android.popularmoviesapp/reviews/
+        final String type = mContext.getContentResolver().
+                getType(ReviewEntry.CONTENT_URI);
+
+        // THEN
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
+        assertEquals("Error: the ReviewEntry CONTENT_URI should return ReviewEntry.CONTENT_TYPE",
+                ReviewEntry.CONTENT_TYPE, type);
+    }
+
+    public void test_getType_videos() {
+
+        // WHEN
+        // content://com.example.android.popularmoviesapp/videos/
+        final String type = mContext.getContentResolver().
+                getType(VideoEntry.CONTENT_URI);
+
+        // THEN
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/videos
+        assertEquals("Error: the VideoEntry CONTENT_URI should return VideoEntry.CONTENT_TYPE",
+                VideoEntry.CONTENT_TYPE, type);
     }
 
     public void test_query_movies() {
@@ -136,18 +150,36 @@ public class TestProvider extends AndroidTestCase {
         return movieCursor;
     }
 
-    // TODO match style of test_query_movies
     public void test_query_reviews() {
+        queryReviews();
+    }
 
+    public void test_getNotificationUri_reviews() {
+
+        // GIVEN
+        final Cursor reviewCursor = queryReviews();
+
+        if (Build.VERSION.SDK_INT >= 19) {
+
+            // WHEN
+            final Uri notificationUri = reviewCursor.getNotificationUri();
+
+            // THEN
+            assertEquals("Error: Review Query did not properly set NotificationUri",
+                    notificationUri, ReviewEntry.CONTENT_URI);
+        }
+    }
+
+    private Cursor queryReviews() {
         final long testMovieRowId = 1;
         long reviewRowId = TestUtilities.createAndInsertReviewValues(mContext, testMovieRowId);
         assertTrue("Unable to Insert ReviewEntry into the Database", reviewRowId != -1);
 
         // create review values
-        ContentValues reviewValues = TestUtilities.createReviewValues(testMovieRowId);
+        final ContentValues reviewValues = TestUtilities.createReviewValues(testMovieRowId);
 
         // test the basic content provider query
-        Cursor reviewCursor = mContext.getContentResolver().query(
+        final Cursor reviewCursor = mContext.getContentResolver().query(
                 ReviewEntry.CONTENT_URI,
                 null,
                 null,
@@ -155,8 +187,50 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
         TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
+
+        return reviewCursor;
     }
 
+    public void test_query_videos() {
+        queryVideos();
+    }
+
+    public void test_getNotificationUri_videos() {
+
+        // GIVEN
+        final Cursor videoCursor = queryVideos();
+
+        if (Build.VERSION.SDK_INT >= 19) {
+
+            // WHEN
+            final Uri notificationUri = videoCursor.getNotificationUri();
+
+            // THEN
+            assertEquals("Error: Video Query did not properly set NotificationUri",
+                    notificationUri, VideoEntry.CONTENT_URI);
+        }
+    }
+
+    private Cursor queryVideos() {
+        final long testMovieRowId = 1;
+        long videoRowId = TestUtilities.createAndInsertVideoValues(mContext, testMovieRowId);
+        assertTrue("Unable to Insert VideoEntry into the Database", videoRowId != -1);
+
+        // create video values
+        final ContentValues videoValues = TestUtilities.createVideoValues(testMovieRowId);
+
+        // test the basic content provider query
+        final Cursor videoCursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testVideoQuery", videoCursor, videoValues);
+
+        return videoCursor;
+    }
 
     public void testInsertReadProvider() {
         test_insert_and_query();
@@ -169,14 +243,17 @@ public class TestProvider extends AndroidTestCase {
      * A review entry is created and inserted into the content provider.
      * Ensures the queried reviews URI returns a cursor.
      *
-     * Ensures the queried movie URI, which is a join between the movie and review entry,
+     * A video entry is created and inserted into the content provider.
+     * Ensures the queried videos URI returns a cursor.
+     *
+     * Ensures the queried movie URI, which is a join between the movie, review and video entry,
      * returns a cursor.
      *
      * TODO has too much responsibility
      */
     public void test_insert_and_query() {
 
-        final ContentValues testMovieValues = TestUtilities.createMovieValues();
+        final ContentValues testValues = TestUtilities.createMovieValues();
 
         // register content observer
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
@@ -184,7 +261,7 @@ public class TestProvider extends AndroidTestCase {
                 registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
 
         final Uri movieInsertUri = mContext.getContentResolver().
-                insert(MovieEntry.CONTENT_URI, testMovieValues);
+                insert(MovieEntry.CONTENT_URI, testValues);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
@@ -200,9 +277,9 @@ public class TestProvider extends AndroidTestCase {
                 null  // sort order
         );
         TestUtilities.validateCursor("Error validating movie data",
-                moviesCursor, testMovieValues);
+                moviesCursor, testValues);
 
-        final ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+        final ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
 
         tco = TestUtilities.getTestContentObserver();
 
@@ -210,7 +287,7 @@ public class TestProvider extends AndroidTestCase {
                 registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
 
         Uri reviewInsertUri = mContext.getContentResolver()
-                .insert(ReviewEntry.CONTENT_URI, testValues);
+                .insert(ReviewEntry.CONTENT_URI, reviewValues);
         assertTrue(reviewInsertUri != null);
 
         tco.waitForNotificationOrFail();
@@ -224,10 +301,37 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
         TestUtilities.validateCursor("Error validating review data",
-                reviewsCursor, testValues);
+                reviewsCursor, reviewValues);
 
-        // add expected movie values to review values
-        testValues.putAll(testMovieValues);
+        // add review values to test values
+        testValues.putAll(reviewValues);
+
+        final ContentValues videoValues = TestUtilities.createVideoValues(movieRowId);
+
+        tco = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().
+                registerContentObserver(VideoEntry.CONTENT_URI, true, tco);
+
+        Uri videoInsertUri = mContext.getContentResolver()
+                .insert(VideoEntry.CONTENT_URI, videoValues);
+        assertTrue(videoInsertUri != null);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        final Cursor videosCursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("Error validating video data",
+                videosCursor, videoValues);
+
+        // add review values to testValues
+        testValues.putAll(videoValues);
 
         // joined data
         final Cursor singleMovieCursor = mContext.getContentResolver().query(
@@ -238,8 +342,8 @@ public class TestProvider extends AndroidTestCase {
                 null
         );
         Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(singleMovieCursor));
-        TestUtilities.validateCursor("Error validating joined movie and review data",
-                singleMovieCursor, testValues);
+        TestUtilities.validateCursor("Error validating joined data",
+                singleMovieCursor, videoValues);
     }
 
 
@@ -420,6 +524,12 @@ public class TestProvider extends AndroidTestCase {
                 null // selection args
         );
 
+        mContext.getContentResolver().delete(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // selection args
+        );
+
         final Cursor movieCursor = mContext.getContentResolver().query(
                 MovieEntry.CONTENT_URI, // URI
                 null, // all columns
@@ -427,19 +537,31 @@ public class TestProvider extends AndroidTestCase {
                 null, // selection args
                 null // sort order
         );
-        assertEquals("Error: Records not deleted from movie table during delete", 0, movieCursor.getCount());
+        assertEquals("Error: Records not deleted from movie table during delete",
+                0, movieCursor.getCount());
         movieCursor.close();
 
-        final Cursor topRatedCursor = mContext.getContentResolver().query(
+        final Cursor reviewCursor = mContext.getContentResolver().query(
                 ReviewEntry.CONTENT_URI, // URI
                 null, // all columns
                 null, // all rows
                 null, // selection args
                 null // sort order
         );
-        assertEquals("Error: Records not deleted from top_rated table during delete", 0, movieCursor.getCount());
-        movieCursor.close();
-    }
+        assertEquals("Error: Records not deleted from reviews table during delete",
+                0, reviewCursor.getCount());
+        reviewCursor.close();
 
+        final Cursor videoCursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // selection args
+                null // sort order
+        );
+        assertEquals("Error: Records not deleted from videos table during delete",
+                0, videoCursor.getCount());
+        videoCursor.close();
+    }
 }
 

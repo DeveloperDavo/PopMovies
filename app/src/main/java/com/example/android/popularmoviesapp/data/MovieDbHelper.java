@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
@@ -16,7 +17,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
 public class MovieDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -42,6 +43,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
         // TODO: make movie_id a foreign key
+        // TODO: review_id should be text
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
                 ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
@@ -50,8 +52,15 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
                 ReviewEntry.COLUMN_URL + " TEXT NOT NULL);";
 
+        final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
+                VideoEntry._ID + " INTEGER PRIMARY KEY, " +
+                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL, " +
+                VideoEntry.COLUMN_VIDEO_KEY + " TEXT NOT NULL);";
+
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);
+        db.execSQL(SQL_CREATE_VIDEOS_TABLE);
     }
 
     @Override
@@ -59,8 +68,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
                 newVersion + ". OLD DATA WILL BE DESTROYED");
         // should be your top priority before modifying this method.
-        db.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + VideoEntry.TABLE_NAME);
         onCreate(db);
     }
 }
