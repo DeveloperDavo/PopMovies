@@ -12,15 +12,16 @@ import android.widget.TextView;
 
 public class ReviewAdapter extends CursorAdapter {
     private static final String LOG_TAG = ReviewAdapter.class.getSimpleName();
-//    private String text;
+    private String text;
 
     public ReviewAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
     }
 
-//    public void setText(String text) {
-//        this.text = text;
-//    }
+    // TODO: may use to determine max position
+    public void setText(String text) {
+        this.text = text;
+    }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -32,8 +33,6 @@ public class ReviewAdapter extends CursorAdapter {
         TextView textView = (TextView) view.findViewById(R.id.review_text_view);
         final String author = cursor.getString(DetailFragment.COL_REVIEW_AUTHOR);
         Log.d(LOG_TAG, "bindView cursor: " + DatabaseUtils.dumpCursorToString(cursor));
-        Log.d(LOG_TAG, "review author: " + author);
-//        Log.d(LOG_TAG, "text: " + text);
         textView.setText(author);
     }
 }

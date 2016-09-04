@@ -308,14 +308,14 @@ public class MovieProvider extends ContentProvider {
                         " ON " + ReviewEntry.TABLE_NAME +
                         "." + ReviewEntry.COLUMN_MOVIE_KEY +
                         " = " + MovieEntry.TABLE_NAME +
-                        "." + MovieEntry._ID);
-//                        "." + MovieEntry._ID +
-//                        " INNER JOIN " +
-//                        VideoEntry.TABLE_NAME +
-//                        " ON " + VideoEntry.TABLE_NAME +
-//                        "." + VideoEntry.COLUMN_MOVIE_KEY +
-//                        " = " + MovieEntry.TABLE_NAME +
 //                        "." + MovieEntry._ID);
+                        "." + MovieEntry._ID +
+                        " INNER JOIN " +
+                        VideoEntry.TABLE_NAME +
+                        " ON " + VideoEntry.TABLE_NAME +
+                        "." + VideoEntry.COLUMN_MOVIE_KEY +
+                        " = " + MovieEntry.TABLE_NAME +
+                        "." + MovieEntry._ID);
     }
 
     // movies._id = ?
