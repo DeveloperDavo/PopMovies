@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,19 +46,22 @@ public class MainActivity extends AppCompatActivity implements MoviePostersFragm
     }
 
     @Override
-    public void onItemSelected(long movieKey) {
+    public void onItemSelected(Uri singleMovieUri) {
 
         // if two pane mode, show the detail view,
         // else launch detail activity
         if (twoPaneLayout) {
+            final Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, singleMovieUri);
 
-            DetailFragment fragment = DetailFragment.newInstance(movieKey);
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
-            startActivity(DetailActivity.newIntent(this, movieKey));
+            startActivity(DetailActivity.newIntent(this, singleMovieUri));
         }
     }
 }

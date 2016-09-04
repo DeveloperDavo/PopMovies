@@ -2,6 +2,8 @@ package com.example.android.popularmoviesapp;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,15 @@ import android.widget.TextView;
 
 public class ReviewAdapter extends CursorAdapter {
     private static final String LOG_TAG = ReviewAdapter.class.getSimpleName();
+    private String text;
 
     public ReviewAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
+    }
+
+    // TODO: may use to determine max position
+    public void setText(String text) {
+        this.text = text;
     }
 
     @Override
@@ -24,7 +32,7 @@ public class ReviewAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView textView = (TextView) view.findViewById(R.id.review_text_view);
         final String author = cursor.getString(DetailFragment.COL_REVIEW_AUTHOR);
-//        Log.d(LOG_TAG, "bindView cursor: " + DatabaseUtils.dumpCursorToString(cursor));
+        Log.d(LOG_TAG, "bindView cursor: " + DatabaseUtils.dumpCursorToString(cursor));
         textView.setText(author);
     }
 }
