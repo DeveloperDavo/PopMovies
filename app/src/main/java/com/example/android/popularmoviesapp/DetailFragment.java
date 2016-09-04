@@ -1,8 +1,10 @@
 package com.example.android.popularmoviesapp;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -17,7 +19,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -40,23 +41,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
             MovieEntry.COLUMN_RELEASE,
-            VideoEntry.COLUMN_VIDEO_KEY
+            ReviewEntry.COLUMN_AUTHOR
+//            VideoEntry.COLUMN_VIDEO_KEY,
     };
 
-    static final int COL__ID = 0;
-    static final int COL_MOVIE_ID = 1;
     static final int COL_MOVIE_TITLE = 2;
     static final int COL_MOVIE_POSTER_PATH = 3;
     static final int COL_MOVIE_OVERVIEW = 4;
     static final int COL_MOVIE_RATING = 5;
     static final int COL_MOVIE_RELEASE = 6;
-    static final int COL_VIDEO_KEY = 7;
+//    static final int COL_VIDEO_KEY = 7;
 
     private static final int REVIEW_LOADER = 1;
     static final String[] REVIEW_COLUMNS = new String[]{
+            ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID,
+            ReviewEntry.COLUMN_AUTHOR,
             ReviewEntry.COLUMN_CONTENT
     };
-    static final int COL_REVIEW_CONTENT = 0;
+    static final int COL_REVIEW_AUTHOR = 1;
+    static final int COL_REVIEW_CONTENT = 2;
 
     /**********************************************************************************************/
 
@@ -67,7 +70,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView releaseDateView;
     private ListView reviewsView;
     private TextView videosView;
-    private Cursor detailCursor;
 
     public static DetailFragment newInstance() {
         Log.d(LOG_TAG, "newInstance");
@@ -89,8 +91,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
 
+        final Cursor cursor = getContext().getContentResolver().query(detailUri, REVIEW_COLUMNS, null, null, null);
+        Log.d(LOG_TAG, "detailUri query REVIEW_COLUMNS: " + DatabaseUtils.dumpCursorToString(cursor));
+
         // instantiate adapters
         reviewAdapter = new ReviewAdapter(getActivity(), null, 0);
+//        reviewAdapter.setText("test");
 
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -104,6 +110,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         videosView = (TextView) rootView.findViewById(R.id.video1);
 
         // attach adapters to list views
+        reviewsView.setAdapter(reviewAdapter);
         reviewsView.setAdapter(reviewAdapter);
 
         return rootView;
@@ -121,12 +128,24 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
         // if detail fragment is created without data (ie two pane layout)
         if (null == detailUri) {
             return null;
         }
 
+        switch (id) {
+            case 0:
+                return getDetailCursorLoader();
+            case 1:
+                return getReviewCursorLoader();
+            default:
+                Log.e(LOG_TAG, "loader id does not exist");
+                return null;
+        }
+    }
+
+    @Nullable
+    private Loader<Cursor> getDetailCursorLoader() {
         return new CursorLoader(getActivity(),
                 detailUri,
                 DETAIL_COLUMNS,
@@ -135,73 +154,98 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 null);
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        loadDetailCursor(cursor);
-        loadReviewCursorAdapter(cursor);
+    @NonNull
+    private Loader<Cursor> getReviewCursorLoader() {
+        return new CursorLoader(getActivity(),
+                detailUri,
+                REVIEW_COLUMNS,
+                null,
+                null,
+                null);
     }
 
-    private void loadDetailCursor(Cursor cursor) {
-        detailCursor = cursor;
-//        Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        switch (loader.getId()) {
+            case 0:
+                loadMovieDetails(cursor);
+                break;
+            case 1:
+                reviewAdapter.swapCursor(cursor);
+                break;
+            default:
+                Log.e(LOG_TAG, "loader id does not exist");
+                return;
+        }
+    }
 
-        if (!detailCursor.moveToFirst()) {
-            Log.d(LOG_TAG, "detailCursor.moveToFirst returned false");
+    private void loadMovieDetails(Cursor cursor) {
+
+
+        if (!cursor.moveToFirst()) {
+            Log.d(LOG_TAG, "cursor.moveToFirst returned false");
             return;
         }
 
-        loadPosterIntoView();
-        loadTitleIntoView();
-        loadOverviewIntoView();
-        loadRatingIntoView();
-        loadReleaseIntoView();
-        loadVideo1IntoView();
+        loadPosterIntoView(cursor);
+        loadTitleIntoView(cursor);
+        loadOverviewIntoView(cursor);
+        loadRatingIntoView(cursor);
+        loadReleaseIntoView(cursor);
+//        loadVideo1IntoView(cursor);
     }
 
-    private void loadReviewCursorAdapter(Cursor cursor) {
-        Cursor reviewCursor = cursor;
-        reviewAdapter.swapCursor(reviewCursor);
+    private void loadReviewDetails(Cursor cursor) {
     }
 
-    private void loadPosterIntoView() {
-        final String posterUrl = detailCursor.getString(COL_MOVIE_POSTER_PATH);
+    private void loadPosterIntoView(Cursor cursor) {
+        final String posterUrl = cursor.getString(COL_MOVIE_POSTER_PATH);
 
         if (posterUrl != null) {
             Picasso.with(getActivity()).load(posterUrl).into(posterView);
         }
     }
 
-    private void loadTitleIntoView() {
-        final String title = detailCursor.getString(COL_MOVIE_TITLE);
+    private void loadTitleIntoView(Cursor cursor) {
+        final String title = cursor.getString(COL_MOVIE_TITLE);
         titleView.setText(title);
     }
 
-    private void loadOverviewIntoView() {
-        final String overview = detailCursor.getString(COL_MOVIE_OVERVIEW);
+    private void loadOverviewIntoView(Cursor cursor) {
+        final String overview = cursor.getString(COL_MOVIE_OVERVIEW);
         overviewView.setText(overview);
     }
 
-    private void loadRatingIntoView() {
-        final double userRating = detailCursor.getDouble(COL_MOVIE_RATING);
+    private void loadRatingIntoView(Cursor cursor) {
+        final double userRating = cursor.getDouble(COL_MOVIE_RATING);
         userRatingView.setText(Utility.formatRating(getContext(), userRating));
     }
 
-    private void loadReleaseIntoView() {
-        final String releaseDate = detailCursor.getString(COL_MOVIE_RELEASE);
+    private void loadReleaseIntoView(Cursor cursor) {
+        final String releaseDate = cursor.getString(COL_MOVIE_RELEASE);
         releaseDateView.setText(releaseDate.substring(0, 4));
     }
 
-    private void loadVideo1IntoView() {
-        final String video1 = detailCursor.getString(COL_VIDEO_KEY);
+/*    private void loadVideo1IntoView(Cursor cursor) {
+        final String video1 = cursor.getString(COL_VIDEO_KEY);
         videosView.setText(video1);
-    }
+    }*/
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        detailCursor = null;
-        // release any resources we might be using
-        reviewAdapter.swapCursor(null);
+        switch (loader.getId()) {
+            case 0:
+                // TODO: what is the point of this?
+//                detailUri = null;
+                break;
+            case 1:
+                // release any resources we might be using
+                reviewAdapter.swapCursor(null);
+                break;
+            default:
+                Log.e(LOG_TAG, "loader id does not exist");
+                return;
+        }
     }
 
 }
-

@@ -29,6 +29,7 @@ public class MoviePosterAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.findViewById(R.id.poster_image_view);
+        // TODO: what if there is poster path is null
         Picasso.with(context).load(getPosterUrlFrom(cursor)).into(imageView);
     }
 

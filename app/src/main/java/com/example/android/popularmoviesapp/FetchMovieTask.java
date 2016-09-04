@@ -188,6 +188,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         // bulk insert into database
         // TODO not to be used so often in final version
         deleteAndBulkInsert(contentValuesVector);
+//        final Cursor cursor = context.getContentResolver().query(MovieEntry.CONTENT_URI, null, null, null, null);
+//        Log.d(LOG_TAG, "movie query: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
     private void deleteAndBulkInsert(Vector<ContentValues> contentValuesVector) {
@@ -227,7 +229,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
         long movieId = cursor.getLong(colMovieId);
 
-        Log.d(LOG_TAG, "fetching reviews");
+//        Log.d(LOG_TAG, "fetching reviews");
         (new FetchReviewsTask(context, movieKey, movieId)).execute();
     }
 
@@ -250,7 +252,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
         long movieId = cursor.getLong(colMovieId);
 
-        Log.d(LOG_TAG, "fetching videos");
+//        Log.d(LOG_TAG, "fetching videos");
         (new FetchVideosTask(context, movieKey, movieId)).execute();
     }
 

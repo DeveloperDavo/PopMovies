@@ -60,8 +60,8 @@ public class FetchVideosTask extends AsyncTask<Void, Void, Void> {
 
             URL url = new URL(builtUri.toString());
 
-            Log.d(LOG_TAG, "movie_key: " + movie_key);
-            Log.d(LOG_TAG, "videos url: " + url);
+//            Log.d(LOG_TAG, "movie_key: " + movie_key);
+//            Log.d(LOG_TAG, "videos url: " + url);
 
             // create the request to TMDb, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();

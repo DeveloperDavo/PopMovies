@@ -61,8 +61,8 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
 
             URL url = new URL(builtUri.toString());
 
-            Log.d(LOG_TAG, "movie_key: " + movie_key);
-            Log.d(LOG_TAG, "reviews url: " + url);
+//            Log.d(LOG_TAG, "movie_key: " + movie_key);
+//            Log.d(LOG_TAG, "reviews url: " + url);
 
             // create the request to TMDb, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -162,7 +162,7 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
             int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
-            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+//            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
         }
     }
 
