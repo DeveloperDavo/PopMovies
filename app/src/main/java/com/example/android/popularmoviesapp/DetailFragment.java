@@ -1,7 +1,6 @@
 package com.example.android.popularmoviesapp;
 
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -26,8 +24,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
-    public static final String DETAIL_URI = "detailUri";
-    private Uri detailUri;
+    private static long movieKey;
     private ReviewAdapter reviewAdapter;
 
     /**********************************************************************************************/
@@ -41,8 +38,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
             MovieEntry.COLUMN_RELEASE,
-            ReviewEntry.COLUMN_AUTHOR,
-            VideoEntry.COLUMN_VIDEO_KEY
+//            VideoEntry.COLUMN_VIDEO_KEY,
+//            ReviewEntry.COLUMN_AUTHOR
     };
 
     static final int COL_MOVIE_TITLE = 2;
@@ -50,7 +47,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_OVERVIEW = 4;
     static final int COL_MOVIE_RATING = 5;
     static final int COL_MOVIE_RELEASE = 6;
-    static final int COL_VIDEO_KEY = 7;
+//    static final int COL_VIDEO_KEY = 7;
 
     private static final int REVIEW_LOADER = 1;
     static final String[] REVIEW_COLUMNS = new String[]{
@@ -76,6 +73,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return new DetailFragment();
     }
 
+    public static DetailFragment newInstance(long movieKey) {
+        Log.d(LOG_TAG, "newInstance");
+        DetailFragment.movieKey = movieKey;
+        return new DetailFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreate");
@@ -86,18 +89,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        final Bundle arguments = getArguments();
-        if (arguments != null) {
-            detailUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
-        }
+//        final Bundle arguments = getArguments();
+//        if (arguments != null) {
+//            detailUri = arguments.getParcelable(DetailFragment.MOVIE_KEY);
+//        }
 
         // instantiate adapters
         reviewAdapter = new ReviewAdapter(getActivity(), null, 0);
-
-        // query cursor, get count and pass to reviewAdapter so the adapter knows when to start using the video data
-//        final Cursor cursor = getContext().getContentResolver().query(detailUri, REVIEW_COLUMNS, null, null, null);
-//        int count = cursor.getCount();
-//        Log.d(LOG_TAG, "detailUri query REVIEW_COLUMNS: " + DatabaseUtils.dumpCursorToString(cursor));
 
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -130,9 +128,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // if detail fragment is created without data (ie two pane layout)
-        if (null == detailUri) {
-            return null;
-        }
+//        if (null == detailUri) {
+//            return null;
+//        }
 
         switch (id) {
             case 0:
@@ -147,21 +145,37 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Nullable
     private Loader<Cursor> getDetailCursorLoader() {
+//        return new CursorLoader(getActivity(),
+//                detailUri,
+//                DETAIL_COLUMNS,
+//                null,
+//                null,
+//                null);
+        final String selection = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
+        final String[] selectionArgs = new String[]{Long.toString(movieKey)};
         return new CursorLoader(getActivity(),
-                detailUri,
+                MovieEntry.CONTENT_URI,
                 DETAIL_COLUMNS,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null);
     }
 
     @NonNull
     private Loader<Cursor> getReviewCursorLoader() {
+//        return new CursorLoader(getActivity(),
+//                detailUri,
+//                REVIEW_COLUMNS,
+//                null,
+//                null,
+//                null);
+        final String selection = ReviewEntry.TABLE_NAME + "." + ReviewEntry.COLUMN_MOVIE_KEY + " = ?";
+        final String[] selectionArgs = new String[]{Long.toString(movieKey)};
         return new CursorLoader(getActivity(),
-                detailUri,
+                ReviewEntry.CONTENT_URI,
                 REVIEW_COLUMNS,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null);
     }
 
@@ -193,7 +207,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         loadOverviewIntoView(cursor);
         loadRatingIntoView(cursor);
         loadReleaseIntoView(cursor);
-        loadVideo1IntoView(cursor);
+//        loadVideo1IntoView(cursor);
     }
 
     private void loadPosterIntoView(Cursor cursor) {
@@ -224,16 +238,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         releaseDateView.setText(releaseDate.substring(0, 4));
     }
 
-    private void loadVideo1IntoView(Cursor cursor) {
+/*    private void loadVideo1IntoView(Cursor cursor) {
         final String video1 = cursor.getString(COL_VIDEO_KEY);
         videosView.setText(video1);
-    }
+    }*/
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
             case 0:
-                // TODO: what is the point of this?
+                // TODO: what was the point of this?
 //                detailUri = null;
                 break;
             case 1:

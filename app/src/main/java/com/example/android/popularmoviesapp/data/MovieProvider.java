@@ -308,7 +308,7 @@ public class MovieProvider extends ContentProvider {
                         " ON " + ReviewEntry.TABLE_NAME +
                         "." + ReviewEntry.COLUMN_MOVIE_KEY +
                         " = " + MovieEntry.TABLE_NAME +
-//                        "." + MovieEntry._ID);
+//                        "." + MovieEntry.MOVIE_KEY);
                         "." + MovieEntry._ID +
                         " INNER JOIN " +
                         VideoEntry.TABLE_NAME +
