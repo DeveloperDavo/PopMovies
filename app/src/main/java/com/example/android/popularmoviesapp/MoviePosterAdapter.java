@@ -29,10 +29,7 @@ public class MoviePosterAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.findViewById(R.id.poster_image_view);
-//        Picasso.with(context).load(R.drawable.jason_bourne).into(imageView);
         Picasso.with(context).load(getPosterUrlFrom(cursor)).into(imageView);
-
-        // TODO differ between screen sizes (w342 for landscape, w185 for portrait for 5", 2 cols)
     }
 
     private String getPosterUrlFrom(Cursor cursor) {

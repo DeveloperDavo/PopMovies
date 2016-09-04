@@ -13,23 +13,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.popularmoviesapp.data.MovieContract;
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
-/**
- * Created by David on 22/08/16.
- */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
     public static final String DETAIL_URI = "detailUri";
     private Uri detailUri;
-
+    private ReviewAdapter reviewAdapter;
 
     /**********************************************************************************************/
 
@@ -42,8 +40,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
             MovieEntry.COLUMN_RELEASE,
-            ReviewEntry.COLUMN_CONTENT,
-            MovieContract.VideoEntry.COLUMN_VIDEO_KEY
+            VideoEntry.COLUMN_VIDEO_KEY
     };
 
     static final int COL__ID = 0;
@@ -53,8 +50,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_OVERVIEW = 4;
     static final int COL_MOVIE_RATING = 5;
     static final int COL_MOVIE_RELEASE = 6;
-    static final int COL_REVIEW_CONTENT = 7;
-    static final int COL_VIDEO_KEY = 8;
+    static final int COL_VIDEO_KEY = 7;
+
+    private static final int REVIEW_LOADER = 1;
+    static final String[] REVIEW_COLUMNS = new String[]{
+            ReviewEntry.COLUMN_CONTENT
+    };
+    static final int COL_REVIEW_CONTENT = 0;
 
     /**********************************************************************************************/
 
@@ -63,7 +65,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView overviewView;
     private TextView userRatingView;
     private TextView releaseDateView;
-    private TextView reviewsView;
+    private ListView reviewsView;
     private TextView videosView;
     private Cursor detailCursor;
 
@@ -87,15 +89,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             detailUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
 
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        // instantiate adapters
+        reviewAdapter = new ReviewAdapter(getActivity(), null, 0);
 
+        final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        // get views
         posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
         titleView = (TextView) rootView.findViewById(R.id.title);
         overviewView = (TextView) rootView.findViewById(R.id.overview);
         userRatingView = (TextView) rootView.findViewById(R.id.rating);
         releaseDateView = (TextView) rootView.findViewById(R.id.release);
-        reviewsView = (TextView) rootView.findViewById(R.id.review1);
+        reviewsView = (ListView) rootView.findViewById(R.id.list_view_reviews);
         videosView = (TextView) rootView.findViewById(R.id.video1);
+
+        // attach adapters to list views
+        reviewsView.setAdapter(reviewAdapter);
 
         return rootView;
 
@@ -106,6 +115,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().initLoader(DETAIL_LOADER, // uniqueId that identifies the loader
                 null, // optional arguments to supply the loader at construction
                 this); // LoaderManger.LoaderCallbacks implementation
+        getLoaderManager().initLoader(REVIEW_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -127,6 +137,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        loadDetailCursor(cursor);
+        loadReviewCursorAdapter(cursor);
+    }
+
+    private void loadDetailCursor(Cursor cursor) {
         detailCursor = cursor;
 //        Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
 
@@ -140,14 +155,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         loadOverviewIntoView();
         loadRatingIntoView();
         loadReleaseIntoView();
-        loadReview1IntoView();
         loadVideo1IntoView();
-
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        detailCursor = null;
+    private void loadReviewCursorAdapter(Cursor cursor) {
+        Cursor reviewCursor = cursor;
+        reviewAdapter.swapCursor(reviewCursor);
     }
 
     private void loadPosterIntoView() {
@@ -178,14 +191,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         releaseDateView.setText(releaseDate.substring(0, 4));
     }
 
-    private void loadReview1IntoView() {
-        final String review1 = detailCursor.getString(COL_REVIEW_CONTENT);
-        reviewsView.setText(review1);
-    }
-
     private void loadVideo1IntoView() {
         final String video1 = detailCursor.getString(COL_VIDEO_KEY);
         videosView.setText(video1);
     }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        detailCursor = null;
+        // release any resources we might be using
+        reviewAdapter.swapCursor(null);
+    }
+
 }
 
