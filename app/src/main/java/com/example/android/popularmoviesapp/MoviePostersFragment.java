@@ -1,7 +1,6 @@
 package com.example.android.popularmoviesapp;
 
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -89,13 +88,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
                 // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
 
                 // increment the position to match Database Ids indexed starting at 1
-                final long _id = position + 1;
-
-                // append Id to uri
-                final Uri singleMovieUri = MovieEntry.buildMovieUri(_id);
+                final long movieKey = position + 1;
 
                 // call onItemSelected, which is overridden in MainActivity
-                ((Callback) getActivity()).onItemSelected(singleMovieUri);
+                ((Callback) getActivity()).onItemSelected(movieKey);
                 selectedPosition = position;
             }
         });
@@ -192,6 +188,6 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(Uri singleMovieUri);
+        void onItemSelected(long movieKey);
     }
 }
