@@ -20,6 +20,7 @@ import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
@@ -27,6 +28,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final String MOVIE_KEY = "movie_key";
     private long movieKey;
     private ReviewAdapter reviewAdapter;
+    private DetailAdapter detailAdapter;
 
     /**********************************************************************************************/
 
@@ -53,8 +55,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             ReviewEntry.COLUMN_AUTHOR,
             ReviewEntry.COLUMN_CONTENT
     };
+
     static final int COL_REVIEW_AUTHOR = 1;
     static final int COL_REVIEW_CONTENT = 2;
+
+    private static final int VIDEO_LOADER = 2;
+    static final String[] VIDEO_COLUMNS = new String[]{
+            VideoEntry.TABLE_NAME + "." + VideoEntry._ID,
+            VideoEntry.COLUMN_VIDEO_ID,
+    };
+
+    static final int COL_VIDEO__ID = 0;
+    static final int COL_VIDEO_ID = 1;
 
     /**********************************************************************************************/
 
@@ -64,7 +76,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView userRatingView;
     private TextView releaseDateView;
     private ListView reviewsView;
-//    private TextView videosView;
+    private ListView detailView;
 
     public static DetailFragment newInstance() {
         Log.d(LOG_TAG, "newInstance");
@@ -88,6 +100,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         // instantiate adapters
         reviewAdapter = new ReviewAdapter(getActivity(), null, 0);
+        detailAdapter = new DetailAdapter(getActivity(), null, 0);
 
         final View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -98,11 +111,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         userRatingView = (TextView) rootView.findViewById(R.id.rating);
         releaseDateView = (TextView) rootView.findViewById(R.id.release);
         reviewsView = (ListView) rootView.findViewById(R.id.list_view_reviews);
-//        videosView = (TextView) rootView.findViewById(R.id.video1);
+        detailView = (ListView) rootView.findViewById(R.id.list_view_videos);
 
         // attach adapters to list views
         reviewsView.setAdapter(reviewAdapter);
-        reviewsView.setAdapter(reviewAdapter);
+        detailView.setAdapter(detailAdapter);
 
         return rootView;
 
@@ -114,6 +127,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 null, // optional arguments to supply the loader at construction
                 this); // LoaderManger.LoaderCallbacks implementation
         getLoaderManager().initLoader(REVIEW_LOADER, null, this);
+        getLoaderManager().initLoader(VIDEO_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -129,6 +143,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 return getDetailCursorLoader();
             case 1:
                 return getReviewCursorLoader();
+            case 2:
+                return buildVideoCursorLoader();
             default:
                 Log.e(LOG_TAG, "loader id does not exist");
                 return null;
@@ -162,6 +178,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 null);
     }
 
+    @NonNull
+    private Loader<Cursor> buildVideoCursorLoader() {
+
+        final String selection = VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_MOVIE_KEY + " = ?";
+        final String[] selectionArgs = new String[]{Long.toString(movieKey)};
+        return new CursorLoader(getActivity(),
+                VideoEntry.CONTENT_URI,
+                VIDEO_COLUMNS,
+                selection,
+                selectionArgs,
+                null);
+    }
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         switch (loader.getId()) {
@@ -170,6 +199,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 break;
             case 1:
                 reviewAdapter.swapCursor(cursor);
+                break;
+            case 2:
+                detailAdapter.swapCursor(cursor);
                 break;
             default:
                 Log.e(LOG_TAG, "loader id does not exist");
@@ -190,7 +222,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         loadOverviewIntoView(cursor);
         loadRatingIntoView(cursor);
         loadReleaseIntoView(cursor);
-//        loadVideo1IntoView(cursor);
     }
 
     private void loadPosterIntoView(Cursor cursor) {
@@ -221,11 +252,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         releaseDateView.setText(releaseDate.substring(0, 4));
     }
 
-/*    private void loadVideo1IntoView(Cursor cursor) {
-        final String video1 = cursor.getString(COL_VIDEO_KEY);
-        videosView.setText(video1);
-    }*/
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
@@ -236,6 +262,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             case 1:
                 // release any resources we might be using
                 reviewAdapter.swapCursor(null);
+                break;
+            case 2:
+                // release any resources we might be using
+                detailAdapter.swapCursor(null);
                 break;
             default:
                 Log.e(LOG_TAG, "loader id does not exist");

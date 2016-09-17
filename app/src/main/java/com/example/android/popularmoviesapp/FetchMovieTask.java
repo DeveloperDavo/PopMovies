@@ -275,7 +275,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
         int deleted = context.getContentResolver().delete(
                 VideoEntry.CONTENT_URI, null, null);
-        Log.d(LOG_TAG, deleted + "vidoes deleted");
+        Log.d(LOG_TAG, deleted + "videos deleted");
 
     }
 

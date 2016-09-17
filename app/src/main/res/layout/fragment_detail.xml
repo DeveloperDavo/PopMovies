@@ -76,12 +76,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/video1"
+        <ListView
+            android:id="@+id/list_view_videos"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:linksClickable="true"
-            tools:text="Video: The quick brown fox jumps over the lazy dog" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </LinearLayout>
