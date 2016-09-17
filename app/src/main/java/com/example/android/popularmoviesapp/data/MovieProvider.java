@@ -80,7 +80,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
-                cursor = getCursorForSingleMovie(uri, projection, sortOrder);
+                cursor = buildCursorForSingleMovie(uri, projection, sortOrder);
 //                Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
@@ -281,7 +281,7 @@ public class MovieProvider extends ContentProvider {
         super.shutdown();
     }
 
-    private Cursor getCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
+    private Cursor buildCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
@@ -300,22 +300,15 @@ public class MovieProvider extends ContentProvider {
     static {
         JOIN_QUERY_BUILDER = new SQLiteQueryBuilder();
 
-        // movies INNER JOIN reviews ON reviews.movie_key = movies._id
-        // INNER JOIN videos ON videos.movie_key = movies._id
+        // movies LEFT OUTER JOIN videos on movies.id = videos.movie_key
         JOIN_QUERY_BUILDER.setTables(
-                MovieEntry.TABLE_NAME + " INNER JOIN " +
-                        ReviewEntry.TABLE_NAME +
-                        " ON " + ReviewEntry.TABLE_NAME +
-                        "." + ReviewEntry.COLUMN_MOVIE_KEY +
-                        " = " + MovieEntry.TABLE_NAME +
-//                        "." + MovieEntry._ID);
-                        "." + MovieEntry._ID +
-                        " INNER JOIN " +
+                MovieEntry.TABLE_NAME +
+                        " LEFT OUTER JOIN " +
                         VideoEntry.TABLE_NAME +
-                        " ON " + VideoEntry.TABLE_NAME +
-                        "." + VideoEntry.COLUMN_MOVIE_KEY +
-                        " = " + MovieEntry.TABLE_NAME +
-                        "." + MovieEntry._ID);
+                        " ON " + MovieEntry.TABLE_NAME +
+                        "." + MovieEntry._ID +
+                        " = " + VideoEntry.TABLE_NAME +
+                        "." + VideoEntry.COLUMN_MOVIE_KEY);
     }
 
     // movies._id = ?

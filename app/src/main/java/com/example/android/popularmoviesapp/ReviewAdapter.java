@@ -23,8 +23,8 @@ public class ReviewAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView textView = (TextView) view.findViewById(R.id.review_text_view);
-        final String author = cursor.getString(DetailFragment.COL_REVIEW_AUTHOR);
+//        final String author = cursor.getString(DetailFragment.COL_REVIEW_AUTHOR);
 //        Log.d(LOG_TAG, "bindView cursor: " + DatabaseUtils.dumpCursorToString(cursor));
-        textView.setText(author);
+//        textView.setText(author);
     }
 }
