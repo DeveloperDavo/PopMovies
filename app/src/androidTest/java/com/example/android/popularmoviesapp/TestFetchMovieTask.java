@@ -3,6 +3,7 @@ package com.example.android.popularmoviesapp;
 import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.example.android.popularmoviesapp.data.TestUtilities;
 
@@ -22,6 +23,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
      * TODO test case has too much responsibility
      */
     @TargetApi(11)
+    @Suppress
     public void test_addMovie() {
         // start from a clean state
         getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,

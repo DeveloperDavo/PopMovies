@@ -69,6 +69,7 @@ public class TestDb extends AndroidTestCase {
         movieColumnHashSet.add(MovieEntry.COLUMN_POSTER_PATH);
         movieColumnHashSet.add(MovieEntry.COLUMN_OVERVIEW);
         movieColumnHashSet.add(MovieEntry.COLUMN_RATING);
+        movieColumnHashSet.add(MovieEntry.COLUMN_POPULARITY);
         movieColumnHashSet.add(MovieEntry.COLUMN_RELEASE);
         movieColumnHashSet.add(MovieEntry.COLUMN_FAVORITE);
 
@@ -115,6 +116,8 @@ public class TestDb extends AndroidTestCase {
         videoColumnHashSet.add(VideoEntry.COLUMN_MOVIE_KEY);
         videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_ID);
         videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_KEY);
+        videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_SITE);
+        videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_TYPE);
 
         int videoColumnIndex = videoCursor.getColumnIndex("name");
         do {

@@ -30,6 +30,7 @@ public class TestUtilities extends AndroidTestCase {
     public static final String POSTER_PATH = "path_to_poster";
     public static final String OVERVIEW = "Luke Skywalker is no where to be found...";
     public static final double RATING = 8.5;
+    public static final double POPULARITY = 90.12;
     public static final String RELEASE = "2015-12-17";
     public static final int FAVORITE = 1;
 
@@ -78,6 +79,7 @@ public class TestUtilities extends AndroidTestCase {
         movieValues.put(MovieEntry.COLUMN_POSTER_PATH, POSTER_PATH);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
         movieValues.put(MovieEntry.COLUMN_RATING, RATING);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, POPULARITY);
         movieValues.put(MovieEntry.COLUMN_RELEASE, RELEASE);
         movieValues.put(MovieEntry.COLUMN_FAVORITE, FAVORITE);
         return movieValues;
@@ -130,6 +132,7 @@ public class TestUtilities extends AndroidTestCase {
             movieValues.put(MovieEntry.COLUMN_POSTER_PATH, "posterPath " + i);
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, "overview " + i);
             movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
+            movieValues.put(MovieEntry.COLUMN_POPULARITY, i + 80.99);
             movieValues.put(MovieEntry.COLUMN_RELEASE, "release " + i);
             movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 1);
 

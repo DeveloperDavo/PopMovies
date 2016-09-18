@@ -16,7 +16,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
 public class MovieDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -38,6 +38,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
                 MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
