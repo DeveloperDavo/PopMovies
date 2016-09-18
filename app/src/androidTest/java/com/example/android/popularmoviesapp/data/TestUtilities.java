@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.example.android.popularmoviesapp.utils.PollingCheck;
 
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.Set;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 /**
  * Created by David on 10/07/16.

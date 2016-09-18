@@ -279,42 +279,84 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     }
 
-    // TODO update instead of insert if movie_id already exists
     public long addMovie(long movieId, String title, String posterPath, String overview,
-                         double rating, String release, int favorite) {
-        long movieRowId;
+                         double rating, double popularity, String release, int favorite) {
 
-        // check if movie_id already exists
-        Cursor movieCursor = context.getContentResolver().query(
-                MovieEntry.CONTENT_URI, // uri
-                new String[]{MovieEntry._ID}, // projection
-                MovieEntry.COLUMN_MOVIE_ID + " = ?", // selection
-                new String[]{Long.toString(movieId)}, // selectionArgs
+        long movieRowId = checkIfMovieIdExists(movieId);
+
+        if (movieRowId == -1) {
+            movieRowId = insertMovie(movieId, title, posterPath, overview, rating, popularity,
+                    release, favorite);
+        } else {
+            movieRowId = updateMovie(title, posterPath, overview, rating, popularity,
+                    release, favorite);
+        }
+
+        return movieRowId;
+    }
+
+    private long checkIfMovieIdExists(long movieId) {
+        long movieRowId = -1;
+
+        final String[] projection = {MovieEntry._ID};
+        final String selection = MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        final String[] selectionArgs = {Long.toString(movieId)};
+
+        final Cursor movieCursor = context.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
                 null); // sortOrder
 
         if (movieCursor.moveToFirst()) {
             int locationIdIndex = movieCursor.getColumnIndex(MovieEntry._ID);
             movieRowId = movieCursor.getLong(locationIdIndex);
-        } else {
-            ContentValues movieValues = new ContentValues();
-
-            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
-            movieValues.put(MovieEntry.COLUMN_TITLE, title);
-            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
-            movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
-            movieValues.put(MovieEntry.COLUMN_RATING, rating);
-            movieValues.put(MovieEntry.COLUMN_RELEASE, release);
-            movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
-
-            // insert movieValues into db
-            Uri insertedUri = context.getContentResolver().insert(
-                    MovieEntry.CONTENT_URI, movieValues);
-
-            // extract movieRowId from URI
-            movieRowId = ContentUris.parseId(insertedUri);
         }
 
         movieCursor.close();
         return movieRowId;
+    }
+
+    private long insertMovie(
+            long movieId, String title, String posterPath, String overview,
+            double rating, double popularity, String release, int favorite) {
+
+        long movieRowId;
+        ContentValues movieValues = new ContentValues();
+
+        movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+        movieValues.put(MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        movieValues.put(MovieEntry.COLUMN_RATING, rating);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
+
+        final Uri insertedUri = context.getContentResolver().insert(
+                MovieEntry.CONTENT_URI, movieValues);
+
+        // extract movieRowId from URI
+        movieRowId = ContentUris.parseId(insertedUri);
+        return movieRowId;
+    }
+
+    private long updateMovie(
+            String title, String posterPath, String overview,
+            double rating, double popularity, String release, int favorite) {
+
+        ContentValues movieValues = new ContentValues();
+
+        movieValues.put(MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        movieValues.put(MovieEntry.COLUMN_RATING, rating);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+
+        return context.getContentResolver().update(
+                MovieEntry.CONTENT_URI, movieValues, null, null);
+
     }
 }
