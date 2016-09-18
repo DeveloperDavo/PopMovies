@@ -157,6 +157,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         // TODO sortOrder
+//        final String sortOrder = MovieEntry.COLUMN_POPULARITY;
         final String sortOrder = null;
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
@@ -169,9 +170,9 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         posterAdapter.swapCursor(data);
-        if (selectedPosition != GridView.INVALID_POSITION) {
-            gridView.smoothScrollToPosition(selectedPosition);
-        }
+//        if (selectedPosition != GridView.INVALID_POSITION) {
+//            gridView.smoothScrollToPosition(selectedPosition);
+//        }
     }
 
     @Override

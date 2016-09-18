@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
@@ -34,14 +33,11 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-    private ArrayAdapter<String> posterAdapter;
     private final Context context;
     private String movieJsonStr;
-    private MovieInfoParser movieInfoParser;
 
     public FetchMovieTask(Context context) {
         this.context = context;
-        this.posterAdapter = posterAdapter;
     }
 
     /**
@@ -126,15 +122,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             }
         }
 
-//            movieInfoParser = new MovieInfoParser(movieJsonStr);
-
-        // log posterUrls
-//                String[] posterUrls = movieInfoParser.getPosterUrls();
-//                for (String posterUrl : posterUrls) {
-//                    Log.d(LOG_TAG, "posterUrl: " + posterUrl);
-//                }
-
-//            return movieInfoParser.getPosterUrls();
         return null;
     }
 
@@ -146,13 +133,18 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         final String MD_POSTER_PATH = "poster_path";
         final String MD_OVERVIEW = "overview";
         final String MD_RATING = "vote_average";
+        final String MD_POPULARITY = "popularity";
         final String MD_RELEASE = "release_date";
         final String POSTER_URL_BASE = "http://image.tmdb.org/t/p/w185/";
 
         final JSONObject data = new JSONObject(movieJsonStr);
         final JSONArray movies = data.getJSONArray(MD_RESULTS);
 
-        Vector<ContentValues> contentValuesVector = new Vector<>(movies.length());
+//        Vector<ContentValues> contentValuesVector = new Vector<>(movies.length());
+
+        // TODO
+        deleteOldReviewData();
+        deleteOldVideoData();
 
         for (int i = 0; i < movies.length(); i++) {
 
@@ -163,59 +155,56 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             final String posterPath = POSTER_URL_BASE + movieData.getString(MD_POSTER_PATH);
             final String overview = movieData.getString(MD_OVERVIEW);
             final double rating = movieData.getDouble(MD_RATING);
+            final double popularity = movieData.getDouble(MD_POPULARITY);
             final String release = movieData.getString(MD_RELEASE);
             final int favorite = 0; // default to false
 
-//            addMovie(movieId, title, posterPath, overview, rating, release, favorite);
-
-
             // TODO only poster_path and movie id is necessary for the main activity
+            long movieRowId = addMovie(movieId, title, posterPath, overview, rating, popularity, release, favorite);
 
-            ContentValues movieValues = new ContentValues();
-
-            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
-            movieValues.put(MovieEntry.COLUMN_TITLE, title);
-            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
-            movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
-            movieValues.put(MovieEntry.COLUMN_RATING, rating);
-            movieValues.put(MovieEntry.COLUMN_RELEASE, release);
-            movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
-
-            contentValuesVector.add(movieValues);
+//            ContentValues movieValues = new ContentValues();
+//
+//            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+//            movieValues.put(MovieEntry.COLUMN_TITLE, title);
+//            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+//            movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+//            movieValues.put(MovieEntry.COLUMN_RATING, rating);
+//            movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+//            movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
+//
+//            contentValuesVector.add(movieValues);
 
         }
 
         // bulk insert into database
         // TODO not to be used so often in final version
-        deleteAndBulkInsert(contentValuesVector);
+//        bulkInsert(contentValuesVector);
 //        final Cursor cursor = context.getContentResolver().query(MovieEntry.CONTENT_URI, null, null, null, null);
 //        Log.d(LOG_TAG, "movie query: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
-    private void deleteAndBulkInsert(Vector<ContentValues> contentValuesVector) {
+    private void bulkInsert(Vector<ContentValues> contentValuesVector) {
         if (contentValuesVector.size() > 0) {
             Uri uri = MovieEntry.CONTENT_URI;
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
-            deleteOldMovieData();
-            deleteOldReviewData();
-            deleteOldVideoData();
 //            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
 //            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
             for (ContentValues contentvalues : contentValuesArray) {
                 final Uri movieInsertUri = context.getContentResolver().insert(uri, contentvalues);
-                fetchReviews(movieInsertUri);
-                fetchVideos(movieInsertUri);
+//                fetchReviews(movieInsertUri);
+//                fetchVideos(movieInsertUri);
             }
         }
     }
 
     // TODO: is there a better place for this? Does it make sense to put it in FRT?
-    private void fetchReviews(Uri movieInsertUri) {
+    // TODO: duplicate code
+    private void fetchReviews(long movieKey) {
 
-        final long movieKey = ContentUris.parseId(movieInsertUri);
         final Uri movieUri = MovieEntry.CONTENT_URI;
         final String[] columns = new String[]{MovieEntry.COLUMN_MOVIE_ID};
+        // TODO: remove magic number
         final int colMovieId = 0;
         final String selection = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
         final String[] selectionArgs = new String[]{Long.toString(movieKey)};
@@ -234,11 +223,12 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     }
 
     // TODO: is there a better place for this? Does it make sense to put it in FRT?
-    private void fetchVideos(Uri movieInsertUri) {
+    // TODO: duplicate code
+    private void fetchVideos(long movieKey) {
 
-        final long movieKey = ContentUris.parseId(movieInsertUri);
         final Uri movieUri = MovieEntry.CONTENT_URI;
         final String[] columns = new String[]{MovieEntry.COLUMN_MOVIE_ID};
+        // TODO: remove magic number
         final int colMovieId = 0;
         final String selection = MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
         final String[] selectionArgs = new String[]{Long.toString(movieKey)};
@@ -256,13 +246,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         (new FetchVideosTask(context, movieKey, movieId)).execute();
     }
 
-    private void deleteOldMovieData() {
-
-        int deleted = context.getContentResolver().delete(
-                MovieEntry.CONTENT_URI, null, null);
-        Log.d(LOG_TAG, deleted + "movies deleted");
-    }
-
+    // TODO
     private void deleteOldReviewData() {
 
         int deleted = context.getContentResolver().delete(
@@ -271,6 +255,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     }
 
+    // TODO
     private void deleteOldVideoData() {
 
         int deleted = context.getContentResolver().delete(
@@ -288,8 +273,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             movieRowId = insertMovie(movieId, title, posterPath, overview, rating, popularity,
                     release, favorite);
         } else {
-            movieRowId = updateMovie(title, posterPath, overview, rating, popularity,
-                    release, favorite);
+            movieRowId = updateMovie(movieId, title, posterPath, overview, rating, popularity, release);
         }
 
         return movieRowId;
@@ -343,8 +327,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     }
 
     private long updateMovie(
-            String title, String posterPath, String overview,
-            double rating, double popularity, String release, int favorite) {
+            long movieId, String title, String posterPath, String overview,
+            double rating, double popularity, String release) {
 
         ContentValues movieValues = new ContentValues();
 
@@ -355,8 +339,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
         movieValues.put(MovieEntry.COLUMN_RELEASE, release);
 
+        final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        final String[] selectionArgs = {Long.toString(movieId)};
         return context.getContentResolver().update(
-                MovieEntry.CONTENT_URI, movieValues, null, null);
-
+                MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
     }
 }

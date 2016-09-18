@@ -4,6 +4,9 @@ import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.TestUtilities.FAVORITE;
 import static com.example.android.popularmoviesapp.data.TestUtilities.MOVIE_ID;
@@ -26,24 +29,26 @@ public class TestFetchMovieTask extends AndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
+        deleteExistingEntries();
         fetchMovieTask = new FetchMovieTask(getContext());
+        fetchMovieTask.addMovie(MOVIE_ID + 1, TITLE, POSTER_PATH, OVERVIEW, RATING - 1,
+                POPULARITY + 1000, RELEASE, FAVORITE);
     }
 
     @TargetApi(11)
     // TODO: separate into separate test cases
     public void test_addMovie() {
-        final long movieRowId = test_addMovie_returnsMovieIdUponSuccessfulInsert();
+
+        final long movieRowId = test_addMovie_returnsMovieRowIdUponSuccessfulInsert();
 
         test_queryMovie_hasSameId(movieRowId);
         test_queryMovie_hasInitialData();
-        test_addMovieAgain_hasSameId(movieRowId);
+        test_addMovie_updatesOneMovie();
         test_queryMovie_hasUpdatedData();
 
     }
 
-    private long test_addMovie_returnsMovieIdUponSuccessfulInsert() {
-        // GIVEN
-        deleteExistingMovieEntry();
+    private long test_addMovie_returnsMovieRowIdUponSuccessfulInsert() {
 
         // WHEN
         final long movieRowId = fetchMovieTask.addMovie(
@@ -75,29 +80,33 @@ public class TestFetchMovieTask extends AndroidTestCase {
     }
 
     private void test_queryMovie_hasInitialData() {
-        test_queryMovie_movieHasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
+        test_queryMovie_hasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
                 RATING_TO_BE_REPLACED, POPULARITY_TO_BE_REPLACED, RELEASE,
                 FAVORITE_NOT_TO_BE_REPLACED);
 
     }
 
-    private void test_addMovieAgain_hasSameId(long movieRowId) {
+    private void test_addMovie_updatesOneMovie() {
+
+        // GIVEN
+        final int expected = 1;
 
         // WHEN
-        final long newMovieRowId = fetchMovieTask.addMovie(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
+        final long moviesUpdated = fetchMovieTask.addMovie(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
                 RATING, POPULARITY, RELEASE, FAVORITE);
 
         // THEN
-        assertEquals("Error: inserting a movie again should return the same ID",
-                movieRowId, newMovieRowId);
+        assertEquals("Error: adding the same movie again should only update one entry",
+                expected, moviesUpdated);
+
     }
 
     private void test_queryMovie_hasUpdatedData() {
-        test_queryMovie_movieHasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
+        test_queryMovie_hasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
                 RATING, POPULARITY, RELEASE, FAVORITE_NOT_TO_BE_REPLACED);
     }
 
-    private void test_queryMovie_movieHasCorrectData(
+    private void test_queryMovie_hasCorrectData(
             long expectedMovieId, String expectedTitle, String expectedPosterPath,
             String expectedOverview, double expectedRating,
             double expectedPopularity, String expectedRelease, int expectedFavorite) {
@@ -160,7 +169,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         // reset our state back to normal
-        deleteExistingMovieEntry();
+        deleteExistingEntries();
 
         // clean up the test so that other tests can use the content provider
         getContext().getContentResolver().
@@ -168,10 +177,16 @@ public class TestFetchMovieTask extends AndroidTestCase {
                 getLocalContentProvider().shutdown();
     }
 
-    private void deleteExistingMovieEntry() {
+    private void deleteExistingEntries() {
         getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,
-                MovieEntry.COLUMN_MOVIE_ID + " = ?",
-                new String[]{Long.toString(MOVIE_ID)});
+                null,
+                null);
+        getContext().getContentResolver().delete(ReviewEntry.CONTENT_URI,
+                null,
+                null);
+        getContext().getContentResolver().delete(VideoEntry.CONTENT_URI,
+                null,
+                null);
     }
 
 }
