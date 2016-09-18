@@ -60,8 +60,8 @@ public class FetchVideosTask extends AsyncTask<Void, Void, Void> {
 
             URL url = new URL(builtUri.toString());
 
-//            Log.d(LOG_TAG, "movie_key: " + movie_key);
-//            Log.d(LOG_TAG, "videos url: " + url);
+            Log.d(LOG_TAG, "movie_key: " + movie_key);
+            Log.d(LOG_TAG, "videos url: " + url);
 
             // create the request to TMDb, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -120,6 +120,8 @@ public class FetchVideosTask extends AsyncTask<Void, Void, Void> {
         final String MD_RESULTS = "results";
         final String MD_KEY = "key";
         final String MD_ID = "id";
+        final String MD_SITE = "site";
+        final String MD_TYPE = "type";
 
         final JSONObject data = new JSONObject(videosJsonStr);
         final JSONArray videos = data.getJSONArray(MD_RESULTS);
@@ -132,12 +134,16 @@ public class FetchVideosTask extends AsyncTask<Void, Void, Void> {
             final JSONObject videosData = videos.getJSONObject(i);
             final String id = videosData.getString(MD_ID);
             final String key = videosData.getString(MD_KEY);
+            final String site = videosData.getString(MD_SITE);
+            final String type = videosData.getString(MD_TYPE);
 
             ContentValues videoValues = new ContentValues();
 
             videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, movie_key);
             videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, key);
             videoValues.put(VideoEntry.COLUMN_VIDEO_ID, id);
+            videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, site);
+            videoValues.put(VideoEntry.COLUMN_VIDEO_TYPE, type);
 
             contentValuesVector.add(videoValues);
 

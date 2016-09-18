@@ -12,12 +12,11 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
 /**
  * Created by David on 10/07/16.
  * Manages database creation and version management.
- *
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -56,7 +55,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 VideoEntry._ID + " INTEGER PRIMARY KEY, " +
                 VideoEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
                 VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_KEY + " TEXT NOT NULL);";
+                VideoEntry.COLUMN_VIDEO_KEY + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_VIDEO_SITE + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_VIDEO_TYPE + " TEXT NOT NULL);";
 
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);

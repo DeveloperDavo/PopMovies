@@ -39,6 +39,8 @@ public class TestUtilities extends AndroidTestCase {
 
     public final static String VIDEO_ID = "videoId_ADFK";
     public final static String VIDEO_KEY = "videoKey_ASFDJK";
+    private static final String VIDEO_SITE = "YouTube";
+    private static final String VIDEO_TYPE = "Trailer";
 
     /**
      * Ensures an empty cursor is not returned.
@@ -98,6 +100,8 @@ public class TestUtilities extends AndroidTestCase {
         videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, moviesRowId);
         videoValues.put(VideoEntry.COLUMN_VIDEO_ID, VIDEO_ID);
         videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, VIDEO_KEY);
+        videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, VIDEO_SITE);
+        videoValues.put(VideoEntry.COLUMN_VIDEO_TYPE, VIDEO_TYPE);
         return videoValues;
     }
 
