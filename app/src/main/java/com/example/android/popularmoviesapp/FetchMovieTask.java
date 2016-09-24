@@ -160,7 +160,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             final int favorite = 0; // default to false
 
             // TODO only poster_path and movie id is necessary for the main activity
-            long movieRowId = addMovie(movieId, title, posterPath, overview, rating, popularity, release, favorite);
+            insertOrUpdate(movieId, title, posterPath, overview, rating, popularity, release, favorite);
 
 //            ContentValues movieValues = new ContentValues();
 //
@@ -264,19 +264,22 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     }
 
-    public long addMovie(long movieId, String title, String posterPath, String overview,
-                         double rating, double popularity, String release, int favorite) {
+    /**
+     * @return movieId upon insert and number of rows updated upon update
+     */
+    long insertOrUpdate(long movieId, String title, String posterPath, String overview,
+                               double rating, double popularity, String release, int favorite) {
 
         long movieRowId = checkIfMovieIdExists(movieId);
 
         if (movieRowId == -1) {
-            movieRowId = insertMovie(movieId, title, posterPath, overview, rating, popularity,
+            return insertMovie(movieId, title, posterPath, overview, rating, popularity,
                     release, favorite);
         } else {
-            movieRowId = updateMovie(movieId, title, posterPath, overview, rating, popularity, release);
+            return updateMovie(movieId, title, posterPath, overview, rating, popularity,
+                    release, favorite);
         }
 
-        return movieRowId;
     }
 
     private long checkIfMovieIdExists(long movieId) {
@@ -302,6 +305,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         return movieRowId;
     }
 
+    // TODO movieRowId is not used
     private long insertMovie(
             long movieId, String title, String posterPath, String overview,
             double rating, double popularity, String release, int favorite) {
@@ -328,7 +332,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private long updateMovie(
             long movieId, String title, String posterPath, String overview,
-            double rating, double popularity, String release) {
+            double rating, double popularity, String release, int favorite) {
 
         ContentValues movieValues = new ContentValues();
 
@@ -338,6 +342,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
         movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
 
         final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};

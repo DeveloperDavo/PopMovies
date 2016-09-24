@@ -1,14 +1,19 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -62,10 +67,11 @@ public class DetailAdapter extends CursorAdapter {
             setOverview(viewHolder, cursor);
             setRating(viewHolder, context, cursor);
             setRelease(viewHolder, cursor);
+            setButtonTextAndPersistChoice(viewHolder, context, cursor);
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
-//        Log.d(LOG_TAG, "bindView cursor: " + DatabaseUtils.dumpCursorToString(cursor));
+        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
     private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
@@ -101,15 +107,46 @@ public class DetailAdapter extends CursorAdapter {
         viewHolder.videoTextView.setText("Video");
     }
 
+    private void setButtonTextAndPersistChoice(ViewHolder viewHolder, final Context context, final Cursor cursor) {
+        viewHolder.favoriteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Log.d(LOG_TAG, "onClick");
+                updateMovie(context, cursor);
+            }
+        });
+
+    }
+
+    private void updateMovie(Context context, Cursor cursor) {
+        Log.d(LOG_TAG, "updateMovie");
+
+        ContentValues movieValues = new ContentValues();
+
+        final long favorite = cursor.getInt(DetailFragment.COL_MOVIE_FAVORITE);
+
+        if (favorite == 0) {
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, 1);
+        } else {
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, 0);
+        }
+
+        final long movieId = cursor.getLong(DetailFragment.COL_MOVIE_ID);
+        final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        final String[] selectionArgs = {Long.toString(movieId)};
+        context.getContentResolver().update(
+                MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
+    }
+
     /* Used to speed up loading the views within the list view */
     public static class ViewHolder {
 
-        final ImageView posterView;
-        final TextView titleView;
-        final TextView overviewView;
-        final TextView userRatingView;
-        final TextView releaseDateView;
-        final TextView videoTextView;
+        ImageView posterView;
+        TextView titleView;
+        TextView overviewView;
+        TextView userRatingView;
+        TextView releaseDateView;
+        TextView videoTextView;
+        Button favoriteButton;
 
         public ViewHolder(View rootView) {
             posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
@@ -118,6 +155,7 @@ public class DetailAdapter extends CursorAdapter {
             userRatingView = (TextView) rootView.findViewById(R.id.rating);
             releaseDateView = (TextView) rootView.findViewById(R.id.release);
             videoTextView = (TextView) rootView.findViewById(R.id.video_text_view);
+            favoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
         }
     }
 }

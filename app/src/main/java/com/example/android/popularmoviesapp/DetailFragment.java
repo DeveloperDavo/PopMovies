@@ -34,13 +34,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieEntry.COLUMN_OVERVIEW,
             MovieEntry.COLUMN_RATING,
             MovieEntry.COLUMN_RELEASE,
+            MovieEntry.COLUMN_FAVORITE
     };
 
+    static final int COL_MOVIE_ID = 1;
     static final int COL_MOVIE_TITLE = 2;
     static final int COL_MOVIE_POSTER_PATH = 3;
     static final int COL_MOVIE_OVERVIEW = 4;
     static final int COL_MOVIE_RATING = 5;
     static final int COL_MOVIE_RELEASE = 6;
+    static final int COL_MOVIE_FAVORITE = 7;
 
     /**********************************************************************************************/
 

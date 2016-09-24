@@ -54,6 +54,12 @@
                 android:textColor="#000000"
                 tools:text="rating" />
 
+            <Button
+                android:id="@+id/button_favorite"
+                android:layout_width="wrap_content"
+                android:text="mark as favorite"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </LinearLayout>
 

@@ -23,7 +23,6 @@ import static com.example.android.popularmoviesapp.data.TestUtilities.TITLE;
 public class TestFetchMovieTask extends AndroidTestCase {
     public static final double RATING_TO_BE_REPLACED = 7.4;
     public static final double POPULARITY_TO_BE_REPLACED = 23.19;
-    public static final int FAVORITE_NOT_TO_BE_REPLACED = 0;
 
     private FetchMovieTask fetchMovieTask;
 
@@ -31,7 +30,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
     protected void setUp() throws Exception {
         deleteExistingEntries();
         fetchMovieTask = new FetchMovieTask(getContext());
-        fetchMovieTask.addMovie(MOVIE_ID + 1, TITLE, POSTER_PATH, OVERVIEW, RATING - 1,
+        fetchMovieTask.insertOrUpdate(MOVIE_ID + 1, TITLE, POSTER_PATH, OVERVIEW, RATING - 1,
                 POPULARITY + 1000, RELEASE, FAVORITE);
     }
 
@@ -51,12 +50,12 @@ public class TestFetchMovieTask extends AndroidTestCase {
     private long test_addMovie_returnsMovieRowIdUponSuccessfulInsert() {
 
         // WHEN
-        final long movieRowId = fetchMovieTask.addMovie(
+        final long movieRowId = fetchMovieTask.insertOrUpdate(
                 MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW, RATING_TO_BE_REPLACED,
-                POPULARITY_TO_BE_REPLACED, RELEASE, FAVORITE_NOT_TO_BE_REPLACED);
+                POPULARITY_TO_BE_REPLACED, RELEASE, FAVORITE);
 
         // THEN
-        assertFalse("Error: addMovie should not be -1", movieRowId == -1);
+        assertFalse("Error: insertOrUpdate should not be -1", movieRowId == -1);
 
         return movieRowId;
     }
@@ -72,7 +71,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
 
             // THEN
             assertEquals("Error: the queried value of movieRowId does not " +
-                    "match the returned value from addMovie", expectedMovieRowId, movieRowId);
+                    "match the returned value from insertOrUpdate", expectedMovieRowId, movieRowId);
         } else {
             fail("Error: the id you used to queryMovie returned an empty cursor");
         }
@@ -81,9 +80,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
 
     private void test_queryMovie_hasInitialData() {
         test_queryMovie_hasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
-                RATING_TO_BE_REPLACED, POPULARITY_TO_BE_REPLACED, RELEASE,
-                FAVORITE_NOT_TO_BE_REPLACED);
-
+                RATING_TO_BE_REPLACED, POPULARITY_TO_BE_REPLACED, RELEASE, FAVORITE);
     }
 
     private void test_addMovie_updatesOneMovie() {
@@ -92,7 +89,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
         final int expected = 1;
 
         // WHEN
-        final long moviesUpdated = fetchMovieTask.addMovie(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
+        final long moviesUpdated = fetchMovieTask.insertOrUpdate(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
                 RATING, POPULARITY, RELEASE, FAVORITE);
 
         // THEN
@@ -103,7 +100,7 @@ public class TestFetchMovieTask extends AndroidTestCase {
 
     private void test_queryMovie_hasUpdatedData() {
         test_queryMovie_hasCorrectData(MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
-                RATING, POPULARITY, RELEASE, FAVORITE_NOT_TO_BE_REPLACED);
+                RATING, POPULARITY, RELEASE, FAVORITE);
     }
 
     private void test_queryMovie_hasCorrectData(
