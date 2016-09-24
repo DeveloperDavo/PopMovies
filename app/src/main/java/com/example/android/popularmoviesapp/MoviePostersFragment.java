@@ -33,13 +33,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     static final int COL_ID = 0;
     static final int COL_MOVIE_POSTER_PATH = 1;
-    private static final String SELECTION = "selection";
-    private static final String SELECTION_ARGS = "selection_args";
 
     /**********************************************************************************************/
 
     private MoviePosterAdapter posterAdapter;
-    private MoviePosterAdapter favPosterAdapter;
     private GridView gridView;
     private int selectedPosition = GridView.INVALID_POSITION;
 
@@ -57,6 +54,15 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d(LOG_TAG, "onSaveInstanceState");
+        if (selectedPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, selectedPosition);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
@@ -69,7 +75,18 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         gridView = (GridView) rootView.findViewById(R.id.grid_view_posters);
         gridView.setAdapter(posterAdapter);
 
-        // invoke when an item in the list has been clicked
+        openDetailViewOnClick();
+
+        // if a position has already been selected, get it
+        // FIXME: savedInstanceSate is null upon reload
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
+        return rootView;
+    }
+
+    private void openDetailViewOnClick() {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
              * Enter detail activity upon clicking on the item in the list
@@ -87,21 +104,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
                 // call onItemSelected, which is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
                 selectedPosition = position;
+                // TODO: workaround for savedInstanceState
+                Utility.setPosition(getContext(), selectedPosition);
             }
         });
-
-        // if a position has already been selected, get it
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
-        }
-
-        return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(LOG_TAG, "onStart");
-        super.onStart();
     }
 
     @Override
@@ -130,7 +136,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
             final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
             return setSortOrderAndRestartLoader(sortOrder);
         } else if (id == R.id.action_favorites) {
-            restartLoaderWithArgs();
+            final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
+            final String selectionArg = Integer.toString(1);
+            final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+            setSelectionAndRestartLoader(selection, selectionArg, sortOrder);
         }
 
         return super.onOptionsItemSelected(item);
@@ -140,14 +149,17 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.d(LOG_TAG, "onCreateLoader");
 
+        // TODO: workaround for savedInstanceState
+        final String selection = Utility.getSelection(getContext());
+        final String selectionArg = Utility.getSelectionArg(getContext());
+        String[] selectionArgs;
+        if (selectionArg == null) {
+            selectionArgs = null;
+        } else {
+            selectionArgs = new String[]{selectionArg};
+        }
         final String sortOrder = Utility.getSortOrder(getContext());
 
-        String selection = null;
-        String[] selectionArgs = null;
-        if (args != null) {
-            selection = args.getString(SELECTION);
-            selectionArgs = args.getStringArray(SELECTION_ARGS);
-        }
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
@@ -160,6 +172,9 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.d(LOG_TAG, "onLoaderFinished");
         posterAdapter.swapCursor(data);
+        // TODO: workaround for savedInstanceState
+        gridView.smoothScrollToPosition(Integer.parseInt(Utility.getPosition(getContext())));
+
 //        if (selectedPosition != GridView.INVALID_POSITION) {
 //            gridView.smoothScrollToPosition(selectedPosition);
 //        }
@@ -176,21 +191,26 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         (new FetchMovieTask(getContext())).execute(getString(prefString));
     }
 
+    // TODO: workaround for savedInstanceState
     private boolean setSortOrderAndRestartLoader(String sortOrder) {
         Log.d(LOG_TAG, "setSortOrderAndRestartLoader");
+        Utility.setSelection(getContext(), null);
+        Utility.setSelectionArg(getContext(), null);
         Utility.setSortOrder(getContext(), sortOrder);
+        Utility.setPosition(getContext(), GridView.INVALID_POSITION);
         getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
         return true;
     }
 
-    private boolean restartLoaderWithArgs() {
-        Log.d(LOG_TAG, "restartLoaderWithArgs");
-        final Bundle args = new Bundle();
-        final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
-        final String[] selectionArgs = new String[]{Integer.toString(1)};
-        args.putString(SELECTION, selection);
-        args.putStringArray(SELECTION_ARGS, selectionArgs);
-        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, args, this);
+    // TODO: workaround for savedInstanceState
+    private boolean setSelectionAndRestartLoader(
+            String selection, String selectionArg, String sortOrder) {
+        Log.d(LOG_TAG, "setSelectionAndRestartLoader");
+        Utility.setSelection(getContext(), selection);
+        Utility.setSelectionArg(getContext(), selectionArg);
+        Utility.setSortOrder(getContext(), sortOrder);
+        Utility.setPosition(getContext(), GridView.INVALID_POSITION);
+        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
         return true;
     }
 

@@ -12,7 +12,10 @@
     <!-- user rating format -->
     <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g>/10</string>
 
-    <!-- sort order -->
+    <!-- TODO: workaround for savedInstanceState -->
     <string name="sort_order_key">sort_order</string>
+    <string name="selection_key">selection_key</string>
+    <string name="selection_arg_key">selection_arg_key</string>
+    <string name="position_key">position_key</string>
 
 </resources>
