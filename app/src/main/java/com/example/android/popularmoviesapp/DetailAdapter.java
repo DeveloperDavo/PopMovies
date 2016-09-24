@@ -3,7 +3,6 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,7 +70,7 @@ public class DetailAdapter extends CursorAdapter {
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
-        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
+//        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
     private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
