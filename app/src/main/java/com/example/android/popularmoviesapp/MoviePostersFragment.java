@@ -42,7 +42,6 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     private static final String SELECTED_KEY = "selected_position";
 
-
     public MoviePostersFragment() {
         // Required empty public constructor
     }
@@ -126,9 +125,15 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
         if (id == R.id.action_sort_by_popularity) {
             updateMovies(R.string.pref_sort_by_popularity);
+            final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+            Utility.setSortOrder(getContext(), sortOrder);
+            getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
             return true;
         } else if (id == R.id.action_sort_by_rating) {
             updateMovies(R.string.pref_sort_by_rating);
+            final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
+            Utility.setSortOrder(getContext(), sortOrder);
+            getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
             return true;
         }
 
@@ -153,9 +158,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        // TODO sortOrder
-//        final String sortOrder = MovieEntry.COLUMN_POPULARITY;
-        final String sortOrder = null;
+        final String sortOrder = Utility.getSortOrder(getContext());
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,

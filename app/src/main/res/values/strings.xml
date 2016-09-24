@@ -10,4 +10,7 @@
     <!-- user rating format -->
     <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g>/10</string>
 
+    <!-- sort order -->
+    <string name="sort_order_key">sort_order</string>
+
 </resources>
