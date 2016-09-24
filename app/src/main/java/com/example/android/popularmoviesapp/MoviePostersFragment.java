@@ -87,11 +87,8 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
 
-                // increment the position to match Database Ids indexed starting at 1
-                final long movieKey = position + 1;
-
                 // call onItemSelected, which is overridden in MainActivity
-                ((Callback) getActivity()).onItemSelected(movieKey);
+                ((Callback) getActivity()).onItemSelected(id);
                 selectedPosition = position;
             }
         });
