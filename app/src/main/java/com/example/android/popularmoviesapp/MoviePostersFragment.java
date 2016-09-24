@@ -33,10 +33,13 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     static final int COL_ID = 0;
     static final int COL_MOVIE_POSTER_PATH = 1;
+    private static final String SELECTION = "selection";
+    private static final String SELECTION_ARGS = "selection_args";
 
     /**********************************************************************************************/
 
     private MoviePosterAdapter posterAdapter;
+    private MoviePosterAdapter favPosterAdapter;
     private GridView gridView;
     private int selectedPosition = GridView.INVALID_POSITION;
 
@@ -44,11 +47,6 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     public MoviePostersFragment() {
         // Required empty public constructor
-    }
-
-    public static MoviePostersFragment newInstance() {
-        Log.d(LOG_TAG, "newInstance");
-        return new MoviePostersFragment();
     }
 
     @Override
@@ -104,12 +102,12 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     public void onStart() {
         Log.d(LOG_TAG, "onStart");
         super.onStart();
-//        updateMovies(R.string.pref_sort_by_rating);
     }
 
-    private void updateMovies(int prefString) {
-        Log.d(LOG_TAG, "updateMovies");
-        (new FetchMovieTask(getContext())).execute(getString(prefString));
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIE_POSTERS_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -126,49 +124,41 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         if (id == R.id.action_sort_by_popularity) {
             updateMovies(R.string.pref_sort_by_popularity);
             final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-            Utility.setSortOrder(getContext(), sortOrder);
-            getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
-            return true;
+            return setSortOrderAndRestartLoader(sortOrder);
         } else if (id == R.id.action_sort_by_rating) {
             updateMovies(R.string.pref_sort_by_rating);
             final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
-            Utility.setSortOrder(getContext(), sortOrder);
-            getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
-            return true;
+            return setSortOrderAndRestartLoader(sortOrder);
+        } else if (id == R.id.action_favorites) {
+            restartLoaderWithArgs();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(MOVIE_POSTERS_LOADER, null, this);
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        // keep selected position upon screen saving state
-        if (selectedPosition != GridView.INVALID_POSITION) {
-            outState.putInt(SELECTED_KEY, selectedPosition);
-        }
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.d(LOG_TAG, "onCreateLoader");
 
         final String sortOrder = Utility.getSortOrder(getContext());
+
+        String selection = null;
+        String[] selectionArgs = null;
+        if (args != null) {
+            selection = args.getString(SELECTION);
+            selectionArgs = args.getStringArray(SELECTION_ARGS);
+        }
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.d(LOG_TAG, "onLoaderFinished");
         posterAdapter.swapCursor(data);
 //        if (selectedPosition != GridView.INVALID_POSITION) {
 //            gridView.smoothScrollToPosition(selectedPosition);
@@ -177,7 +167,31 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(LOG_TAG, "onLoaderReset");
         posterAdapter.swapCursor(null);
+    }
+
+    private void updateMovies(int prefString) {
+        Log.d(LOG_TAG, "updateMovies");
+        (new FetchMovieTask(getContext())).execute(getString(prefString));
+    }
+
+    private boolean setSortOrderAndRestartLoader(String sortOrder) {
+        Log.d(LOG_TAG, "setSortOrderAndRestartLoader");
+        Utility.setSortOrder(getContext(), sortOrder);
+        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
+        return true;
+    }
+
+    private boolean restartLoaderWithArgs() {
+        Log.d(LOG_TAG, "restartLoaderWithArgs");
+        final Bundle args = new Bundle();
+        final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
+        final String[] selectionArgs = new String[]{Integer.toString(1)};
+        args.putString(SELECTION, selection);
+        args.putStringArray(SELECTION_ARGS, selectionArgs);
+        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, args, this);
+        return true;
     }
 
     /**
@@ -192,3 +206,4 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         void onItemSelected(long movieKey);
     }
 }
+
