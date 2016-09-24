@@ -160,7 +160,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             final int favorite = 0; // default to false
 
             // TODO only poster_path and movie id is necessary for the main activity
-            insertOrUpdate(movieId, title, posterPath, overview, rating, popularity, release, favorite);
+            insertOrUpdate(movieId, title, posterPath, overview, rating, popularity, release,
+                    favorite);
 
 //            ContentValues movieValues = new ContentValues();
 //
@@ -276,8 +277,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             return insertMovie(movieId, title, posterPath, overview, rating, popularity,
                     release, favorite);
         } else {
-            return updateMovie(movieId, title, posterPath, overview, rating, popularity,
-                    release, favorite);
+            return updateMovie(movieId, title, posterPath, overview, rating, popularity, release);
         }
 
     }
@@ -332,7 +332,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private long updateMovie(
             long movieId, String title, String posterPath, String overview,
-            double rating, double popularity, String release, int favorite) {
+            double rating, double popularity, String release) {
 
         ContentValues movieValues = new ContentValues();
 
@@ -342,7 +342,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
         movieValues.put(MovieEntry.COLUMN_RELEASE, release);
-        movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
 
         final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};
