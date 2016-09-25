@@ -18,4 +18,8 @@
     <string name="selection_arg_key">selection_arg_key</string>
     <string name="position_key">position_key</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">popularmovies.example.com</string>
+    <string name="content_authority">com.example.android.popularmoviesapp</string>
+
 </resources>

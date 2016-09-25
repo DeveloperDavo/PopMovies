@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
@@ -199,7 +201,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     private void updateMovies(int prefString) {
         Log.d(LOG_TAG, "updateMovies");
-        (new FetchMovieTask(getContext())).execute(getString(prefString));
+        PopMoviesSyncAdapter.syncImmediately(getActivity());
+
+//        (new FetchMovieTask(getContext())).execute(getString(prefString));
+
     }
 
     // TODO: workaround for savedInstanceState

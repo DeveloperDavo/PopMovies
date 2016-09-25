@@ -14,7 +14,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
  * Manages database creation and version management.
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
-    public static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
+    private static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
     private static final int DATABASE_VERSION = 4;
 
