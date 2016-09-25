@@ -10,21 +10,10 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  */
 public class Utility {
 
-    private static final String SOURCE_PREFERENCE = "source";
     private static final String SORT_ORDER_PREFERENCE = "sort_order";
     private static final String SELECTION_PREFERENCE = "selection";
     private static final String SELECTION_ARG_PREFERENCE = "selection_arg";
     private static final String POSITION_PREFERENCE = "position";
-
-    public static void setSource(Context context, String source) {
-        setPreferenceText(context, source, R.string.source_key, SOURCE_PREFERENCE);
-    }
-
-    public static String getSource(Context context) {
-        final String defValue = context.getString(R.string.source_popular);
-        return getPreferenceText(context, SOURCE_PREFERENCE,
-                defValue, R.string.source_key);
-    }
 
     // TODO: workaround for savedInstanceState
     public static void setSelection(Context context, String selection) {

@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.example.android.popularmoviesapp.BuildConfig;
 import com.example.android.popularmoviesapp.R;
-import com.example.android.popularmoviesapp.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,19 +29,23 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 public class MoviesSyncer {
     private static final String LOG_TAG = MoviesSyncer.class.getSimpleName();
 
+    public static void syncTopRatedMovies(Context context) {
+        final String source = context.getString(R.string.source_top_rated);
+        syncMovies(context, source);
+    }
+
+    public static void syncPopularMovies(Context context) {
+        final String source = context.getString(R.string.source_popular);
+        syncMovies(context, source);
+    }
+
     /**
      * Gets movie data with a http request.
      * Parses data as a JSON string
      * and persists it.
-     * Publishes the result on the UI.
+     * publishes the result on the UI.
      */
-    public static void syncMovies(Context context) {
-        final String source = Utility.getSource(context);
-
-        // if source is favorites, there is nothing to look up
-        if (source == context.getString(R.string.source_favorites)) {
-            return;
-        }
+    private static void syncMovies(Context context, String source) {
 
         // Declared outside in order to be closed in finally block
         HttpURLConnection urlConnection = null;

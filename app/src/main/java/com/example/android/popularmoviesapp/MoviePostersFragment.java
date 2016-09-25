@@ -152,29 +152,25 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     }
 
     private void setPopularPrefs() {
-        final String source = getString(R.string.source_popular);
         final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-        setPreferences(source, null, null, sortOrder);
+        setPreferences(null, null, sortOrder);
     }
 
     private void setRatingPrefs() {
-        final String source = getString(R.string.source_top_rated);
         final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
-        setPreferences(source, null, null, sortOrder);
+        setPreferences(null, null, sortOrder);
     }
 
     private void setFavoritesPrefs() {
         final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
         final String selectionArg = Integer.toString(1);
-        final String source = getString(R.string.source_favorites);
         final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-        setPreferences(source, selection, selectionArg, sortOrder);
+        setPreferences(selection, selectionArg, sortOrder);
     }
 
     // TODO: workaround for savedInstanceState
-    private void setPreferences(String source, String selection, String selectionArg, String sortOrder) {
+    private void setPreferences(String selection, String selectionArg, String sortOrder) {
 //        Log.d(LOG_TAG, "setPreferences");
-        Utility.setSource(getContext(), source);
         setSelection(getContext(), selection);
         Utility.setSelectionArg(getContext(), selectionArg);
         Utility.setSortOrder(getContext(), sortOrder);

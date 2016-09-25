@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 
+import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
+
 public class MainActivity extends AppCompatActivity implements MoviePostersFragment.Callback {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -35,7 +37,9 @@ public class MainActivity extends AppCompatActivity implements MoviePostersFragm
             twoPaneLayout = false;
         }
 
-        Log.d(LOG_TAG, "density: " + getResources().getDisplayMetrics().density);
+        PopMoviesSyncAdapter.initializeSyncAdapter(this);
+
+//        Log.d(LOG_TAG, "density: " + getResources().getDisplayMetrics().density);
     }
 
     @Override
