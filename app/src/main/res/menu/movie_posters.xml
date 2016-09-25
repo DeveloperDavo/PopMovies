@@ -8,6 +8,6 @@
         android:title="@string/action_sort_by_popularity" />
     <item
         android:id="@+id/action_favorites"
-        android:title="@string/action_favorites" />
+        android:title="@string/action_show_favorites" />
 
 </menu>

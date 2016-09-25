@@ -30,6 +30,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  * Parses data as a JSON string on background thread and
  * publishes the result on the UI.
  */
+// TODO: delete class and test
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 

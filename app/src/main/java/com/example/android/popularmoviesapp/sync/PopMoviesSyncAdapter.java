@@ -8,7 +8,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.android.popularmoviesapp.R;
 
@@ -24,9 +23,11 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     @Override
+    // Called every time a sync is performed - defined in android manifest
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "onPerformSync");
+//        Log.d(LOG_TAG, "onPerformSync");
+        MoviesSyncer.syncMovies(getContext());
     }
 
     /**
@@ -35,7 +36,7 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
      * @param context The context used to access the account service
      */
     public static void syncImmediately(Context context) {
-        Log.d(LOG_TAG, "syncImmediately");
+//        Log.d(LOG_TAG, "syncImmediately");
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);

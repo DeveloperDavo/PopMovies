@@ -10,84 +10,87 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  */
 public class Utility {
 
+    private static final String SOURCE_PREFERENCE = "source";
     private static final String SORT_ORDER_PREFERENCE = "sort_order";
     private static final String SELECTION_PREFERENCE = "selection";
     private static final String SELECTION_ARG_PREFERENCE = "selection_arg";
-    private static final String POSITION_PREFERENCE = "postion";
+    private static final String POSITION_PREFERENCE = "position";
+
+    public static void setSource(Context context, String source) {
+        setPreferenceText(context, source, R.string.source_key, SOURCE_PREFERENCE);
+    }
+
+    public static String getSource(Context context) {
+        final String defValue = context.getString(R.string.source_popular);
+        return getPreferenceText(context, SOURCE_PREFERENCE,
+                defValue, R.string.source_key);
+    }
 
     // TODO: workaround for savedInstanceState
     public static void setSelection(Context context, String selection) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SELECTION_PREFERENCE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(context.getString(R.string.selection_key), selection);
-        editor.commit();
+        setPreferenceText(context, selection, R.string.selection_key, SELECTION_PREFERENCE);
     }
 
     // TODO: workaround for savedInstanceState
     public static String getSelection(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SELECTION_PREFERENCE, Context.MODE_PRIVATE);
-        final String defValue = null;
-        return settings.getString(context.getString(R.string.selection_key), defValue);
+        return getPreferenceText(context, SELECTION_PREFERENCE, null, R.string.selection_key);
     }
 
     // TODO: workaround for savedInstanceState
     public static void setSelectionArg(Context context, String selectionArg) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SELECTION_ARG_PREFERENCE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(context.getString(R.string.selection_arg_key), selectionArg);
-        editor.commit();
+        setPreferenceText(context, selectionArg, R.string.selection_arg_key,
+                SELECTION_ARG_PREFERENCE);
     }
 
     // TODO: workaround for savedInstanceState
     public static String getSelectionArg(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SELECTION_ARG_PREFERENCE, Context.MODE_PRIVATE);
-        final String defValue = null;
-        return settings.getString(
-                context.getString(R.string.selection_arg_key), defValue);
+        return getPreferenceText(context, SELECTION_ARG_PREFERENCE, null,
+                R.string.selection_arg_key);
     }
 
     // TODO: workaround for savedInstanceState
     public static void setSortOrder(Context context, String sortOrder) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SORT_ORDER_PREFERENCE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(context.getString(R.string.sort_order_key), sortOrder);
-        editor.commit();
+        setPreferenceText(context, sortOrder, R.string.sort_order_key, SORT_ORDER_PREFERENCE);
     }
 
     // TODO: workaround for savedInstanceState
     public static String getSortOrder(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(
-                SORT_ORDER_PREFERENCE, Context.MODE_PRIVATE);
-        final String defValue = MovieEntry.COLUMN_POPULARITY + " DESC";
-        return settings.getString(context.getString(R.string.sort_order_key), defValue);
+        return getPreferenceText(context, SORT_ORDER_PREFERENCE,
+                MovieEntry.COLUMN_POPULARITY + " DESC", R.string.sort_order_key);
     }
 
     // TODO: workaround for savedInstanceState
     public static void setPosition(Context context, int position) {
-        SharedPreferences settings = context.getSharedPreferences(
-                POSITION_PREFERENCE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(context.getString(R.string.position_key), Integer.toString(position));
-        editor.commit();
+        setPreferenceText(context, Integer.toString(position),
+                R.string.position_key, POSITION_PREFERENCE);
     }
 
     // TODO: workaround for savedInstanceState
     public static String getPosition(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(
-                POSITION_PREFERENCE, Context.MODE_PRIVATE);
-        final int defValue = -1;
-        return settings.getString(
-                context.getString(R.string.position_key), Integer.toString(defValue));
+        return getPreferenceText(context, POSITION_PREFERENCE,
+                Integer.toString(-1), R.string.position_key);
     }
 
     public static String formatRating(Context context, double ratingFromDb) {
         int formatId = R.string.format_user_rating;
         return String.format(context.getString(formatId), ratingFromDb);
+    }
+
+    /* Helper methods */
+    private static void setPreferenceText(
+            Context context, String text, int key, String preference) {
+        SharedPreferences settings = context.getSharedPreferences(
+                preference, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(context.getString(key), text);
+        editor.commit();
+    }
+
+    private static String getPreferenceText(
+            Context context, String preference, String defValue, int key) {
+        SharedPreferences settings = context.getSharedPreferences(
+                preference, Context.MODE_PRIVATE);
+        return settings.getString(context.getString(key), defValue);
     }
 
 }

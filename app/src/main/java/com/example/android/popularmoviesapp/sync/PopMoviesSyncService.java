@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by David on 25/09/16.
@@ -18,7 +17,7 @@ public class PopMoviesSyncService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d(LOG_TAG, "onCreate");
+//        Log.d(LOG_TAG, "onCreate");
         synchronized (syncAdapterLock) {
             if (moviesSyncAdapter == null) {
                 moviesSyncAdapter = new PopMoviesSyncAdapter(getApplicationContext(), true);

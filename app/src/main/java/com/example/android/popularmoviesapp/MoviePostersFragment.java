@@ -18,6 +18,7 @@ import android.widget.GridView;
 
 import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
 
+import static com.example.android.popularmoviesapp.Utility.setSelection;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
@@ -125,42 +126,64 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d(LOG_TAG, "onCreateOptionsMenu");
+//        Log.d(LOG_TAG, "onCreateOptionsMenu");
         inflater.inflate(R.menu.movie_posters, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d(LOG_TAG, "onOptionsItemSelected");
+//        Log.d(LOG_TAG, "onOptionsItemSelected");
         int id = item.getItemId();
 
         if (id == R.id.action_sort_by_popularity) {
-            updateMovies(R.string.pref_sort_by_popularity);
-            setSelection(null, null);
-            final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-            setSortOrderAndPositionToInvalid(sortOrder);
-            return restartLoaderAndReturnTrue();
+            setPopularPrefs();
         } else if (id == R.id.action_sort_by_rating) {
-            updateMovies(R.string.pref_sort_by_rating);
-            setSelection(null, null);
-            final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
-            setSortOrderAndPositionToInvalid(sortOrder);
-            return restartLoaderAndReturnTrue();
+            setRatingPrefs();
         } else if (id == R.id.action_favorites) {
-            final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
-            final String selectionArg = Integer.toString(1);
-            final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-            setSelection(selection, selectionArg);
-            setSortOrderAndPositionToInvalid(sortOrder);
-            return restartLoaderAndReturnTrue();
+            setFavoritesPrefs();
+        } else {
+            return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+        PopMoviesSyncAdapter.syncImmediately(getActivity());
+        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
+        return true;
+
+    }
+
+    private void setPopularPrefs() {
+        final String source = getString(R.string.source_popular);
+        final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+        setPreferences(source, null, null, sortOrder);
+    }
+
+    private void setRatingPrefs() {
+        final String source = getString(R.string.source_top_rated);
+        final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
+        setPreferences(source, null, null, sortOrder);
+    }
+
+    private void setFavoritesPrefs() {
+        final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
+        final String selectionArg = Integer.toString(1);
+        final String source = getString(R.string.source_favorites);
+        final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+        setPreferences(source, selection, selectionArg, sortOrder);
+    }
+
+    // TODO: workaround for savedInstanceState
+    private void setPreferences(String source, String selection, String selectionArg, String sortOrder) {
+//        Log.d(LOG_TAG, "setPreferences");
+        Utility.setSource(getContext(), source);
+        setSelection(getContext(), selection);
+        Utility.setSelectionArg(getContext(), selectionArg);
+        Utility.setSortOrder(getContext(), sortOrder);
+        Utility.setPosition(getContext(), GridView.INVALID_POSITION);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.d(LOG_TAG, "onCreateLoader");
+//        Log.d(LOG_TAG, "onCreateLoader");
 
         // TODO: workaround for savedInstanceState
         final String selection = Utility.getSelection(getContext());
@@ -183,7 +206,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.d(LOG_TAG, "onLoaderFinished");
+//        Log.d(LOG_TAG, "onLoaderFinished");
         posterAdapter.swapCursor(data);
         // TODO: workaround for savedInstanceState
         gridView.smoothScrollToPosition(Integer.parseInt(Utility.getPosition(getContext())));
@@ -195,35 +218,8 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.d(LOG_TAG, "onLoaderReset");
+//        Log.d(LOG_TAG, "onLoaderReset");
         posterAdapter.swapCursor(null);
-    }
-
-    private void updateMovies(int prefString) {
-        Log.d(LOG_TAG, "updateMovies");
-        PopMoviesSyncAdapter.syncImmediately(getActivity());
-
-//        (new FetchMovieTask(getContext())).execute(getString(prefString));
-
-    }
-
-    // TODO: workaround for savedInstanceState
-    private void setSelection(String selection, String selectionArg) {
-        Log.d(LOG_TAG, "setSelection");
-        Utility.setSelection(getContext(), selection);
-        Utility.setSelectionArg(getContext(), selectionArg);
-    }
-
-    // TODO: workaround for savedInstanceState
-    private void setSortOrderAndPositionToInvalid(String sortOrder) {
-        Log.d(LOG_TAG, "setSortOrderAndPositionToInvalid");
-        Utility.setSortOrder(getContext(), sortOrder);
-        Utility.setPosition(getContext(), GridView.INVALID_POSITION);
-    }
-
-    private boolean restartLoaderAndReturnTrue(){
-        getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
-        return true;
     }
 
     /**

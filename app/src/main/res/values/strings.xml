@@ -1,17 +1,24 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+
     <string name="app_name">Pop Movies</string>
     <string name="title_activity_detail">Details</string>
-    <string name="action_sort_order">...</string>
+
+    <!-- Spinner -->
     <string name="action_sort_by_rating">Top Rated</string>
     <string name="action_sort_by_popularity">Most Popular</string>
-    <string name="action_favorites">Favorites</string>
-    <string name="pref_sort_by_rating">top_rated</string>
-    <string name="pref_sort_by_popularity">popular</string>
-    <string name="pref_favorites">favorites</string>
+    <string name="action_show_favorites">Favorites</string>
+
+
+    <!-- source of data -->
+    <string name="source_top_rated">top_rated</string>
+    <string name="source_popular">popular</string>
+    <string name="source_favorites">favorites</string>
 
     <!-- user rating format -->
     <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g>/10</string>
 
+    <!-- Preferences -->
+    <string name="source_key">source</string>
     <!-- TODO: workaround for savedInstanceState -->
     <string name="sort_order_key">sort_order</string>
     <string name="selection_key">selection_key</string>
