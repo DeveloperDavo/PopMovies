@@ -13,7 +13,7 @@
         android:background="@color/colorTitle"
         android:fontFamily="sans-serif-light"
         android:padding="16dp"
-        android:textColor="#ffffff"
+        android:textColor="@android:color/background_light"
         android:textSize="56sp"
         tools:text="Title" />
 
@@ -42,6 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
+                android:paddingBottom="16dp"
                 android:textSize="28sp"
                 tools:text="release" />
 
@@ -50,15 +51,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
+                android:paddingBottom="16dp"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:textColor="#000000"
                 tools:text="rating" />
 
             <Button
                 android:id="@+id/button_favorite"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorTitle"
                 android:text="mark as favorite"
-                android:layout_height="wrap_content" />
+                android:textColor="@android:color/background_light" />
 
         </LinearLayout>
     </LinearLayout>

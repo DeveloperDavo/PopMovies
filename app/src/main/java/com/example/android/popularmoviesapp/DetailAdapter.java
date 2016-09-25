@@ -106,8 +106,9 @@ public class DetailAdapter extends CursorAdapter {
         viewHolder.videoTextView.setText("Video");
     }
 
-    private void setButtonTextAndPersistChoice(ViewHolder viewHolder, final Context context, final Cursor cursor) {
-        viewHolder.favoriteButton.setOnClickListener(new View.OnClickListener() {
+    private void setButtonTextAndPersistChoice(final ViewHolder viewHolder, final Context context, final Cursor cursor) {
+        final Button favoriteButton = viewHolder.favoriteButton;
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Log.d(LOG_TAG, "onClick");
                 updateMovie(context, cursor);
