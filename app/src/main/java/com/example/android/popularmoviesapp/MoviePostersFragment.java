@@ -135,6 +135,9 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 //        Log.d(LOG_TAG, "onOptionsItemSelected");
         int id = item.getItemId();
 
+        // TODO: remove
+        PopMoviesSyncAdapter.syncImmediately(getContext());
+
         if (id == R.id.action_sort_by_popularity) {
             setPopularPrefs();
         } else if (id == R.id.action_sort_by_rating) {

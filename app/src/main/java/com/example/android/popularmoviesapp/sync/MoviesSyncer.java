@@ -180,8 +180,8 @@ public class MoviesSyncer {
                 null); // sortOrder
 
         if (movieCursor.moveToFirst()) {
-            int locationIdIndex = movieCursor.getColumnIndex(MovieEntry._ID);
-            movieRowId = movieCursor.getLong(locationIdIndex);
+            int movieIdIndex = movieCursor.getColumnIndex(MovieEntry._ID);
+            movieRowId = movieCursor.getLong(movieIdIndex);
         }
 
         movieCursor.close();
@@ -209,6 +209,10 @@ public class MoviesSyncer {
 
         // extract movieRowId from URI
         movieRowId = ContentUris.parseId(insertedUri);
+        // TODO: move to insertOrUpdate after db has been updated
+        syncVideos(context, movieRowId, movieId);
+        // TODO: sync reviews
+
         return movieRowId;
     }
 
@@ -230,4 +234,11 @@ public class MoviesSyncer {
         return context.getContentResolver().update(
                 MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
     }
+
+    // TODO: is there a better place for this? Does it make sense to put it in FRT?
+    // TODO: after updating db, only need movieId
+    private static void syncVideos(Context context, long movieKey, long movieId) {
+        VideosSyncer.syncVideos(context, movieKey, movieId);
+    }
+
 }

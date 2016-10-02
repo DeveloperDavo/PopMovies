@@ -285,7 +285,10 @@ public class MovieProvider extends ContentProvider {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
-        return JOIN_QUERY_BUILDER.query(readableDatabase,
+//        return JOIN_QUERY_BUILDER.query(
+//                readableDatabase,
+        return readableDatabase.query(
+                MovieEntry.TABLE_NAME,
                 projection,
                 SINGLE_MOVIE_SELECTION,
                 new String[]{String.valueOf(ContentUris.parseId(uri))},

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 /**
  * Created by David on 25/09/16.
  */
-
 public class PopMoviesSyncService extends Service {
     private static final String LOG_TAG = PopMoviesSyncService.class.getSimpleName();
 
