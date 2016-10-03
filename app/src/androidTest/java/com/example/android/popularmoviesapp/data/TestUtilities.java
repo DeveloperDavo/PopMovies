@@ -24,7 +24,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry
  */
 public class TestUtilities extends AndroidTestCase {
 
-    public final static long MOVIE_ROW_ID = 1;
+    public final static long MOVIE_ROW_ID = 17;
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
     public static final String POSTER_PATH = "path_to_poster";
@@ -72,7 +72,7 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     // default movie values
-    static ContentValues createMovieValues() {
+    public static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
         movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
@@ -82,6 +82,21 @@ public class TestUtilities extends AndroidTestCase {
         movieValues.put(MovieEntry.COLUMN_POPULARITY, POPULARITY);
         movieValues.put(MovieEntry.COLUMN_RELEASE, RELEASE);
         movieValues.put(MovieEntry.COLUMN_FAVORITE, FAVORITE);
+        return movieValues;
+    }
+
+    public static ContentValues createMovieValues(
+            int movieId, String title, String posterPath, String overview,
+            Double rating, Double popularity, String release, int favorite) {
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+        movieValues.put(MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        movieValues.put(MovieEntry.COLUMN_RATING, rating);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+        movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
         return movieValues;
     }
 
@@ -107,16 +122,24 @@ public class TestUtilities extends AndroidTestCase {
         return videoValues;
     }
 
-    static long createAndInsertMovieValues(Context context) {
+    /**
+     * @param context
+     * @return movieRowId
+     */
+    public static long createAndInsertMovieValues(Context context) {
 
-        // insert our test records into the database
+        ContentValues testValues = TestUtilities.createMovieValues();
+        return insertMovieValues(context, testValues);
+    }
+
+    private static long insertMovieValues(Context context, ContentValues testValues) {
+
+        // WHEN
         MovieDbHelper dbHelper = new MovieDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues testValues = TestUtilities.createMovieValues();
-
         long moviesRowId = db.insert(MovieEntry.TABLE_NAME, null, testValues);
 
-        // Verify we got a row back.
+        // THEN
         assertTrue("Error: Failure inserting movie values", moviesRowId != -1);
 
         return moviesRowId;

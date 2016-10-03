@@ -26,15 +26,15 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 /**
  * Created by David on 25/09/16.
  */
-public class MoviesSyncer {
+class MoviesSyncer {
     private static final String LOG_TAG = MoviesSyncer.class.getSimpleName();
 
-    public static void syncTopRatedMovies(Context context) {
+    static void syncTopRatedMovies(Context context) {
         final String source = context.getString(R.string.source_top_rated);
         syncMovies(context, source);
     }
 
-    public static void syncPopularMovies(Context context) {
+    static void syncPopularMovies(Context context) {
         final String source = context.getString(R.string.source_popular);
         syncMovies(context, source);
     }
@@ -154,18 +154,17 @@ public class MoviesSyncer {
                                long movieId, String title, String posterPath, String overview,
                                double rating, double popularity, String release, int favorite) {
 
-        long movieRowId = checkIfMovieIdExists(context, movieId);
-
-        if (movieRowId == -1) {
+        if (isMovieInDb(context, movieId)) {
+            return updateMovie(context, movieId, title, posterPath, overview, rating, popularity,
+                    release);
+        } else {
             return insertMovie(context, movieId, title, posterPath, overview, rating, popularity,
                     release, favorite);
-        } else {
-            return updateMovie(context, movieId, title, posterPath, overview, rating, popularity, release);
         }
 
     }
 
-    private static long checkIfMovieIdExists(Context context, long movieId) {
+    static boolean isMovieInDb(Context context, long movieId) {
         long movieRowId = -1;
 
         final String[] projection = {MovieEntry._ID};
@@ -179,18 +178,39 @@ public class MoviesSyncer {
                 selectionArgs,
                 null); // sortOrder
 
+        assert movieCursor != null;
         if (movieCursor.moveToFirst()) {
             int movieIdIndex = movieCursor.getColumnIndex(MovieEntry._ID);
             movieRowId = movieCursor.getLong(movieIdIndex);
         }
 
         movieCursor.close();
-        return movieRowId;
+
+        return movieRowId != -1;
+    }
+
+    private static long updateMovie(Context context,
+                            long movieId, String title, String posterPath, String overview,
+                            double rating, double popularity, String release) {
+
+        ContentValues movieValues = new ContentValues();
+
+        movieValues.put(MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        movieValues.put(MovieEntry.COLUMN_RATING, rating);
+        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
+
+        final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        final String[] selectionArgs = {Long.toString(movieId)};
+        return context.getContentResolver().update(
+                MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
     }
 
     private static long insertMovie(Context context,
-                                    long movieId, String title, String posterPath, String overview,
-                                    double rating, double popularity, String release, int favorite) {
+                            long movieId, String title, String posterPath, String overview,
+                            double rating, double popularity, String release, int favorite) {
 
         long movieRowId;
         ContentValues movieValues = new ContentValues();
@@ -214,25 +234,6 @@ public class MoviesSyncer {
         // TODO: sync reviews
 
         return movieRowId;
-    }
-
-    private static long updateMovie(Context context,
-                                    long movieId, String title, String posterPath, String overview,
-                                    double rating, double popularity, String release) {
-
-        ContentValues movieValues = new ContentValues();
-
-        movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
-        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
-        movieValues.put(MovieEntry.COLUMN_RATING, rating);
-        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
-        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
-
-        final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
-        final String[] selectionArgs = {Long.toString(movieId)};
-        return context.getContentResolver().update(
-                MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
     }
 
     // TODO: is there a better place for this? Does it make sense to put it in FRT?
