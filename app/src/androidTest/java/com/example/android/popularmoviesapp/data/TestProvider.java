@@ -6,16 +6,15 @@ import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
 import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 /**
  * Created by David on 13/07/16.
@@ -332,18 +331,6 @@ public class TestProvider extends AndroidTestCase {
 
         // add review values to testValues
         testValues.putAll(videoValues);
-
-        // joined data
-        final Cursor singleMovieCursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieUri(TestUtilities.MOVIE_ROW_ID),
-                null,
-                null,
-                null,
-                null
-        );
-        Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(singleMovieCursor));
-        TestUtilities.validateCursor("Error validating joined data",
-                singleMovieCursor, videoValues);
     }
 
 

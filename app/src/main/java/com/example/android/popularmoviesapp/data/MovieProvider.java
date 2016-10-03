@@ -6,9 +6,9 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -80,7 +80,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
-                cursor = buildCursorForSingleMovie(uri, projection, sortOrder);
+                cursor = buildCursorForSingleMovie(uri, selectionArgs);
 //                Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
@@ -206,6 +206,7 @@ public class MovieProvider extends ContentProvider {
                 rowsUpdated = writableDatabase.update(ReviewEntry.TABLE_NAME,
                         values, selection, selectionArgs);
                 break;
+            // TODO videos
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -281,50 +282,50 @@ public class MovieProvider extends ContentProvider {
         super.shutdown();
     }
 
-    private Cursor buildCursorForSingleMovie(Uri uri, String[] projection, String sortOrder) {
+    // TODO: update selection args to take the movie id (after updating db)
+    private Cursor buildCursorForSingleMovie(Uri uri, String[] selectionArgsForVideosAndReviews) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
-//        return JOIN_QUERY_BUILDER.query(
-//                readableDatabase,
-        return readableDatabase.query(
+        final String[] allColumns = null;
+        final String[] selectionArgs = {String.valueOf(ContentUris.parseId(uri))};
+        final String groupBy = null;
+        final String having = null;
+        final String orderBy = null;
+
+        final Cursor movieCursor = readableDatabase.query(
                 MovieEntry.TABLE_NAME,
-                projection,
+                allColumns,
                 SINGLE_MOVIE_SELECTION,
-                new String[]{String.valueOf(ContentUris.parseId(uri))},
-                null,
-                null,
-                sortOrder
+                selectionArgs,
+                groupBy,
+                having,
+                orderBy
         );
-    }
 
-    private static final SQLiteQueryBuilder JOIN_QUERY_BUILDER;
+        final Cursor videoCursor = readableDatabase.query(
+                VideoEntry.TABLE_NAME,
+                allColumns,
+                VIDEOS_SELECTION,
+                selectionArgsForVideosAndReviews,
+                groupBy,
+                having,
+                orderBy
+        );
 
-    static {
-        JOIN_QUERY_BUILDER = new SQLiteQueryBuilder();
-
-        // movies LEFT OUTER JOIN videos on movies.id = videos.movie_key
-        JOIN_QUERY_BUILDER.setTables(
-                MovieEntry.TABLE_NAME +
-                        " LEFT OUTER JOIN " +
-                        VideoEntry.TABLE_NAME +
-                        " ON " + MovieEntry.TABLE_NAME +
-                        "." + MovieEntry._ID +
-                        " = " + VideoEntry.TABLE_NAME +
-                        "." + VideoEntry.COLUMN_MOVIE_KEY);
+        return new MergeCursor(new Cursor[]{movieCursor, videoCursor});
     }
 
     // movies._id = ?
     private static final String SINGLE_MOVIE_SELECTION =
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
 
-    // movies._id = ? AND reviews._id = ?
-    // TODO not in use yet
-    private static final String SINGLE_REVIEW_SELECTION =
-            ReviewEntry.TABLE_NAME + "." +
-                    MovieEntry._ID + " = ? AND " +
-                    ReviewEntry.TABLE_NAME + "." +
-                    ReviewEntry._ID + " = ?";
+    // TODO: update to movie_id (after updating db)
+    // videos.movie_key = ?
+    private static final String VIDEOS_SELECTION =
+            VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_MOVIE_KEY + " = ?";
+
+
 }
 
 

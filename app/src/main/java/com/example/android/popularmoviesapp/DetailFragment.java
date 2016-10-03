@@ -23,29 +23,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private long movieKey;
     private DetailAdapter detailAdapter;
 
-    /**********************************************************************************************/
-
     private static final int DETAIL_LOADER = 0;
-    static final String[] DETAIL_COLUMNS = new String[]{
-            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
-            MovieEntry.COLUMN_MOVIE_ID,
-            MovieEntry.COLUMN_TITLE,
-            MovieEntry.COLUMN_POSTER_PATH,
-            MovieEntry.COLUMN_OVERVIEW,
-            MovieEntry.COLUMN_RATING,
-            MovieEntry.COLUMN_RELEASE,
-            MovieEntry.COLUMN_FAVORITE
-    };
-
-    static final int COL_MOVIE_ID = 1;
-    static final int COL_MOVIE_TITLE = 2;
-    static final int COL_MOVIE_POSTER_PATH = 3;
-    static final int COL_MOVIE_OVERVIEW = 4;
-    static final int COL_MOVIE_RATING = 5;
-    static final int COL_MOVIE_RELEASE = 6;
-    static final int COL_MOVIE_FAVORITE = 7;
-
-    /**********************************************************************************************/
 
     private ListView detailView;
 
@@ -104,13 +82,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     private Loader<Cursor> buildDetailCursorLoader() {
 
+        // TODO: update selection args to take the movie id (after updating db)
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
+        final String[] projection = null;
+        final String selection = null;
+        final String[] selectionArgs = {String.valueOf(movieKey)};
+        final String sortOrder = null;
+
         return new CursorLoader(getActivity(),
                 uri,
-                DETAIL_COLUMNS,
-                null,
-                null,
-                null);
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder);
     }
 
     @Override

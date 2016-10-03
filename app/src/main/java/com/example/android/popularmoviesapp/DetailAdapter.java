@@ -3,6 +3,7 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmoviesapp.data.MovieContract;
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
@@ -71,11 +73,12 @@ public class DetailAdapter extends CursorAdapter {
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
-//        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
+        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
     private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
-        final String posterUrl = cursor.getString(DetailFragment.COL_MOVIE_POSTER_PATH);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH);
+        final String posterUrl = cursor.getString(columnIndex);
 
         if (posterUrl != null) {
             Picasso.with(context).load(posterUrl).into(viewHolder.posterView);
@@ -83,28 +86,33 @@ public class DetailAdapter extends CursorAdapter {
     }
 
     private void setMovieTitle(ViewHolder viewHolder, Cursor cursor) {
-        final String title = cursor.getString(DetailFragment.COL_MOVIE_TITLE);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
+        final String title = cursor.getString(columnIndex);
         viewHolder.titleView.setText(title);
     }
 
     private void setOverview(ViewHolder viewHolder, Cursor cursor) {
-        final String overview = cursor.getString(DetailFragment.COL_MOVIE_OVERVIEW);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW);
+        final String overview = cursor.getString(columnIndex);
         viewHolder.overviewView.setText(overview);
     }
 
     private void setRating(ViewHolder viewHolder, Context context, Cursor cursor) {
-        final double userRating = cursor.getDouble(DetailFragment.COL_MOVIE_RATING);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_RATING);
+        final double userRating = cursor.getDouble(columnIndex);
         viewHolder.userRatingView.setText(Utility.formatRating(context, userRating));
     }
 
     private void setRelease(ViewHolder viewHolder, Cursor cursor) {
-        final String releaseDate = cursor.getString(DetailFragment.COL_MOVIE_RELEASE);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE);
+        final String releaseDate = cursor.getString(columnIndex);
         viewHolder.releaseDateView.setText(releaseDate.substring(0, 4));
     }
 
     private void setVideoText(ViewHolder viewHolder, Cursor cursor) {
-//        final String videoPosition = cursor.getString(DetailFragment.COL_VIDEO__ID);
-        viewHolder.videoTextView.setText("Video");
+        int columnIndex = cursor.getColumnIndex(MovieContract.VideoEntry._ID);
+        final String videoPosition = cursor.getString(columnIndex);
+        viewHolder.videoTextView.setText("Video " + videoPosition);
     }
 
     private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
@@ -137,7 +145,8 @@ public class DetailAdapter extends CursorAdapter {
     }
 
     private boolean isFavorite(Cursor cursor) {
-        final long favorite = cursor.getInt(DetailFragment.COL_MOVIE_FAVORITE);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
+        final long favorite = cursor.getInt(columnIndex);
 
         if (favorite == 0) {
             return false;
@@ -165,7 +174,8 @@ public class DetailAdapter extends CursorAdapter {
             movieValues.put(MovieEntry.COLUMN_FAVORITE, 1);
         }
 
-        final long movieId = cursor.getLong(DetailFragment.COL_MOVIE_ID);
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
+        final long movieId = cursor.getLong(columnIndex);
         final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};
         context.getContentResolver().update(
