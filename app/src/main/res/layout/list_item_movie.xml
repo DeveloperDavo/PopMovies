@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/colorTitle"
+        android:background="@color/colorAccent"
         android:fontFamily="sans-serif-light"
         android:padding="16dp"
         android:textColor="@android:color/background_light"
@@ -42,7 +42,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
-                android:paddingBottom="16dp"
                 android:textSize="28sp"
                 tools:text="release" />
 
@@ -60,8 +59,6 @@
                 android:id="@+id/button_favorite"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:background="@color/colorTitle"
-                android:text="mark as favorite"
                 android:textColor="@android:color/background_light" />
 
         </LinearLayout>

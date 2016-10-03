@@ -3,6 +3,7 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,7 +67,7 @@ public class DetailAdapter extends CursorAdapter {
             setOverview(viewHolder, cursor);
             setRating(viewHolder, context, cursor);
             setRelease(viewHolder, cursor);
-            setButtonTextAndPersistChoice(viewHolder, context, cursor);
+            setButtonViewAndPersistChoice(viewHolder, context, cursor);
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
@@ -106,15 +107,51 @@ public class DetailAdapter extends CursorAdapter {
         viewHolder.videoTextView.setText("Video");
     }
 
-    private void setButtonTextAndPersistChoice(final ViewHolder viewHolder, final Context context, final Cursor cursor) {
+    private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
+                                               final Context context, final Cursor cursor) {
         final Button favoriteButton = viewHolder.favoriteButton;
+        setButtonText(cursor, favoriteButton);
+        setButtonColor(context, cursor, favoriteButton);
+        updateMovieOnClick(context, cursor, favoriteButton);
+    }
+
+    private void setButtonText(Cursor cursor, Button favoriteButton) {
+        String buttonText;
+        if (isFavorite(cursor)) {
+            buttonText = "remove from favorites";
+        } else {
+            buttonText = "add to favorites";
+        }
+        favoriteButton.setText(buttonText);
+    }
+
+    private void setButtonColor(Context context, Cursor cursor, Button favoriteButton) {
+        int color;
+        if (isFavorite(cursor)) {
+            color = R.color.colorButtonAfterClick;
+        } else {
+            color = R.color.colorAccent;
+        }
+        final int buttonColor = ContextCompat.getColor(context, color);
+        favoriteButton.setBackgroundColor(buttonColor);
+    }
+
+    private boolean isFavorite(Cursor cursor) {
+        final long favorite = cursor.getInt(DetailFragment.COL_MOVIE_FAVORITE);
+
+        if (favorite == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void updateMovieOnClick(final Context context, final Cursor cursor, Button favoriteButton) {
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Log.d(LOG_TAG, "onClick");
                 updateMovie(context, cursor);
             }
         });
-
     }
 
     private void updateMovie(Context context, Cursor cursor) {
@@ -122,12 +159,10 @@ public class DetailAdapter extends CursorAdapter {
 
         ContentValues movieValues = new ContentValues();
 
-        final long favorite = cursor.getInt(DetailFragment.COL_MOVIE_FAVORITE);
-
-        if (favorite == 0) {
-            movieValues.put(MovieEntry.COLUMN_FAVORITE, 1);
-        } else {
+        if (isFavorite(cursor)) {
             movieValues.put(MovieEntry.COLUMN_FAVORITE, 0);
+        } else {
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, 1);
         }
 
         final long movieId = cursor.getLong(DetailFragment.COL_MOVIE_ID);
