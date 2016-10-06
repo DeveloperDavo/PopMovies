@@ -3,7 +3,6 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.popularmoviesapp.data.MovieContract;
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
@@ -73,7 +71,7 @@ public class DetailAdapter extends CursorAdapter {
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
-        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
+//        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
     private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
@@ -110,9 +108,8 @@ public class DetailAdapter extends CursorAdapter {
     }
 
     private void setVideoText(ViewHolder viewHolder, Cursor cursor) {
-        int columnIndex = cursor.getColumnIndex(MovieContract.VideoEntry._ID);
-        final String videoPosition = cursor.getString(columnIndex);
-        viewHolder.videoTextView.setText("Video " + videoPosition);
+        final int videoCount = cursor.getPosition();
+        viewHolder.videoTextView.setText("Video " + videoCount);
     }
 
     private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
@@ -146,6 +143,10 @@ public class DetailAdapter extends CursorAdapter {
 
     private boolean isFavorite(Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
+        if (columnIndex == -1) {
+            throw new IllegalStateException("Favorite column not found");
+        }
+
         final long favorite = cursor.getInt(columnIndex);
 
         if (favorite == 0) {
