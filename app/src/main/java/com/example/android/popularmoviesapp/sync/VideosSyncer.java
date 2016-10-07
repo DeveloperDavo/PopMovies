@@ -56,7 +56,7 @@ public class VideosSyncer {
 
             URL url = new URL(builtUri.toString());
 
-            Log.d(LOG_TAG, "url: " + url);
+//            Log.d(LOG_TAG, "url: " + url);
 
             // create the request to TMDb, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();

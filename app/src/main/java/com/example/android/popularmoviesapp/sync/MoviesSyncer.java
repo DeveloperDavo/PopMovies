@@ -54,7 +54,7 @@ class MoviesSyncer {
 
         try {
             // https://www.themoviedb.org/
-            final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+            final String BASE_URL = "http://api.themoviedb.org/3/movie";
             final String API_PARAM = "api_key";
 
             Uri builtUri = Uri.parse(BASE_URL).buildUpon()
@@ -155,8 +155,7 @@ class MoviesSyncer {
                                double rating, double popularity, String release, int favorite) {
 
         if (isMovieInDb(context, movieId)) {
-            return updateMovie(context, movieId, title, posterPath, overview, rating, popularity,
-                    release);
+            return updateMovie(context, movieId, rating, popularity);
         } else {
             return insertMovie(context, movieId, title, posterPath, overview, rating, popularity,
                     release, favorite);
@@ -189,23 +188,19 @@ class MoviesSyncer {
         return movieRowId != -1;
     }
 
-    private static long updateMovie(Context context,
-                            long movieId, String title, String posterPath, String overview,
-                            double rating, double popularity, String release) {
+    private static long updateMovie(
+            Context context, long movieId, double rating, double popularity) {
 
         ContentValues movieValues = new ContentValues();
 
-        movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
-        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
-        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
 
         final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};
+        final Uri contentUri = MovieEntry.CONTENT_URI;
         return context.getContentResolver().update(
-                MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
+                contentUri, movieValues, where, selectionArgs);
     }
 
     private static long insertMovie(Context context,
@@ -213,11 +208,12 @@ class MoviesSyncer {
                             double rating, double popularity, String release, int favorite) {
 
         long movieRowId;
+        final byte[] posterBlob = PosterSyncer.sync(posterPath);
         ContentValues movieValues = new ContentValues();
 
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
         movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterBlob);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
