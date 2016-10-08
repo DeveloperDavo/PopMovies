@@ -92,7 +92,7 @@ class MoviesSyncer {
             }
             movieJsonStr = buffer.toString();
 //                Log.d(LOG_TAG, "movieJsonStr: " + movieJsonStr);
-            parseAndPersistMovieData(context, movieJsonStr);
+            parseAndPersistMoviesData(context, movieJsonStr);
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
@@ -114,10 +114,22 @@ class MoviesSyncer {
         }
     }
 
-    private static void parseAndPersistMovieData(Context context, String movieJsonStr)
+    private static void parseAndPersistMoviesData(Context context, String movieJsonStr)
             throws JSONException {
 
         final String MD_RESULTS = "results";
+
+        final JSONObject data = new JSONObject(movieJsonStr);
+        final JSONArray movies = data.getJSONArray(MD_RESULTS);
+
+        for (int i = 0; i < movies.length(); i++) {
+            parseAndPersistMovieData(context, movies, i);
+        }
+    }
+
+    private static void parseAndPersistMovieData(
+            Context context, JSONArray movies, int i) throws JSONException {
+
         final String MD_ID = "id";
         final String MD_TITLE = "original_title";
         final String MD_POSTER_PATH = "poster_path";
@@ -126,29 +138,23 @@ class MoviesSyncer {
         final String MD_POPULARITY = "popularity";
         final String MD_RELEASE = "release_date";
 
-        final JSONObject data = new JSONObject(movieJsonStr);
-        final JSONArray movies = data.getJSONArray(MD_RESULTS);
+        // get data from JSON String
+        final JSONObject movieData = movies.getJSONObject(i);
+        final long movieId = movieData.getLong(MD_ID);
+        final String title = movieData.getString(MD_TITLE);
+        final String posterPath = movieData.getString(MD_POSTER_PATH);
+        final String overview = movieData.getString(MD_OVERVIEW);
+        final double rating = movieData.getDouble(MD_RATING);
+        final double popularity = movieData.getDouble(MD_POPULARITY);
+        final String release = movieData.getString(MD_RELEASE);
+        final int favorite = 0; // default to false
 
-        for (int i = 0; i < movies.length(); i++) {
+        final Bitmap bitmap = PosterSyncer.sync(posterPath);
+        final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
 
-            // get data from JSON String
-            final JSONObject movieData = movies.getJSONObject(i);
-            final long movieId = movieData.getLong(MD_ID);
-            final String title = movieData.getString(MD_TITLE);
-            final String posterPath = movieData.getString(MD_POSTER_PATH);
-            final String overview = movieData.getString(MD_OVERVIEW);
-            final double rating = movieData.getDouble(MD_RATING);
-            final double popularity = movieData.getDouble(MD_POPULARITY);
-            final String release = movieData.getString(MD_RELEASE);
-            final int favorite = 0; // default to false
-
-            final Bitmap bitmap = PosterSyncer.sync(posterPath);
-            final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
-
-            // TODO only poster_path and movie id is necessary for the main activity
-            insertOrUpdate(context, movieId, title, posterBlob, overview, rating, popularity, release,
-                    favorite);
-        }
+        // TODO only poster_path and movie id is necessary for the main activity
+        insertOrUpdate(context, movieId, title, posterBlob, overview, rating, popularity, release,
+                favorite);
     }
 
     /**

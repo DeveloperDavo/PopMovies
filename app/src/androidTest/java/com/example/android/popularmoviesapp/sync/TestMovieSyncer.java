@@ -43,7 +43,6 @@ public class TestMovieSyncer extends AndroidTestCase {
 
     }
 
-    // TODO: syncing posters is causing a null pointer exception
     public void test_insertOrUpdate_insertsMovie() {
 
         // WHEN
