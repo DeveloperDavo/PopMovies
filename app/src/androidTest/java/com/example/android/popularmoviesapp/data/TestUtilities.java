@@ -27,7 +27,7 @@ public class TestUtilities extends AndroidTestCase {
     public final static long MOVIE_ROW_ID = 17;
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
-    public static final String POSTER_PATH = "path_to_poster";
+    public static final byte[] POSTER = new byte[]{};
     public static final String OVERVIEW = "Luke Skywalker is no where to be found...";
     public static final double RATING = 8.5;
     public static final double POPULARITY = 90.12;
@@ -57,18 +57,42 @@ public class TestUtilities extends AndroidTestCase {
     /**
      * Ensures all columns are found and have the correct values.
      */
-    static void validateCurrentRecord(String error, Cursor valueCursor, ContentValues expectedValues) {
+    static void validateCurrentRecord(
+            String errorMessage, Cursor valueCursor, ContentValues expectedValues) {
+
         Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
         for (Map.Entry<String, Object> entry : valueSet) {
             String columnName = entry.getKey();
             int idx = valueCursor.getColumnIndex(columnName);
-            assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
+
+            assertFalse("Column '" + columnName + "' not found. " + errorMessage, idx == -1);
+
             String expectedValue = entry.getValue().toString();
-            final String actualValue = valueCursor.getString(idx);
-            assertEquals("Value '" + actualValue +
-                    "' did not match the expected value '" +
-                    expectedValue + "'. " + error, expectedValue, actualValue);
+            final int type = valueCursor.getType(idx);
+            if (type == valueCursor.FIELD_TYPE_BLOB) {
+                validateBlob(errorMessage, valueCursor, idx, expectedValue);
+            } else {
+                validateString(errorMessage, valueCursor, idx, expectedValue);
+            }
         }
+    }
+
+    // TODO: not quite sure how to test this yet
+    private static void validateBlob(
+            String errorMessage, Cursor valueCursor, int idx, String expectedValue) {
+        final byte[] actualValue = valueCursor.getBlob(idx);
+//        assertEquals("Value '" + actualValue +
+//                "' did not match the expected value '" +
+//                expectedValue + "'. " + errorMessage, expectedValue, actualValue.toString());
+    }
+
+    private static void validateString(
+            String errorMessage, Cursor valueCursor, int idx, String expectedValue) {
+
+        final String actualValue = valueCursor.getString(idx);
+        assertEquals("Value '" + actualValue +
+                "' did not match the expected value '" +
+                expectedValue + "'. " + errorMessage, expectedValue, actualValue);
     }
 
     // default movie values
@@ -76,27 +100,12 @@ public class TestUtilities extends AndroidTestCase {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
         movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
-        movieValues.put(MovieEntry.COLUMN_POSTER, POSTER_PATH);
+        movieValues.put(MovieEntry.COLUMN_POSTER, POSTER);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
         movieValues.put(MovieEntry.COLUMN_RATING, RATING);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, POPULARITY);
         movieValues.put(MovieEntry.COLUMN_RELEASE, RELEASE);
         movieValues.put(MovieEntry.COLUMN_FAVORITE, FAVORITE);
-        return movieValues;
-    }
-
-    public static ContentValues createMovieValues(
-            int movieId, String title, String posterPath, String overview,
-            Double rating, Double popularity, String release, int favorite) {
-        ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
-        movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER, posterPath);
-        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
-        movieValues.put(MovieEntry.COLUMN_RATING, rating);
-        movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
-        movieValues.put(MovieEntry.COLUMN_RELEASE, release);
-        movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
         return movieValues;
     }
 
@@ -123,7 +132,6 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     /**
-     * @param context
      * @return movieRowId
      */
     public static long createAndInsertMovieValues(Context context) {

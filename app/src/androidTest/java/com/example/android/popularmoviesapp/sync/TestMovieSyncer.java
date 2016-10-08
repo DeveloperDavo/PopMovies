@@ -2,19 +2,10 @@ package com.example.android.popularmoviesapp.sync;
 
 import android.test.AndroidTestCase;
 
-import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.example.android.popularmoviesapp.data.TestUtilities;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
-import static com.example.android.popularmoviesapp.data.TestUtilities.FAVORITE;
-import static com.example.android.popularmoviesapp.data.TestUtilities.MOVIE_ID;
-import static com.example.android.popularmoviesapp.data.TestUtilities.OVERVIEW;
-import static com.example.android.popularmoviesapp.data.TestUtilities.POPULARITY;
-import static com.example.android.popularmoviesapp.data.TestUtilities.POSTER_PATH;
-import static com.example.android.popularmoviesapp.data.TestUtilities.RATING;
-import static com.example.android.popularmoviesapp.data.TestUtilities.RELEASE;
-import static com.example.android.popularmoviesapp.data.TestUtilities.TITLE;
+import static com.example.android.popularmoviesapp.data.TestUtilities.*;
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
 
 public class TestMovieSyncer extends AndroidTestCase {
     private static final double UPDATED_RATING = 7.4;
@@ -57,7 +48,7 @@ public class TestMovieSyncer extends AndroidTestCase {
 
         // WHEN
         final long movieRowId = MoviesSyncer.insertOrUpdate(getContext(),
-                MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW, RATING,
+                MOVIE_ID, TITLE, POSTER, OVERVIEW, RATING,
                 POPULARITY, RELEASE, FAVORITE);
 
         // THEN
@@ -73,7 +64,7 @@ public class TestMovieSyncer extends AndroidTestCase {
 
         // WHEN
         final long moviesUpdated = MoviesSyncer.insertOrUpdate(
-                getContext(), MOVIE_ID, TITLE, POSTER_PATH, OVERVIEW,
+                getContext(), MOVIE_ID, TITLE, POSTER, OVERVIEW,
                 UPDATED_RATING, UPDATED_POPULARITY, RELEASE, FAVORITE);
 
         // THEN
