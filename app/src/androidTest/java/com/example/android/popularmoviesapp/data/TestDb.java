@@ -66,7 +66,7 @@ public class TestDb extends AndroidTestCase {
         movieColumnHashSet.add(MovieEntry._ID);
         movieColumnHashSet.add(MovieEntry.COLUMN_MOVIE_ID);
         movieColumnHashSet.add(MovieEntry.COLUMN_TITLE);
-        movieColumnHashSet.add(MovieEntry.COLUMN_POSTER_PATH);
+        movieColumnHashSet.add(MovieEntry.COLUMN_POSTER);
         movieColumnHashSet.add(MovieEntry.COLUMN_OVERVIEW);
         movieColumnHashSet.add(MovieEntry.COLUMN_RATING);
         movieColumnHashSet.add(MovieEntry.COLUMN_POPULARITY);

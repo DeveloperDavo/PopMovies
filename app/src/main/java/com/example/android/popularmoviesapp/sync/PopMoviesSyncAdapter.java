@@ -32,8 +32,8 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "onPerformSync");
-        MoviesSyncer.syncTopRatedMovies(getContext());
         MoviesSyncer.syncPopularMovies(getContext());
+        MoviesSyncer.syncTopRatedMovies(getContext());
     }
 
     public static void initializeSyncAdapter(Context context) {
@@ -46,7 +46,7 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
      * @param context The context used to access the account service
      */
     public static void syncImmediately(Context context) {
-//        Log.d(LOG_TAG, "syncImmediately");
+        Log.d(LOG_TAG, "syncImmediately");
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
@@ -93,9 +93,6 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         /* Without calling setSyncAutomatically, our periodic sync will not be enabled. */
         ContentResolver.setSyncAutomatically(
                 newAccount, context.getString(R.string.content_authority), true);
-
-        /* Finally, let's do a sync to get things started */
-        syncImmediately(context);
     }
 
     /**

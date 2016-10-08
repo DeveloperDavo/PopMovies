@@ -16,12 +16,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
-
 import static com.example.android.popularmoviesapp.Utility.setSelection;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
+// TODO: rename as PostersFragment
 public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = MoviePostersFragment.class.getSimpleName();
@@ -29,13 +28,6 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     /**********************************************************************************************/
 
     private static final int MOVIE_POSTERS_LOADER = 0;
-    private static final String[] MOVIE_COLUMNS = {
-            MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
-            MovieEntry.COLUMN_POSTER_PATH,
-    };
-
-    static final int COL_ID = 0;
-    static final int COL_MOVIE_POSTER_PATH = 1;
 
     /**********************************************************************************************/
 
@@ -136,7 +128,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         int id = item.getItemId();
 
         // TODO: remove
-        PopMoviesSyncAdapter.syncImmediately(getContext());
+//        PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {
             setPopularPrefs();
@@ -148,7 +140,6 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
             return super.onOptionsItemSelected(item);
         }
 
-        PopMoviesSyncAdapter.syncImmediately(getActivity());
         getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
         return true;
 
@@ -184,6 +175,11 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 //        Log.d(LOG_TAG, "onCreateLoader");
 
+        final String[] projection = {
+                MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
+                MovieEntry.COLUMN_POSTER,
+        };
+
         // TODO: workaround for savedInstanceState
         final String selection = Utility.getSelection(getContext());
         final String selectionArg = Utility.getSelectionArg(getContext());
@@ -197,7 +193,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
-                MOVIE_COLUMNS,
+                projection,
                 selection,
                 selectionArgs,
                 sortOrder);

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
-import com.squareup.picasso.Picasso;
 
 /**
  * Created by David on 17/09/16.
@@ -31,16 +29,25 @@ public class DetailAdapter extends CursorAdapter {
 
     @Override
     public int getViewTypeCount() {
+//        Log.d(LOG_TAG, "getViewTypeCount");
         return VIEW_TYPE_COUNT;
     }
 
     @Override
     public int getItemViewType(int position) {
+//        Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(this.getCursor()));
         return (position == 0) ? VIEW_TYPE_MOVIE_DETAILS : VIEW_TYPE_VIDEOS;
     }
 
     @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+//        Log.d(LOG_TAG, "getView");
+        return super.getView(position, convertView, parent);
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
+//        Log.d(LOG_TAG, "newView");
         final int viewType = getItemViewType(cursor.getPosition());
 
         int layoutId = -1;
@@ -58,11 +65,12 @@ public class DetailAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+//        Log.d(LOG_TAG, "bindView");
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         final int viewType = getItemViewType(cursor.getPosition());
         if (viewType == VIEW_TYPE_MOVIE_DETAILS) {
-            setPoster(viewHolder, context, cursor);
+            setPoster(viewHolder, cursor);
             setMovieTitle(viewHolder, cursor);
             setOverview(viewHolder, cursor);
             setRating(viewHolder, context, cursor);
@@ -71,16 +79,11 @@ public class DetailAdapter extends CursorAdapter {
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         }
-//        Log.d(LOG_TAG, "bindView: " + DatabaseUtils.dumpCursorToString(cursor));
     }
 
-    private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
-        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH);
-        final String posterUrl = cursor.getString(columnIndex);
-
-        if (posterUrl != null) {
-            Picasso.with(context).load(posterUrl).into(viewHolder.posterView);
-        }
+    private void setPoster(ViewHolder viewHolder, Cursor cursor) {
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
+        viewHolder.posterView.setImageBitmap(Utility.getBitmapFromBlob(cursor));
     }
 
     private void setMovieTitle(ViewHolder viewHolder, Cursor cursor) {
@@ -165,7 +168,7 @@ public class DetailAdapter extends CursorAdapter {
     }
 
     private void updateMovie(Context context, Cursor cursor) {
-        Log.d(LOG_TAG, "updateMovie");
+//        Log.d(LOG_TAG, "updateMovie");
 
         ContentValues movieValues = new ContentValues();
 

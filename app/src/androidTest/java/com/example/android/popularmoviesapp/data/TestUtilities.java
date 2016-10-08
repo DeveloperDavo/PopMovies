@@ -76,7 +76,7 @@ public class TestUtilities extends AndroidTestCase {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
         movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, POSTER_PATH);
+        movieValues.put(MovieEntry.COLUMN_POSTER, POSTER_PATH);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, OVERVIEW);
         movieValues.put(MovieEntry.COLUMN_RATING, RATING);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, POPULARITY);
@@ -91,7 +91,7 @@ public class TestUtilities extends AndroidTestCase {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
         movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, posterPath);
+        movieValues.put(MovieEntry.COLUMN_POSTER, posterPath);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
@@ -152,7 +152,7 @@ public class TestUtilities extends AndroidTestCase {
             ContentValues movieValues = new ContentValues();
             movieValues.put(MovieEntry.COLUMN_MOVIE_ID, i + 1000);
             movieValues.put(MovieEntry.COLUMN_TITLE, "title " + i);
-            movieValues.put(MovieEntry.COLUMN_POSTER_PATH, "posterPath " + i);
+            movieValues.put(MovieEntry.COLUMN_POSTER, "posterPath " + i);
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, "overview " + i);
             movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
             movieValues.put(MovieEntry.COLUMN_POPULARITY, i + 80.99);

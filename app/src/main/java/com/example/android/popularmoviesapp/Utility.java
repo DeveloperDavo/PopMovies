@@ -2,6 +2,9 @@ package com.example.android.popularmoviesapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
@@ -60,9 +63,16 @@ public class Utility {
                 Integer.toString(-1), R.string.position_key);
     }
 
-    public static String formatRating(Context context, double ratingFromDb) {
+    static String formatRating(Context context, double ratingFromDb) {
         int formatId = R.string.format_user_rating;
         return String.format(context.getString(formatId), ratingFromDb);
+    }
+
+    // http://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
+    static Bitmap getBitmapFromBlob(Cursor cursor) {
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
+        final byte[] posterBlob = cursor.getBlob(columnIndex);
+        return BitmapFactory.decodeByteArray(posterBlob, 0, posterBlob.length);
     }
 
     /* Helper methods */
