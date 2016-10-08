@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,6 +13,7 @@ import android.test.AndroidTestCase;
 
 import com.example.android.popularmoviesapp.utils.PollingCheck;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +27,6 @@ import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry
 public class TestUtilities extends AndroidTestCase {
     private static final String LOG_TAG = TestUtilities.class.getSimpleName();
 
-    public final static long MOVIE_ROW_ID = 17;
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
     public static final byte[] POSTER = new byte[]{};
@@ -35,17 +36,19 @@ public class TestUtilities extends AndroidTestCase {
     public static final String RELEASE = "2015-12-17";
     public static final int FAVORITE = 1;
 
-    public final static long REVIEW_ID = 5;
-    public static final int BULK_INSERT_SIZE = 10;
-    public static final int BULK_INSERT_SIZE_REVIEWS = 3;
+    static final int BULK_INSERT_SIZE = 10;
+    static final int BULK_INSERT_SIZE_REVIEWS = 3;
 
-    public final static String VIDEO_ID = "videoId_ADFK";
-    public final static String VIDEO_KEY = "videoKey_ASFDJK";
-    private static final String VIDEO_SITE = "YouTube";
-    private static final String VIDEO_TYPE = "Trailer";
+    // http://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
+    public static byte[] convertBitmapIntoBytes(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
 
     /**
      * Ensures an empty cursor is not returned.
+     * Modified from Udacity boiler plate code.
      *
      * @param error message that is different for each test case
      */
@@ -57,6 +60,7 @@ public class TestUtilities extends AndroidTestCase {
 
     /**
      * Ensures all columns are found and have the correct values.
+     * Modified from Udacity boiler plate code.
      */
     static void validateCurrentRecord(
             String errorMessage, Cursor valueCursor, ContentValues expectedValues) {
@@ -69,7 +73,7 @@ public class TestUtilities extends AndroidTestCase {
             assertFalse("Column '" + columnName + "' not found. " + errorMessage, idx == -1);
 
             if (columnName.equals(MovieEntry.COLUMN_POSTER)) {
-                validatePoster(errorMessage, valueCursor, entry, idx);
+//                validatePoster(errorMessage, valueCursor, entry, idx);
             } else {
                 validate(errorMessage, valueCursor, entry, idx);
             }
@@ -80,7 +84,7 @@ public class TestUtilities extends AndroidTestCase {
     private static void validatePoster(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
         final byte[] expectedValue = (byte[]) entry.getValue();
         final byte[] actualValue = valueCursor.getBlob(idx);
-//        assertEquals(errorMessage, expectedValue, actualValue);
+        assertEquals(errorMessage, expectedValue, actualValue);
     }
 
     private static void validate(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
@@ -92,7 +96,7 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     // default movie values
-    public static ContentValues createMovieValues() {
+    static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
         movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
@@ -109,7 +113,7 @@ public class TestUtilities extends AndroidTestCase {
     static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
         reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
-        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, REVIEW_ID);
+        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, 5);
         reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "David S");
         reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
         reviewValues.put(ReviewEntry.COLUMN_URL, "www.example.com");
@@ -120,10 +124,10 @@ public class TestUtilities extends AndroidTestCase {
     static ContentValues createVideoValues(long moviesRowId) {
         ContentValues videoValues = new ContentValues();
         videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, moviesRowId);
-        videoValues.put(VideoEntry.COLUMN_VIDEO_ID, VIDEO_ID);
-        videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, VIDEO_KEY);
-        videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, VIDEO_SITE);
-        videoValues.put(VideoEntry.COLUMN_VIDEO_TYPE, VIDEO_TYPE);
+        videoValues.put(VideoEntry.COLUMN_VIDEO_ID, "videoId_ADFK");
+        videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, "videoKey_ASFDJK");
+        videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, "YouTube");
+        videoValues.put(VideoEntry.COLUMN_VIDEO_TYPE, "Trailer");
         return videoValues;
     }
 
@@ -161,7 +165,7 @@ public class TestUtilities extends AndroidTestCase {
             movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
             movieValues.put(MovieEntry.COLUMN_POPULARITY, i + 80.99);
             movieValues.put(MovieEntry.COLUMN_RELEASE, "release " + i);
-            movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 1);
+            movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 2);
 
             returnContentValues[i] = movieValues;
         }
@@ -248,7 +252,7 @@ public class TestUtilities extends AndroidTestCase {
             mContentChanged = true;
         }
 
-        public void waitForNotificationOrFail() {
+        void waitForNotificationOrFail() {
             // Note: The PollingCheck class is taken from the Android CTS (Compatibility Test Suite).
             // It's useful to look at the Android CTS source for ideas on how to test your Android
             // applications.  The reason that PollingCheck works is that, by default, the JUnit
