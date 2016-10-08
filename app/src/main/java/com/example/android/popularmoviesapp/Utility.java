@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 /**
@@ -69,10 +71,17 @@ public class Utility {
     }
 
     // http://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
+    public static byte[] convertBitmapIntoBytes(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    // http://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
     static Bitmap getBitmapFromBlob(Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
-        final byte[] posterBlob = cursor.getBlob(columnIndex);
-        return BitmapFactory.decodeByteArray(posterBlob, 0, posterBlob.length);
+        final byte[] posterByteArray = cursor.getBlob(columnIndex);
+        return BitmapFactory.decodeByteArray(posterByteArray, 0, posterByteArray.length);
     }
 
     /* Helper methods */

@@ -9,12 +9,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
-import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
-import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
-import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.*;
 
 /**
  * Created by David on 13/07/16.
@@ -339,8 +337,10 @@ public class TestProvider extends AndroidTestCase {
      *
      * Ensures each movie entry can be validated by querying the movies table.
      *
-     * TODO too much responsibility
+     * TODO: too much responsibility
+     * TODO: bulkInsert is not in use at the moment so the test has been suppressed
      */
+    @Suppress
     public void test_bulkInsert_movies() {
 
         ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertMovieValues();

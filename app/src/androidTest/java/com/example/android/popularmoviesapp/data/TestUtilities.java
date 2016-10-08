@@ -23,6 +23,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry
  * Created by David on 10/07/16.
  */
 public class TestUtilities extends AndroidTestCase {
+    private static final String LOG_TAG = TestUtilities.class.getSimpleName();
 
     public final static long MOVIE_ROW_ID = 17;
     public final static long MOVIE_ID = 32343;
@@ -67,28 +68,23 @@ public class TestUtilities extends AndroidTestCase {
 
             assertFalse("Column '" + columnName + "' not found. " + errorMessage, idx == -1);
 
-            String expectedValue = entry.getValue().toString();
-            final int type = valueCursor.getType(idx);
-            if (type == valueCursor.FIELD_TYPE_BLOB) {
-                validateBlob(errorMessage, valueCursor, idx, expectedValue);
+            if (columnName.equals(MovieEntry.COLUMN_POSTER)) {
+                validatePoster(errorMessage, valueCursor, entry, idx);
             } else {
-                validateString(errorMessage, valueCursor, idx, expectedValue);
+                validate(errorMessage, valueCursor, entry, idx);
             }
         }
     }
 
-    // TODO: not quite sure how to test this yet
-    private static void validateBlob(
-            String errorMessage, Cursor valueCursor, int idx, String expectedValue) {
+    // TODO: expectedValue and actualValue are two different references so the test always fails
+    private static void validatePoster(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
+        final byte[] expectedValue = (byte[]) entry.getValue();
         final byte[] actualValue = valueCursor.getBlob(idx);
-//        assertEquals("Value '" + actualValue +
-//                "' did not match the expected value '" +
-//                expectedValue + "'. " + errorMessage, expectedValue, actualValue.toString());
+//        assertEquals(errorMessage, expectedValue, actualValue);
     }
 
-    private static void validateString(
-            String errorMessage, Cursor valueCursor, int idx, String expectedValue) {
-
+    private static void validate(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
+        String expectedValue = entry.getValue().toString();
         final String actualValue = valueCursor.getString(idx);
         assertEquals("Value '" + actualValue +
                 "' did not match the expected value '" +

@@ -4,11 +4,13 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmoviesapp.BuildConfig;
 import com.example.android.popularmoviesapp.R;
+import com.example.android.popularmoviesapp.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -134,12 +136,14 @@ class MoviesSyncer {
             final long movieId = movieData.getLong(MD_ID);
             final String title = movieData.getString(MD_TITLE);
             final String posterPath = movieData.getString(MD_POSTER_PATH);
-            final byte[] posterBlob = PosterSyncer.sync(posterPath);
             final String overview = movieData.getString(MD_OVERVIEW);
             final double rating = movieData.getDouble(MD_RATING);
             final double popularity = movieData.getDouble(MD_POPULARITY);
             final String release = movieData.getString(MD_RELEASE);
             final int favorite = 0; // default to false
+
+            final Bitmap bitmap = PosterSyncer.sync(posterPath);
+            final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
 
             // TODO only poster_path and movie id is necessary for the main activity
             insertOrUpdate(context, movieId, title, posterBlob, overview, rating, popularity, release,
