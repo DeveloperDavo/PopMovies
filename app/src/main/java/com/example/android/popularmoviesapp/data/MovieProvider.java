@@ -65,8 +65,8 @@ public class MovieProvider extends ContentProvider {
         Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
             case MovieUriMatcher.MOVIES_CODE: {
-                cursor = readableDatabase.query(MovieEntry.TABLE_NAME,
-                        projection, selection, selectionArgs, null, null, sortOrder);
+//                cursor = (new MovieCursorBuilder(readableDatabase, projection, selection, selectionArgs, sortOrder).build();
+                cursor = buildCursorForMovies(projection, selection, selectionArgs, sortOrder, readableDatabase);
                 break;
             }
             case MovieUriMatcher.REVIEWS_CODE: {
@@ -282,6 +282,61 @@ public class MovieProvider extends ContentProvider {
         super.shutdown();
     }
 
+    /**
+     * In order to avoid the warning CursorWindow: Window is full the queries have been broken up
+     * into 100 smaller queries and then merged.
+     */
+    // TODO: refactor, improve logic, test
+    private Cursor buildCursorForMovies(
+            String[] projection, String selection,
+            String[] selectionArgs, String sortOrder, SQLiteDatabase readableDatabase) {
+        Log.d(LOG_TAG, "buildCursorForMovies");
+
+        final String originalSelection = selection;
+
+        if (null == sortOrder) {
+            return buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
+        }
+
+        if (sortOrder.equals(MovieEntry.COLUMN_RATING + " DESC")) {
+            if (selection != null) {
+                selection += "AND ";
+            } else {
+                selection = "";
+            }
+            selection += MovieEntry.COLUMN_RATING + " > " + 8.00;
+            final Cursor cursor1 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
+
+            selection = originalSelection;
+            if (selection != null) {
+                selection += "AND ";
+            } else {
+                selection = "";
+            }
+            selection += MovieEntry.COLUMN_RATING + " BETWEEN " + 6.00 + " AND " + 8.00;
+            final Cursor cursor2 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
+
+            selection = originalSelection;
+            if (selection != null) {
+                selection += "AND ";
+            } else {
+                selection = "";
+            }
+            selection += MovieEntry.COLUMN_RATING + " < " + 6.00;
+            final Cursor cursor3 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
+            return new MergeCursor(new Cursor[]{cursor1, cursor2, cursor3});
+        } else {
+            return buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
+        }
+
+    }
+
+    private Cursor buildCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase readableDatabase) {
+        return readableDatabase.query(MovieEntry.TABLE_NAME,
+                projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+
     // TODO: update selection args to take the movie id (after updating db)
     private Cursor buildCursorForSingleMovie(Uri uri, String[] selectionArgsForVideosAndReviews) {
 
@@ -325,8 +380,4 @@ public class MovieProvider extends ContentProvider {
     private static final String VIDEOS_SELECTION =
             VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_MOVIE_KEY + " = ?";
 
-
 }
-
-
-
