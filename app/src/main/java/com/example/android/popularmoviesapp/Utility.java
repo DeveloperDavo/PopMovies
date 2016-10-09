@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+
 import java.io.ByteArrayOutputStream;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -88,6 +90,11 @@ public class Utility {
 
     static String getPosterPathFrom(Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
+        return cursor.getString(columnIndex);
+    }
+
+    static String getVideoKeyFrom(Cursor cursor) {
+        int columnIndex = cursor.getColumnIndex(VideoEntry.COLUMN_VIDEO_KEY);
         return cursor.getString(columnIndex);
     }
 

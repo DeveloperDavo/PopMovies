@@ -20,13 +20,13 @@ import com.squareup.picasso.Picasso;
 /**
  * Created by David on 17/09/16.
  */
-public class DetailAdapter extends CursorAdapter {
+class DetailAdapter extends CursorAdapter {
     private static final String LOG_TAG = DetailAdapter.class.getSimpleName();
     private static final int VIEW_TYPE_MOVIE_DETAILS = 0;
     private static final int VIEW_TYPE_VIDEOS = 1;
     private static final int VIEW_TYPE_COUNT = 2;
 
-    public DetailAdapter(Context context, Cursor cursor, int flags) {
+    DetailAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
     }
 
@@ -194,13 +194,12 @@ public class DetailAdapter extends CursorAdapter {
 
         // TODO: update selection args to take the movie id (after updating db)
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
-        final String[] selectionArgs = {String.valueOf(movieKey)};
-
-        return new SingleMovieCursorBuilder(context).buildCursorForSingleMovie(uri, selectionArgs);
+        final String[] selectionArgsForVideos = {String.valueOf(uri)};
+        return new SingleMovieCursorBuilder(context).build(uri, selectionArgsForVideos);
     }
 
     /* Used to speed up loading the views within the list view */
-    public static class ViewHolder {
+    private static class ViewHolder {
 
         ImageView posterView;
         TextView titleView;
@@ -210,7 +209,7 @@ public class DetailAdapter extends CursorAdapter {
         TextView videoTextView;
         Button favoriteButton;
 
-        public ViewHolder(View rootView) {
+        ViewHolder(View rootView) {
             posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
             titleView = (TextView) rootView.findViewById(R.id.title);
             overviewView = (TextView) rootView.findViewById(R.id.overview);

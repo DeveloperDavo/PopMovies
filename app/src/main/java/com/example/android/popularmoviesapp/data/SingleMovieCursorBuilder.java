@@ -45,7 +45,8 @@ public class SingleMovieCursorBuilder {
     }
 
     // TODO: update selection args to take the movie id (after updating db)
-    public Cursor buildCursorForSingleMovie(Uri uri, String[] selectionArgsForVideos) {
+    // TODO: same thing with movieKey
+    public Cursor build(Uri uri, String[] selectionArgsForVideos) {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
@@ -65,6 +66,7 @@ public class SingleMovieCursorBuilder {
                 orderBy
         );
 
+//        final String[] selectionArgsForVideos = {String.valueOf(uri)};
         final Cursor videoCursor = VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,
                 allColumns,
                 SINGLE_MOVIE_SELECTION,
