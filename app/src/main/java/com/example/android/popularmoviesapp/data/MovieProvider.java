@@ -6,6 +6,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
@@ -66,7 +67,9 @@ public class MovieProvider extends ContentProvider {
         Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
             case MovieUriMatcher.MOVIES_CODE: {
-                cursor = new MovieCursorBuilder(readableDatabase, projection, selection, selectionArgs, sortOrder).build();
+                cursor = readableDatabase.query(MovieEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
             case MovieUriMatcher.REVIEWS_CODE: {

@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import static com.example.android.popularmoviesapp.Utility.setSelection;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
@@ -146,26 +145,24 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     }
 
     private void setPopularPrefs() {
-        final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+        final String sortOrder = Utility.SORT_BY_POPULARITY_DESC;
         setPreferences(null, null, sortOrder);
     }
 
     private void setRatingPrefs() {
-        final String sortOrder = MovieEntry.COLUMN_RATING + " DESC";
-        setPreferences(null, null, sortOrder);
+        setPreferences(null, null, Utility.SORT_BY_RATING_DESC);
     }
 
     private void setFavoritesPrefs() {
         final String selection = MovieEntry.COLUMN_FAVORITE + " = ?";
         final String selectionArg = Integer.toString(1);
-        final String sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
-        setPreferences(selection, selectionArg, sortOrder);
+        setPreferences(selection, selectionArg, Utility.SORT_BY_POPULARITY_DESC);
     }
 
     // TODO: workaround for savedInstanceState
     private void setPreferences(String selection, String selectionArg, String sortOrder) {
 //        Log.d(LOG_TAG, "setPreferences");
-        setSelection(getContext(), selection);
+        Utility.setSelection(getContext(), selection);
         Utility.setSelectionArg(getContext(), selectionArg);
         Utility.setSortOrder(getContext(), sortOrder);
         Utility.setPosition(getContext(), GridView.INVALID_POSITION);
@@ -181,7 +178,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
         };
 
         // TODO: workaround for savedInstanceState
-        final String selection = Utility.getSelection(getContext());
+        String selection = Utility.getSelection(getContext());
         final String selectionArg = Utility.getSelectionArg(getContext());
         String[] selectionArgs;
         if (selectionArg == null) {
@@ -202,7 +199,10 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 //        Log.d(LOG_TAG, "onLoaderFinished");
+
         posterAdapter.swapCursor(data);
+
+
         // TODO: workaround for savedInstanceState
         gridView.smoothScrollToPosition(Integer.parseInt(Utility.getPosition(getContext())));
 
@@ -213,7 +213,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-//        Log.d(LOG_TAG, "onLoaderReset");
+        Log.d(LOG_TAG, "onLoaderReset");
         posterAdapter.swapCursor(null);
     }
 

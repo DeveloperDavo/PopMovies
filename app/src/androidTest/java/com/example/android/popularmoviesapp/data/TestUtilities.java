@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -13,7 +12,6 @@ import android.test.AndroidTestCase;
 
 import com.example.android.popularmoviesapp.utils.PollingCheck;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +27,7 @@ public class TestUtilities extends AndroidTestCase {
 
     public final static long MOVIE_ID = 32343;
     public final static String TITLE = "Star Wars: The Force Awakens";
-    public static final byte[] POSTER = new byte[]{};
+    public static final String POSTER = "posterPath";
     public static final String OVERVIEW = "Luke Skywalker is no where to be found...";
     public static final double RATING = 8.5;
     public static final double POPULARITY = 90.12;
@@ -38,13 +36,6 @@ public class TestUtilities extends AndroidTestCase {
 
     static final int BULK_INSERT_SIZE = 10;
     static final int BULK_INSERT_SIZE_REVIEWS = 3;
-
-    // http://stackoverflow.com/questions/9357668/how-to-store-image-in-sqlite-database
-    public static byte[] convertBitmapIntoBytes(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
-        return outputStream.toByteArray();
-    }
 
     /**
      * Ensures an empty cursor is not returned.

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.example.android.popularmoviesapp.Utility;
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by David on 09/10/16.
  */
+@Suppress
 public class TestMovieCursorBuilder extends AndroidTestCase {
 
     private SQLiteDatabase readableDatabase;
@@ -139,7 +141,7 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
 
         // GIVEN
         final String initialSelection = null;
-        final MovieCursorBuilderOld movieCursorBuilder = new MovieCursorBuilderOld(
+        final MovieCursorBuilder movieCursorBuilder = new MovieCursorBuilder(
                 readableDatabase, null, initialSelection, null, null);
 
         // WHEN

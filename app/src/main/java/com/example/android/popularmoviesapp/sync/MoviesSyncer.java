@@ -4,13 +4,11 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmoviesapp.BuildConfig;
 import com.example.android.popularmoviesapp.R;
-import com.example.android.popularmoviesapp.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -122,8 +120,8 @@ class MoviesSyncer {
         final JSONObject data = new JSONObject(movieJsonStr);
         final JSONArray movies = data.getJSONArray(MD_RESULTS);
 
-//        for (int i = 0; i < movies.length(); i++) {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < movies.length(); i++) {
+//        for (int i = 0; i < 1; i++) {
             parseAndPersistMovieData(context, movies, i);
         }
     }
@@ -150,11 +148,12 @@ class MoviesSyncer {
         final String release = movieData.getString(MD_RELEASE);
         final int favorite = 0; // default to false
 
-        final Bitmap bitmap = PosterSyncer.sync(posterPath);
-        final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
+//        final Bitmap bitmap = PosterSyncer.sync(posterPath);
+//        final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
+        final String posterUrl = "http://image.tmdb.org/t/p/w185/" + posterPath;
 
         // TODO only poster_path and movie id is necessary for the main activity
-        insertOrUpdate(context, movieId, title, posterBlob, overview, rating, popularity, release,
+        insertOrUpdate(context, movieId, title, posterUrl, overview, rating, popularity, release,
                 favorite);
     }
 
@@ -162,13 +161,13 @@ class MoviesSyncer {
      * @return movieId upon insert and number of rows updated upon update
      */
     static long insertOrUpdate(Context context,
-                               long movieId, String title, byte[] posterBlob, String overview,
+                               long movieId, String title, String posterUrl, String overview,
                                double rating, double popularity, String release, int favorite) {
 
         if (isMovieInDb(context, movieId)) {
             return updateMovie(context, movieId, rating, popularity);
         } else {
-            return insertMovie(context, movieId, title, posterBlob, overview, rating, popularity,
+            return insertMovie(context, movieId, title, posterUrl, overview, rating, popularity,
                     release, favorite);
         }
 
@@ -215,7 +214,7 @@ class MoviesSyncer {
     }
 
     private static long insertMovie(Context context,
-                                    long movieId, String title, byte[] posterBlob, String overview,
+                                    long movieId, String title, String posterUrl, String overview,
                                     double rating, double popularity, String release, int favorite) {
 
         long movieRowId;
@@ -223,7 +222,7 @@ class MoviesSyncer {
 
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
         movieValues.put(MovieEntry.COLUMN_TITLE, title);
-        movieValues.put(MovieEntry.COLUMN_POSTER, posterBlob);
+        movieValues.put(MovieEntry.COLUMN_POSTER, posterUrl);
         movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
         movieValues.put(MovieEntry.COLUMN_RATING, rating);
         movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
