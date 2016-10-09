@@ -122,7 +122,8 @@ class MoviesSyncer {
         final JSONObject data = new JSONObject(movieJsonStr);
         final JSONArray movies = data.getJSONArray(MD_RESULTS);
 
-        for (int i = 0; i < movies.length(); i++) {
+//        for (int i = 0; i < movies.length(); i++) {
+        for (int i = 0; i < 1; i++) {
             parseAndPersistMovieData(context, movies, i);
         }
     }

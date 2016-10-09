@@ -19,6 +19,8 @@ public class Utility {
     private static final String SELECTION_PREFERENCE = "selection";
     private static final String SELECTION_ARG_PREFERENCE = "selection_arg";
     private static final String POSITION_PREFERENCE = "position";
+    public static final String SORT_BY_POPULARITY_DESC = MovieEntry.COLUMN_POPULARITY + " DESC";
+    public static final String SORT_BY_RATING_DESC = MovieEntry.COLUMN_RATING + " DESC";
 
     // TODO: workaround for savedInstanceState
     public static void setSelection(Context context, String selection) {
@@ -50,7 +52,7 @@ public class Utility {
     // TODO: workaround for savedInstanceState
     public static String getSortOrder(Context context) {
         return getPreferenceText(context, SORT_ORDER_PREFERENCE,
-                MovieEntry.COLUMN_POPULARITY + " DESC", R.string.sort_order_key);
+                SORT_BY_POPULARITY_DESC, R.string.sort_order_key);
     }
 
     // TODO: workaround for savedInstanceState

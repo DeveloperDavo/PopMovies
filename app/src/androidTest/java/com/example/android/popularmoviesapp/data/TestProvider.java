@@ -12,14 +12,17 @@ import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
+import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
+import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 /**
  * Created by David on 13/07/16.
  */
 public class TestProvider extends AndroidTestCase {
 
-    public static final String LOG_TAG = TestProvider.class.getSimpleName();
+    private static final String LOG_TAG = TestProvider.class.getSimpleName();
 
     @Override
     protected void setUp() throws Exception {
@@ -246,6 +249,8 @@ public class TestProvider extends AndroidTestCase {
      * Ensures the queried movie URI, which is a join between the movie, review and video entry,
      * returns a cursor.
      *
+     * Modified from https://github.com/udacity/Sunshine-Version-2
+     *
      * TODO has too much responsibility
      */
     public void test_insert_and_query() {
@@ -446,6 +451,7 @@ public class TestProvider extends AndroidTestCase {
 
     /**
      * Inserts a movie entry and ensures the overview column has been updated correctly
+     * Modified from https://github.com/udacity/Sunshine-Version-2
      */
     public void testUpdateMovies() {
 
@@ -499,56 +505,6 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void deleteAllRecordsFromProvider() {
-        mContext.getContentResolver().delete(
-                MovieEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // selection args
-        );
-
-        mContext.getContentResolver().delete(
-                ReviewEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // selection args
-        );
-
-        mContext.getContentResolver().delete(
-                VideoEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // selection args
-        );
-
-        final Cursor movieCursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // selection args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from movie table during delete",
-                0, movieCursor.getCount());
-        movieCursor.close();
-
-        final Cursor reviewCursor = mContext.getContentResolver().query(
-                ReviewEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // selection args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from reviews table during delete",
-                0, reviewCursor.getCount());
-        reviewCursor.close();
-
-        final Cursor videoCursor = mContext.getContentResolver().query(
-                VideoEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // selection args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from videos table during delete",
-                0, videoCursor.getCount());
-        videoCursor.close();
+        TestUtilities.deleteAllRecordsFromProvider(mContext);
     }
 }
-

@@ -10,6 +10,7 @@ import android.database.MergeCursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -37,7 +38,7 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
 
         final int match = URI_MATCHER.match(uri);
 
@@ -57,7 +58,7 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection,
+    public Cursor query(@NonNull Uri uri, String[] projection,
                         String selection, String[] selectionArgs, String sortOrder) {
 
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
@@ -65,8 +66,7 @@ public class MovieProvider extends ContentProvider {
         Cursor cursor;
         switch (URI_MATCHER.match(uri)) {
             case MovieUriMatcher.MOVIES_CODE: {
-//                cursor = (new MovieCursorBuilder(readableDatabase, projection, selection, selectionArgs, sortOrder).build();
-                cursor = buildCursorForMovies(projection, selection, selectionArgs, sortOrder, readableDatabase);
+                cursor = new MovieCursorBuilder(readableDatabase, projection, selection, selectionArgs, sortOrder).build();
                 break;
             }
             case MovieUriMatcher.REVIEWS_CODE: {
@@ -81,7 +81,6 @@ public class MovieProvider extends ContentProvider {
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
                 cursor = buildCursorForSingleMovie(uri, selectionArgs);
-//                Log.d(LOG_TAG, "singleMovieCursor query: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
             default:
@@ -94,7 +93,7 @@ public class MovieProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
 
         final int match = URI_MATCHER.match(uri);
         Uri returnUri;
@@ -158,7 +157,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     // delete returns the number of rows affected if a whereClause is passed in, 0
     // otherwise. To remove all rows and get a count pass "1" as the whereClause.
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
         final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
         if (null == selection) selection = "1";
@@ -190,7 +189,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
 
@@ -218,7 +217,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, ContentValues[] values) {
 
         final int match = URI_MATCHER.match(uri);
 
@@ -281,61 +280,6 @@ public class MovieProvider extends ContentProvider {
         movieDbHelper.close();
         super.shutdown();
     }
-
-    /**
-     * In order to avoid the warning CursorWindow: Window is full the queries have been broken up
-     * into 100 smaller queries and then merged.
-     */
-    // TODO: refactor, improve logic, test
-    private Cursor buildCursorForMovies(
-            String[] projection, String selection,
-            String[] selectionArgs, String sortOrder, SQLiteDatabase readableDatabase) {
-        Log.d(LOG_TAG, "buildCursorForMovies");
-
-        final String originalSelection = selection;
-
-        if (null == sortOrder) {
-            return buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
-        }
-
-        if (sortOrder.equals(MovieEntry.COLUMN_RATING + " DESC")) {
-            if (selection != null) {
-                selection += "AND ";
-            } else {
-                selection = "";
-            }
-            selection += MovieEntry.COLUMN_RATING + " > " + 8.00;
-            final Cursor cursor1 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
-
-            selection = originalSelection;
-            if (selection != null) {
-                selection += "AND ";
-            } else {
-                selection = "";
-            }
-            selection += MovieEntry.COLUMN_RATING + " BETWEEN " + 6.00 + " AND " + 8.00;
-            final Cursor cursor2 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
-
-            selection = originalSelection;
-            if (selection != null) {
-                selection += "AND ";
-            } else {
-                selection = "";
-            }
-            selection += MovieEntry.COLUMN_RATING + " < " + 6.00;
-            final Cursor cursor3 = buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
-            return new MergeCursor(new Cursor[]{cursor1, cursor2, cursor3});
-        } else {
-            return buildCursor(projection, selection, selectionArgs, sortOrder, readableDatabase);
-        }
-
-    }
-
-    private Cursor buildCursor(String[] projection, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase readableDatabase) {
-        return readableDatabase.query(MovieEntry.TABLE_NAME,
-                projection, selection, selectionArgs, null, null, sortOrder);
-    }
-
 
     // TODO: update selection args to take the movie id (after updating db)
     private Cursor buildCursorForSingleMovie(Uri uri, String[] selectionArgsForVideosAndReviews) {

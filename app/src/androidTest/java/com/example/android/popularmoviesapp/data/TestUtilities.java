@@ -48,7 +48,7 @@ public class TestUtilities extends AndroidTestCase {
 
     /**
      * Ensures an empty cursor is not returned.
-     * Modified from Udacity boiler plate code.
+     * Modified from https://github.com/udacity/Sunshine-Version-2
      *
      * @param error message that is different for each test case
      */
@@ -60,7 +60,7 @@ public class TestUtilities extends AndroidTestCase {
 
     /**
      * Ensures all columns are found and have the correct values.
-     * Modified from Udacity boiler plate code.
+     * Modified from https://github.com/udacity/Sunshine-Version-2
      */
     static void validateCurrentRecord(
             String errorMessage, Cursor valueCursor, ContentValues expectedValues) {
@@ -140,7 +140,7 @@ public class TestUtilities extends AndroidTestCase {
         return insertMovieValues(context, testValues);
     }
 
-    private static long insertMovieValues(Context context, ContentValues testValues) {
+    static long insertMovieValues(Context context, ContentValues testValues) {
 
         // WHEN
         MovieDbHelper dbHelper = new MovieDbHelper(context);
@@ -163,7 +163,7 @@ public class TestUtilities extends AndroidTestCase {
             movieValues.put(MovieEntry.COLUMN_POSTER, "posterPath " + i);
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, "overview " + i);
             movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
-            movieValues.put(MovieEntry.COLUMN_POPULARITY, i + 80.99);
+            movieValues.put(MovieEntry.COLUMN_POPULARITY, 0.01 + 10 * i);
             movieValues.put(MovieEntry.COLUMN_RELEASE, "release " + i);
             movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 2);
 
@@ -269,5 +269,62 @@ public class TestUtilities extends AndroidTestCase {
 
     static TestContentObserver getTestContentObserver() {
         return TestContentObserver.getTestContentObserver();
+    }
+
+    /**
+     *
+     * Modified from https://github.com/udacity/Sunshine-Version-2
+     */
+    public static void deleteAllRecordsFromProvider(Context context) {
+        context.getContentResolver().delete(
+                MovieEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        context.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        context.getContentResolver().delete(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        final Cursor movieCursor = context.getContentResolver().query(
+                MovieEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+        assertEquals("Error: Records not deleted from movie table during delete",
+                0, movieCursor.getCount());
+        movieCursor.close();
+
+        final Cursor reviewCursor = context.getContentResolver().query(
+                ReviewEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+        assertEquals("Error: Records not deleted from reviews table during delete",
+                0, reviewCursor.getCount());
+        reviewCursor.close();
+
+        final Cursor videoCursor = context.getContentResolver().query(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+        assertEquals("Error: Records not deleted from videos table during delete",
+                0, videoCursor.getCount());
+        videoCursor.close();
     }
 }
