@@ -14,6 +14,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 /**
  * Created by David on 09/10/16.
  */
+// TODO: rename as MoviesCursorBuilder
 class MovieCursorBuilder {
     private static final String LOG_TAG = MovieCursorBuilder.class.getSimpleName();
 

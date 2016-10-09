@@ -2,12 +2,9 @@ package com.example.android.popularmoviesapp.data;
 
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.MergeCursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -69,7 +66,7 @@ public class MovieProvider extends ContentProvider {
             case MovieUriMatcher.MOVIES_CODE: {
                 cursor = readableDatabase.query(MovieEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
-                Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
+//                Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
                 break;
             }
             case MovieUriMatcher.REVIEWS_CODE: {
@@ -83,7 +80,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
-                cursor = buildCursorForSingleMovie(uri, selectionArgs);
+                cursor = new SingleMovieCursorBuilder(getContext()).buildCursorForSingleMovie(uri, selectionArgs);
                 break;
             }
             default:
@@ -283,48 +280,5 @@ public class MovieProvider extends ContentProvider {
         movieDbHelper.close();
         super.shutdown();
     }
-
-    // TODO: update selection args to take the movie id (after updating db)
-    private Cursor buildCursorForSingleMovie(Uri uri, String[] selectionArgsForVideosAndReviews) {
-
-        final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
-
-        final String[] allColumns = null;
-        final String[] selectionArgs = {String.valueOf(ContentUris.parseId(uri))};
-        final String groupBy = null;
-        final String having = null;
-        final String orderBy = null;
-
-        final Cursor movieCursor = readableDatabase.query(
-                MovieEntry.TABLE_NAME,
-                allColumns,
-                SINGLE_MOVIE_SELECTION,
-                selectionArgs,
-                groupBy,
-                having,
-                orderBy
-        );
-
-        final Cursor videoCursor = readableDatabase.query(
-                VideoEntry.TABLE_NAME,
-                allColumns,
-                VIDEOS_SELECTION,
-                selectionArgsForVideosAndReviews,
-                groupBy,
-                having,
-                orderBy
-        );
-
-        return new MergeCursor(new Cursor[]{movieCursor, videoCursor});
-    }
-
-    // movies._id = ?
-    private static final String SINGLE_MOVIE_SELECTION =
-            MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
-
-    // TODO: update to movie_id (after updating db)
-    // videos.movie_key = ?
-    private static final String VIDEOS_SELECTION =
-            VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_MOVIE_KEY + " = ?";
 
 }

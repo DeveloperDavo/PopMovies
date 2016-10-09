@@ -86,6 +86,11 @@ public class Utility {
         return BitmapFactory.decodeByteArray(posterByteArray, 0, posterByteArray.length);
     }
 
+    static String getPosterPathFrom(Cursor cursor) {
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
+        return cursor.getString(columnIndex);
+    }
+
     /* Helper methods */
     private static void setPreferenceText(
             Context context, String text, int key, String preference) {

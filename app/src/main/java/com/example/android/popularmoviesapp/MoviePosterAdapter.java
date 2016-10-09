@@ -8,8 +8,9 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
-import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
+
+import static com.example.android.popularmoviesapp.Utility.getPosterPathFrom;
 
 /**
  * Created by David on 04/04/16.
@@ -33,15 +34,10 @@ class MoviePosterAdapter extends CursorAdapter {
 //        Log.d(LOG_TAG, "bindView");
 
         ImageView imageView = (ImageView) view.findViewById(R.id.poster_image_view);
-        Picasso.with(context).load(getPosterPathFrom(cursor)).into(imageView);
+        Picasso.with(context).load(Utility.getPosterPathFrom(cursor)).into(imageView);
 
 //        final Bitmap bitmap = Utility.getBitmapFromBlob(cursor);
 //        imageView.setImageBitmap(bitmap);
-    }
-
-    private String getPosterPathFrom(Cursor cursor) {
-        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
-        return cursor.getString(columnIndex);
     }
 
 }
