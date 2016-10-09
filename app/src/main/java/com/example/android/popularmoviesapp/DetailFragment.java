@@ -1,9 +1,7 @@
 package com.example.android.popularmoviesapp;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,9 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
-import com.example.android.popularmoviesapp.data.MovieDbHelper;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
@@ -74,47 +69,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         detailView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Cursor cursor = queryVideos();
-                cursor.moveToPosition(position - 1);
-                final String videoKey = Utility.getVideoKeyFrom(cursor);
-
-                final Uri videoUri = Uri.parse("https://www.youtube.com/watch?v=" + videoKey);
-                Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
-
-                if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    Log.d(LOG_TAG, "Couldn't open YouTube");
-                }
+                final Uri videoUri = getVideoUriFromSingleMovieCursor(position);
+                startExternalIntent(videoUri);
             }
         });
     }
 
-    private Cursor queryVideos() {
-        final MovieDbHelper movieDbHelper = new MovieDbHelper(getContext());
-        final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
+    private Uri getVideoUriFromSingleMovieCursor(int position) {
+        final Cursor cursor = Utility.querySingleMovieUri(getContext(), movieKey);
+        cursor.moveToPosition(position);
 
-        // TODO: update to movie_id (after updating db)
-        // videos.movie_key = ?
-        final String selection =
-                VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_MOVIE_KEY + " = ?";
+        final String videoKey = Utility.getVideoKeyFrom(cursor);
+        return Uri.parse("https://www.youtube.com/watch?v=" + videoKey);
+    }
 
-        final Uri uri = MovieEntry.buildMovieUri(movieKey);
-        final String[] allColumns = null;
-        final String[] selectionArgs = {String.valueOf(ContentUris.parseId(uri))};
-        final String groupBy = null;
-        final String having = null;
-        final String orderBy = null;
-
-        return readableDatabase.query(
-                VideoEntry.TABLE_NAME,
-                allColumns,
-                selection,
-                selectionArgs,
-                groupBy,
-                having,
-                orderBy
-        );
+    private void startExternalIntent(Uri videoUri) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d(LOG_TAG, "Couldn't open YouTube");
+        }
     }
 
     @Override

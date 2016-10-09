@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
@@ -96,6 +97,22 @@ public class Utility {
     static String getVideoKeyFrom(Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(VideoEntry.COLUMN_VIDEO_KEY);
         return cursor.getString(columnIndex);
+    }
+
+    // TODO: update selection args to take the movie id (after updating db)
+    static Cursor querySingleMovieUri(Context context, long movieKey) {
+        final Uri uri = MovieEntry.buildMovieUri(movieKey);
+        final String[] projection = null;
+        final String selection = null;
+        final String[] selectionArgs = {String.valueOf(movieKey)};
+        final String sortOrder = null;
+
+        return context.getContentResolver().query(
+                uri,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder);
     }
 
     /* Helper methods */

@@ -3,9 +3,10 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
+import android.database.DatabaseUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
-import com.example.android.popularmoviesapp.data.SingleMovieCursorBuilder;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -127,7 +127,6 @@ class DetailAdapter extends CursorAdapter {
 
     private void setButtonText(Cursor cursor, Button favoriteButton) {
         String buttonText;
-//        Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
         if (isFavorite(cursor)) {
             buttonText = "remove from favorites";
         } else {
@@ -162,9 +161,11 @@ class DetailAdapter extends CursorAdapter {
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 updateFavoritesColumn(context, cursor);
-                final Cursor newCursor = buildNewCursorFrom(context, cursor);
+                final Cursor newCursor = buildNewCursorFrom(cursor);
                 swapCursor(newCursor);
                 notifyDataSetChanged();
+                Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
+                Log.d(LOG_TAG, "cursorDump newCursor: " + DatabaseUtils.dumpCursorToString(newCursor));
             }
         });
     }
@@ -188,14 +189,10 @@ class DetailAdapter extends CursorAdapter {
                 MovieEntry.CONTENT_URI, movieValues, where, selectionArgs);
     }
 
-    private Cursor buildNewCursorFrom(final Context context, final Cursor oldCursor) {
+    private Cursor buildNewCursorFrom(final Cursor oldCursor) {
         final int columnIndex = oldCursor.getColumnIndex(MovieEntry._ID);
         final long movieKey = oldCursor.getLong(columnIndex);
-
-        // TODO: update selection args to take the movie id (after updating db)
-        final Uri uri = MovieEntry.buildMovieUri(movieKey);
-        final String[] selectionArgsForVideos = {String.valueOf(uri)};
-        return new SingleMovieCursorBuilder(context).build(uri, selectionArgsForVideos);
+        return Utility.querySingleMovieUri(mContext, movieKey);
     }
 
     /* Used to speed up loading the views within the list view */
