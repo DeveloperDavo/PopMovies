@@ -26,8 +26,8 @@ import java.net.URL;
  * Created by David on 02/10/16.
  */
 
-public class VideosSyncer {
-    private static final String LOG_TAG = VideosSyncer.class.getSimpleName();
+public class VideoSyncer {
+    private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
 
     /**
      * Gets video data with a http request.

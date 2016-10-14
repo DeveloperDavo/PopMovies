@@ -7,7 +7,7 @@ import android.view.Menu;
 
 import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements MoviePostersFragment.Callback {
+public class MainActivity extends AppCompatActivity implements PostersFragment.Callback {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 

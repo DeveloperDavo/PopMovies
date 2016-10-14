@@ -10,17 +10,14 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import static com.example.android.popularmoviesapp.Utility.getPosterPathFrom;
-
 /**
  * Created by David on 04/04/16.
  */
-// TODO: rename as PosterAdapter
-class MoviePosterAdapter extends CursorAdapter {
+class PosterAdapter extends CursorAdapter {
 
-    private static final String LOG_TAG = MoviePosterAdapter.class.getSimpleName();
+    private static final String LOG_TAG = PosterAdapter.class.getSimpleName();
 
-    MoviePosterAdapter(Context context, Cursor cursor, int flags) {
+    PosterAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
     }
 

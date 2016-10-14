@@ -32,11 +32,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, null);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, null);
 
         // WHEN
-        final Cursor cursor = movieCursorBuilder.build();
+        final Cursor cursor = moviesCursorBuilder.build();
 
         // THEN
         assertThat(cursor.getCount()).isEqualTo(TestUtilities.BULK_INSERT_SIZE);
@@ -48,11 +48,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_RATING_DESC);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_RATING_DESC);
 
         // WHEN
-        final Cursor cursor = movieCursorBuilder.build();
+        final Cursor cursor = moviesCursorBuilder.build();
 
         // THEN
         assertThat(cursor.getCount()).isEqualTo(TestUtilities.BULK_INSERT_SIZE);
@@ -63,11 +63,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_POPULARITY_DESC);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_POPULARITY_DESC);
 
         // WHEN
-        final Cursor cursor = movieCursorBuilder.build();
+        final Cursor cursor = moviesCursorBuilder.build();
 
         // THEN
         assertThat(cursor.getCount()).isEqualTo(TestUtilities.BULK_INSERT_SIZE);
@@ -80,11 +80,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         contentValues.remove(MovieEntry.COLUMN_POPULARITY);
         contentValues.put(MovieEntry.COLUMN_POPULARITY, 0.00);
         TestUtilities.insertMovieValues(mContext, contentValues);
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_POPULARITY_DESC);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, Utility.SORT_BY_POPULARITY_DESC);
 
         // WHEN
-        final Cursor cursor = movieCursorBuilder.build();
+        final Cursor cursor = moviesCursorBuilder.build();
 //        Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
 
         // THEN
@@ -96,14 +96,14 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, null);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, null);
         final String initialSelection = "";
         final int increments = 1;
-        movieCursorBuilder.setIncrements(increments);
+        moviesCursorBuilder.setIncrements(increments);
 
         // WHEN
-        final String selection = movieCursorBuilder.incrementBy(MovieCursorBuilder.RATING, 0, initialSelection);
+        final String selection = moviesCursorBuilder.incrementBy(MoviesCursorBuilder.RATING, 0, initialSelection);
 
         // THEN
         assertThat(selection).isEqualTo(MovieEntry.COLUMN_RATING + " > " + 0.00 + " AND " + MovieEntry.COLUMN_RATING + " <= " + 10.00);
@@ -115,22 +115,22 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder =
-                new MovieCursorBuilder(readableDatabase, null, null, null, null);
+        final MoviesCursorBuilder moviesCursorBuilder =
+                new MoviesCursorBuilder(readableDatabase, null, null, null, null);
         final String initialSelection = "";
         final int increments = 2;
-        movieCursorBuilder.setIncrements(increments);
+        moviesCursorBuilder.setIncrements(increments);
 
         // 1st increment
         // WHEN
-        String selection = movieCursorBuilder.incrementBy(MovieCursorBuilder.POPULARITY, 0, initialSelection);
+        String selection = moviesCursorBuilder.incrementBy(MoviesCursorBuilder.POPULARITY, 0, initialSelection);
 
         // THEN
         assertThat(selection).isEqualTo(MovieEntry.COLUMN_POPULARITY + " > " + 50.00 + " AND " + MovieEntry.COLUMN_POPULARITY + " <= " + 100.00);
 
         // 2nd increment
         // WHEN
-        selection = movieCursorBuilder.incrementBy(MovieCursorBuilder.POPULARITY, 1, initialSelection);
+        selection = moviesCursorBuilder.incrementBy(MoviesCursorBuilder.POPULARITY, 1, initialSelection);
 
         // THEN
         assertThat(selection).isEqualTo(MovieEntry.COLUMN_POPULARITY + " > " + 0.00 + " AND " + MovieEntry.COLUMN_POPULARITY + " <= " + 50.00);
@@ -141,11 +141,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
 
         // GIVEN
         final String initialSelection = null;
-        final MovieCursorBuilder movieCursorBuilder = new MovieCursorBuilder(
+        final MoviesCursorBuilder moviesCursorBuilder = new MoviesCursorBuilder(
                 readableDatabase, null, initialSelection, null, null);
 
         // WHEN
-        final String selection = movieCursorBuilder.setUpSelection(initialSelection);
+        final String selection = moviesCursorBuilder.setUpSelection(initialSelection);
 
         // THEN
         assertThat(selection).isEqualTo("");
@@ -155,11 +155,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
 
         // GIVEN
         final String initialSelection = "notNull";
-        final MovieCursorBuilder movieCursorBuilder = new MovieCursorBuilder(
+        final MoviesCursorBuilder moviesCursorBuilder = new MoviesCursorBuilder(
                 readableDatabase, null, initialSelection, null, null);
 
         // WHEN
-        final String selection = movieCursorBuilder.setUpSelection(initialSelection);
+        final String selection = moviesCursorBuilder.setUpSelection(initialSelection);
 
         // THEN
         assertThat(selection).isEqualTo(initialSelection + " AND ");
@@ -170,11 +170,11 @@ public class TestMovieCursorBuilder extends AndroidTestCase {
         // GIVEN
         mContext.getContentResolver().bulkInsert(
                 MovieEntry.CONTENT_URI, TestUtilities.createBulkInsertMovieValues());
-        final MovieCursorBuilder movieCursorBuilder = new MovieCursorBuilder(
+        final MoviesCursorBuilder moviesCursorBuilder = new MoviesCursorBuilder(
                 readableDatabase, null, null, null, null);
 
         // WHEN
-        final Cursor cursor = movieCursorBuilder.buildCursor(null);
+        final Cursor cursor = moviesCursorBuilder.buildCursor(null);
 
         // THEN
         assertThat(cursor.getCount()).isEqualTo(TestUtilities.BULK_INSERT_SIZE);

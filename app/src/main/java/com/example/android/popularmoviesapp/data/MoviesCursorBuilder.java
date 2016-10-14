@@ -14,9 +14,8 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 /**
  * Created by David on 09/10/16.
  */
-// TODO: rename as MoviesCursorBuilder
-class MovieCursorBuilder {
-    private static final String LOG_TAG = MovieCursorBuilder.class.getSimpleName();
+class MoviesCursorBuilder {
+    private static final String LOG_TAG = MoviesCursorBuilder.class.getSimpleName();
 
     private int increments = 1;
     static final String RATING = "rating";
@@ -28,7 +27,7 @@ class MovieCursorBuilder {
     private String[] selectionArgs;
     private String sortOrder;
 
-    MovieCursorBuilder(
+    MoviesCursorBuilder(
             SQLiteDatabase readableDatabase, String[] projection,
             String selection, String[] selectionArgs, String sortOrder) {
 

@@ -244,7 +244,7 @@ class MoviesSyncer {
     // TODO: is there a better place for this? Does it make sense to put it in FRT?
     // TODO: after updating db, only need movieId
     private static void syncVideos(Context context, long movieKey, long movieId) {
-        VideosSyncer.syncVideos(context, movieKey, movieId);
+        VideoSyncer.syncVideos(context, movieKey, movieId);
     }
 
 }

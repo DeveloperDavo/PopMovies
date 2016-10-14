@@ -19,10 +19,9 @@ import android.widget.GridView;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
-// TODO: rename as PostersFragment
-public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cursor> {
+public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG = MoviePostersFragment.class.getSimpleName();
+    private static final String LOG_TAG = PostersFragment.class.getSimpleName();
 
     /**********************************************************************************************/
 
@@ -30,14 +29,14 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
 
     /**********************************************************************************************/
 
-    private MoviePosterAdapter posterAdapter;
+    private PosterAdapter posterAdapter;
     private GridView gridView;
     private int selectedPosition = GridView.INVALID_POSITION;
 //    Parcelable state;
 
 //    private static final String SELECTED_KEY = "selected_position";
 
-    public MoviePostersFragment() {
+    public PostersFragment() {
         // Required empty public constructor
     }
 
@@ -62,7 +61,7 @@ public class MoviePostersFragment extends Fragment implements LoaderCallbacks<Cu
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
 
-        posterAdapter = new MoviePosterAdapter(getActivity(), null, 0);
+        posterAdapter = new PosterAdapter(getActivity(), null, 0);
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 

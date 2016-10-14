@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fragment_main"
-        android:name="com.example.android.popularmoviesapp.MoviePostersFragment"
+        android:name="com.example.android.popularmoviesapp.PostersFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
