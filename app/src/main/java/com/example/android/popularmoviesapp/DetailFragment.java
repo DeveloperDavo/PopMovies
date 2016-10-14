@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -73,26 +72,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final Cursor cursor = Utility.getSingleMovieCursorAndMoveTo(
+                final Cursor cursor = Utility.getSingleMovieCursorAndMoveToPosition(
                         getContext(), position, movieKey);
 
-                if (isVideosView(cursor)) {
+                if (Utility.isVideosView(cursor)) {
                     final Uri videoUri = getVideoUriFrom(cursor);
                     startExternalIntent(videoUri);
                 } else {
+
                 }
             }
         });
-    }
-
-    private boolean isVideosView(Cursor cursor) {
-        return VideoEntry.COLUMN_VIDEO_ID.equals(getColumnNameOf12thColumn(cursor));
-    }
-
-    // The 12th column is the first column that differs between reviews and videos
-    private String getColumnNameOf12thColumn(Cursor cursor) {
-        final int columnIndex = 11;
-        return cursor.getColumnName(columnIndex);
     }
 
     private Uri getVideoUriFrom(Cursor cursor) {

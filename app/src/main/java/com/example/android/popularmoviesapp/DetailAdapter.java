@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
-import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -33,7 +32,6 @@ class DetailAdapter extends CursorAdapter {
 
     @Override
     public int getViewTypeCount() {
-//        Log.d(LOG_TAG, "getViewTypeCount");
         return VIEW_TYPE_COUNT;
     }
 
@@ -48,26 +46,12 @@ class DetailAdapter extends CursorAdapter {
                 VIEW_TYPE_MOVIE_DETAILS : getItemViewTypeFrom((Cursor) getItem(position));
     }
 
-    /**
-     * Determines the name of the 11th column
-     * (the first column which is different for videos and reviews).
-     *
-     * @return view type as an int
-     */
     private int getItemViewTypeFrom(Cursor cursor) {
-        final int columnIndex = 11;
-        final String columnName = cursor.getColumnName(columnIndex);
-        if (VideoEntry.COLUMN_VIDEO_ID.equals(columnName)) {
+        if (Utility.isVideosView(cursor)) {
             return VIEW_TYPE_VIDEOS;
         } else {
             return VIEW_TYPE_REVIEWS;
         }
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-//        Log.d(LOG_TAG, "getView");
-        return super.getView(position, convertView, parent);
     }
 
     @Override

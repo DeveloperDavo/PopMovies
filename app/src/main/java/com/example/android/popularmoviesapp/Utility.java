@@ -101,7 +101,7 @@ public class Utility {
     }
 
     static long getMovieIdFromMovieKey(Context context, long movieKey, int position) {
-        final Cursor cursor = getSingleMovieCursorAndMoveTo(context, position, movieKey);
+        final Cursor cursor = getSingleMovieCursorAndMoveToPosition(context, position, movieKey);
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
         return cursor.getLong(columnIndex);
     }
@@ -122,10 +122,20 @@ public class Utility {
     }
 
     @NonNull
-    static Cursor getSingleMovieCursorAndMoveTo(Context context, int position, long movieKey) {
+    static Cursor getSingleMovieCursorAndMoveToPosition(Context context, int position, long movieKey) {
         final Cursor cursor = Utility.querySingleMovieUri(context, movieKey);
         cursor.moveToPosition(position);
         return cursor;
+    }
+
+    static boolean isVideosView(Cursor cursor) {
+        return VideoEntry.COLUMN_VIDEO_ID.equals(getColumnNameOf12thColumn(cursor));
+    }
+
+    // The 12th column is the first column that differs between reviews and videos
+    private static String getColumnNameOf12thColumn(Cursor cursor) {
+        final int columnIndex = 11;
+        return cursor.getColumnName(columnIndex);
     }
 
     /* Helper methods */
