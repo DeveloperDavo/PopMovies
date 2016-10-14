@@ -99,11 +99,18 @@ public class Utility {
         return cursor.getString(columnIndex);
     }
 
+    static long getMovieIdFromMovieKey(Context context, long movieKey) {
+        final Cursor cursor = querySingleMovieUri(context, movieKey);
+        cursor.moveToFirst();
+        int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
+        return cursor.getLong(columnIndex);
+    }
+
     static Cursor querySingleMovieUri(Context context, long movieKey) {
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
         final String[] projection = null;
         final String selection = null;
-        final String[] selectionArgs = {String.valueOf(movieKey)};
+        final String[] selectionArgs = null;
         final String sortOrder = null;
 
         return context.getContentResolver().query(

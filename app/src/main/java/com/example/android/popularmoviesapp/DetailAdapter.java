@@ -3,10 +3,8 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -138,7 +136,8 @@ class DetailAdapter extends CursorAdapter {
     private void setRelease(ViewHolder viewHolder, Cursor cursor) {
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE);
         final String releaseDate = cursor.getString(columnIndex);
-        viewHolder.releaseDateView.setText(releaseDate.substring(0, 4));
+        final String releaseYear = releaseDate.substring(0, 4);
+        viewHolder.releaseDateView.setText(releaseYear);
     }
 
     private void setVideoText(ViewHolder viewHolder, Cursor cursor) {
@@ -147,7 +146,6 @@ class DetailAdapter extends CursorAdapter {
     }
 
     private void setReviewText(ViewHolder viewHolder, Cursor cursor) {
-        Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
         int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_CONTENT);
         viewHolder.reviewTextView.setText(cursor.getString(columnIndex));
     }
