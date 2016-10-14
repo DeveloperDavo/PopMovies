@@ -18,6 +18,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  * Created by David on 22/08/16.
  */
 public class Utility {
+    private static final String LOG_TAG = Utility.class.getSimpleName();
 
     private static final String SORT_ORDER_PREFERENCE = "sort_order";
     private static final String SELECTION_PREFERENCE = "selection";

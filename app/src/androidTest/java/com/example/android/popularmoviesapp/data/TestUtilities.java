@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp.data;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -87,7 +88,7 @@ public class TestUtilities extends AndroidTestCase {
     }
 
     // default movie values
-    static ContentValues createMovieValues() {
+    public static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, MOVIE_ID);
         movieValues.put(MovieEntry.COLUMN_TITLE, TITLE);
@@ -209,15 +210,10 @@ public class TestUtilities extends AndroidTestCase {
         return videoRowId;
     }
 
-    /*
-         Students: The functions we provide inside of TestProvider use this utility class to test
-         the ContentObserver callbacks using the PollingCheck class that we grabbed from the Android
-         CTS tests.
-         Note that this only tests that the onChange function is called; it does not test that the
-         correct Uri is returned.
-      */
-    // TODO improve understanding
-    static class TestContentObserver extends ContentObserver {
+    /**
+     * sourced from https://github.com/udacity/Sunshine-Version-2
+     */
+    public static class TestContentObserver extends ContentObserver {
         final HandlerThread mHT;
         boolean mContentChanged;
 
@@ -243,7 +239,7 @@ public class TestUtilities extends AndroidTestCase {
             mContentChanged = true;
         }
 
-        void waitForNotificationOrFail() {
+        public void waitForNotificationOrFail() {
             // Note: The PollingCheck class is taken from the Android CTS (Compatibility Test Suite).
             // It's useful to look at the Android CTS source for ideas on how to test your Android
             // applications.  The reason that PollingCheck works is that, by default, the JUnit
@@ -258,7 +254,7 @@ public class TestUtilities extends AndroidTestCase {
         }
     }
 
-    static TestContentObserver getTestContentObserver() {
+    public static TestContentObserver getTestContentObserver() {
         return TestContentObserver.getTestContentObserver();
     }
 
@@ -318,4 +314,26 @@ public class TestUtilities extends AndroidTestCase {
                 0, videoCursor.getCount());
         videoCursor.close();
     }
+
+    /**
+     *
+     * Modified from https://github.com/udacity/Sunshine-Version-2
+     */
+    public static long insertTestMovie(Context context) {
+        final ContentValues testValues = TestUtilities.createMovieValues();
+
+        // register content observer
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        context.getContentResolver().
+                registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
+
+        final Uri movieInsertUri = context.getContentResolver().
+                insert(MovieEntry.CONTENT_URI, testValues);
+
+        tco.waitForNotificationOrFail();
+        context.getContentResolver().unregisterContentObserver(tco);
+
+        return ContentUris.parseId(movieInsertUri);
+    }
+
 }

@@ -16,7 +16,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
 public class MovieDbHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -33,30 +33,30 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
                 MovieEntry._ID + " INTEGER PRIMARY KEY, " +
-                MovieEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
-                MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_POSTER + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
-                MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
-                MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_MOVIE_ID + " INTEGER, " +
+                MovieEntry.COLUMN_TITLE + " TEXT, " +
+                MovieEntry.COLUMN_POSTER + " TEXT, " +
+                MovieEntry.COLUMN_OVERVIEW + " TEXT, " +
+                MovieEntry.COLUMN_RATING + " REAL, " +
+                MovieEntry.COLUMN_POPULARITY + " REAL, " +
+                MovieEntry.COLUMN_RELEASE + " TEXT, " +
                 MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
-                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-                ReviewEntry.COLUMN_REVIEW_ID + " INTEGER UNIQUE NOT NULL, " +
-                ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
-                ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
-                ReviewEntry.COLUMN_URL + " TEXT NOT NULL);";
+                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER, " +
+                ReviewEntry.COLUMN_REVIEW_ID + " INTEGER, " +
+                ReviewEntry.COLUMN_AUTHOR + " TEXT, " +
+                ReviewEntry.COLUMN_CONTENT + " TEXT, " +
+                ReviewEntry.COLUMN_URL + " TEXT);";
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY, " +
-                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_KEY + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_SITE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_TYPE + " TEXT NOT NULL);";
+                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER, " +
+                VideoEntry.COLUMN_VIDEO_ID + " TEXT, " +
+                VideoEntry.COLUMN_VIDEO_KEY + " TEXT, " +
+                VideoEntry.COLUMN_VIDEO_SITE + " TEXT, " +
+                VideoEntry.COLUMN_VIDEO_TYPE + " TEXT);";
 
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
         db.execSQL(SQL_CREATE_REVIEWS_TABLE);

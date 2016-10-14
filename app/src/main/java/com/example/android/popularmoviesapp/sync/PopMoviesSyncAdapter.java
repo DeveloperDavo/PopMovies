@@ -41,6 +41,20 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
+     * Helper method to have the sync adapter sync immediately
+     *
+     * @param context The context used to access the account service
+     */
+    public static void syncImmediately(Context context) {
+        Log.d(LOG_TAG, "syncImmediately");
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    /**
      * Helper method to get the fake account to be used with SyncAdapter, or make a new one
      * if the fake account doesn't exist yet.  If we make a new account, we call the
      * onAccountCreated method so we can initialize things.

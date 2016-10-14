@@ -234,14 +234,11 @@ class MoviesSyncer {
         // extract movieRowId from URI
         movieRowId = ContentUris.parseId(insertedUri);
 
-        syncVideos(context, movieRowId, movieId);
+        // TODO: move to insertOrUpdate
+        VideoSyncer.sync(context, movieRowId, movieId);
         // TODO: sync reviews
 
         return movieRowId;
-    }
-
-    private static void syncVideos(Context context, long movieKey, long movieId) {
-        VideoSyncer.syncVideos(context, movieKey, movieId);
     }
 
 }

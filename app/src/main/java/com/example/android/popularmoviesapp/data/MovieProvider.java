@@ -22,8 +22,8 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
  * Retrieves and modifies the data in the database.
  */
 public class MovieProvider extends ContentProvider {
-
     private static final String LOG_TAG = MovieProvider.class.getSimpleName();
+
     private MovieDbHelper movieDbHelper;
 
     private static final UriMatcher URI_MATCHER = MovieUriMatcher.buildUriMatcher();
@@ -203,6 +203,10 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MovieUriMatcher.REVIEWS_CODE:
                 rowsUpdated = writableDatabase.update(ReviewEntry.TABLE_NAME,
+                        values, selection, selectionArgs);
+                break;
+            case MovieUriMatcher.VIDEOS_CODE:
+                rowsUpdated = writableDatabase.update(VideoEntry.TABLE_NAME,
                         values, selection, selectionArgs);
                 break;
             default:

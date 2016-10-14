@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.android.popularmoviesapp.sync.FetchReviewsTask;
+import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
@@ -94,12 +94,12 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
                 selectedPosition = position;
 
-                final long movieId = Utility.getMovieIdFromMovieKey(getContext(), id, position);
+//                final long movieId = Utility.getMovieIdFromMovieKey(getContext(), id, position);
 
                 // onItemSelected is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
 
-                new FetchReviewsTask(getContext(), id, movieId).execute();
+//                new FetchReviewsTask(getContext(), id, movieId).execute();
 
                 // persist position so it can be later restored
                 Utility.setPosition(getContext(), position);
@@ -122,7 +122,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-//        PopMoviesSyncAdapter.syncImmediately(getContext());
+        PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {
             setPopularPrefs();
