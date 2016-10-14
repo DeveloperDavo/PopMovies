@@ -32,9 +32,8 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     private PosterAdapter posterAdapter;
     private GridView gridView;
     private int selectedPosition = GridView.INVALID_POSITION;
-//    Parcelable state;
 
-//    private static final String SELECTED_KEY = "selected_position";
+    private static final String SELECTED_KEY = "selected_position";
 
     public PostersFragment() {
         // Required empty public constructor
@@ -50,10 +49,10 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Log.d(LOG_TAG, "onSaveInstanceState");
-//        if (selectedPosition != GridView.INVALID_POSITION) {
-//            outState.putInt(SELECTED_KEY, selectedPosition);
-//        }
-//        state = gridView.onSaveInstanceState();
+        if (selectedPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, selectedPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -72,14 +71,11 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         openDetailViewOnClick();
 
         // if a position has already been selected, get it
-        // FIXME: savedInstanceSate is null upon reload
-//        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-//            selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
-//        }
-        // TODO: alternative solution??
-//        if (state != null) {
-//            gridView.onRestoreInstanceState(state);
-//        }
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
+        } else {
+            selectedPosition = Integer.parseInt(Utility.getPosition(getContext()));
+        }
 
         return rootView;
     }
@@ -100,7 +96,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
                 // call onItemSelected, which is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
                 selectedPosition = position;
-                // TODO: workaround for savedInstanceState
                 Utility.setPosition(getContext(), selectedPosition);
             }
         });
@@ -155,7 +150,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         setPreferences(selection, selectionArg, Utility.SORT_BY_POPULARITY_DESC);
     }
 
-    // TODO: workaround for savedInstanceState
     private void setPreferences(String selection, String selectionArg, String sortOrder) {
 //        Log.d(LOG_TAG, "setPreferences");
         Utility.setSelection(getContext(), selection);
@@ -173,15 +167,16 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
                 MovieEntry.COLUMN_POSTER,
         };
 
-        // TODO: workaround for savedInstanceState
-        String selection = Utility.getSelection(getContext());
+        final String selection = Utility.getSelection(getContext());
         final String selectionArg = Utility.getSelectionArg(getContext());
+
         String[] selectionArgs;
         if (selectionArg == null) {
             selectionArgs = null;
         } else {
             selectionArgs = new String[]{selectionArg};
         }
+
         final String sortOrder = Utility.getSortOrder(getContext());
 
         return new CursorLoader(getActivity(),
@@ -198,13 +193,9 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
         posterAdapter.swapCursor(data);
 
-
-        // TODO: workaround for savedInstanceState
-        gridView.smoothScrollToPosition(Integer.parseInt(Utility.getPosition(getContext())));
-
-//        if (selectedPosition != GridView.INVALID_POSITION) {
-//            gridView.smoothScrollToPosition(selectedPosition);
-//        }
+        if (selectedPosition != GridView.INVALID_POSITION) {
+            gridView.smoothScrollToPosition(selectedPosition);
+        }
     }
 
     @Override
