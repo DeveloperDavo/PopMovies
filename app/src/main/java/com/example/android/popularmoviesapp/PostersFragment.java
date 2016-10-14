@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.example.android.popularmoviesapp.sync.FetchReviewsTask;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
