@@ -1,4 +1,4 @@
-package com.example.android.popularmoviesapp.sync;
+package com.example.android.popularmoviesapp;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.popularmoviesapp.BuildConfig;
 import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
 import org.json.JSONArray;
