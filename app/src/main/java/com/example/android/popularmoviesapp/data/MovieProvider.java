@@ -80,7 +80,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MovieUriMatcher.SINGLE_MOVIE_CODE: {
-                cursor = new SingleMovieCursorBuilder(getContext()).build(uri, selectionArgs);
+                cursor = new SingleMovieCursorBuilder(getContext(), uri).build();
                 break;
             }
             default:

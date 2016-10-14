@@ -17,18 +17,28 @@ import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry
  */
 public class SingleMovieCursorBuilder {
 
-    private static final SQLiteQueryBuilder VIDEOS_MOVIE_FAV_JOIN;
-
+    private final Uri uri;
     private Context context;
 
-    public SingleMovieCursorBuilder(Context context) {
+    public SingleMovieCursorBuilder(Context context, Uri uri) {
         this.context = context;
+        this.uri = uri;
     }
 
-    // movies._ID = ?
     // TODO: update to movie_id (after updating db)
+    // movies._ID = ?
     private static final String SINGLE_MOVIE_SELECTION =
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
+
+    // videos.site = ?
+    private static final String VIDEO_SITE_SELECTION =
+            VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_VIDEO_SITE + " = ?";
+
+    // videos.type = ?
+    private static final String VIDEO_TYPE_SELECTION =
+            VideoEntry.TABLE_NAME + "." + VideoEntry.COLUMN_VIDEO_TYPE + " = ?";
+
+    private static final SQLiteQueryBuilder VIDEOS_MOVIE_FAV_JOIN;
 
     static {
         VIDEOS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
@@ -46,12 +56,13 @@ public class SingleMovieCursorBuilder {
 
     // TODO: update selection args to take the movie id (after updating db)
     // TODO: same thing with movieKey
-    public Cursor build(Uri uri, String[] selectionArgsForVideos) {
+    public Cursor build() {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
         final String[] allColumns = null;
-        final String[] selectionArgs = {String.valueOf(ContentUris.parseId(uri))};
+        final long movieKey = ContentUris.parseId(uri);
+        final String[] selectionArgs = {String.valueOf(movieKey)};
         final String groupBy = null;
         final String having = null;
         final String orderBy = null;
@@ -66,11 +77,12 @@ public class SingleMovieCursorBuilder {
                 orderBy
         );
 
-//        final String[] selectionArgsForVideos = {String.valueOf(uri)};
+        final String[] videosSelectionArgs = {String.valueOf(movieKey), "YouTube", "Trailer"};
+        final String videosSelection = SINGLE_MOVIE_SELECTION + " AND " + VIDEO_SITE_SELECTION + " AND " + VIDEO_TYPE_SELECTION;
         final Cursor videoCursor = VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,
                 allColumns,
-                SINGLE_MOVIE_SELECTION,
-                selectionArgsForVideos,
+                videosSelection,
+                videosSelectionArgs,
                 groupBy,
                 having,
                 orderBy

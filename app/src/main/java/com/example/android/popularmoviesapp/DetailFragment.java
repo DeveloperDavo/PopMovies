@@ -114,10 +114,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Loader<Cursor> buildDetailCursorLoader() {
 
         // TODO: update selection args to take the movie id (after updating db)
+
+        // This tells query which uri to use so it can build the cursor in SingleMovieCursorBuilder
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
+
+        // The values are determined while the cursor is being built in SingleMovieCursorBuilder
         final String[] projection = null;
         final String selection = null;
-        final String[] selectionArgs = {String.valueOf(movieKey)};
+        final String[] selectionArgs = null;
         final String sortOrder = null;
 
         return new CursorLoader(getActivity(),

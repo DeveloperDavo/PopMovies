@@ -3,10 +3,8 @@ package com.example.android.popularmoviesapp;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +112,7 @@ class DetailAdapter extends CursorAdapter {
 
     private void setVideoText(ViewHolder viewHolder, Cursor cursor) {
         final int videoCount = cursor.getPosition();
-        viewHolder.videoTextView.setText("Video " + videoCount);
+        viewHolder.videoTextView.setText("Trailer " + videoCount);
     }
 
     private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
@@ -164,8 +162,6 @@ class DetailAdapter extends CursorAdapter {
                 final Cursor newCursor = buildNewCursorFrom(cursor);
                 swapCursor(newCursor);
                 notifyDataSetChanged();
-                Log.d(LOG_TAG, "cursorDump: " + DatabaseUtils.dumpCursorToString(cursor));
-                Log.d(LOG_TAG, "cursorDump newCursor: " + DatabaseUtils.dumpCursorToString(newCursor));
             }
         });
     }
