@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
@@ -53,6 +54,22 @@ public class SingleMovieCursorBuilder {
                         "." + VideoEntry.COLUMN_MOVIE_KEY);
     }
 
+    private static final SQLiteQueryBuilder REVIEWS_MOVIE_FAV_JOIN;
+
+    static {
+        REVIEWS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
+
+        //This is an inner join which looks like
+        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_key
+        REVIEWS_MOVIE_FAV_JOIN.setTables(
+                MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                        ReviewEntry.TABLE_NAME +
+                        " ON " + MovieEntry.TABLE_NAME +
+                        "." + MovieEntry._ID +
+                        " = " + ReviewEntry.TABLE_NAME +
+                        "." + ReviewEntry.COLUMN_MOVIE_KEY);
+    }
+
     public Cursor build() {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
@@ -85,7 +102,16 @@ public class SingleMovieCursorBuilder {
                 orderBy
         );
 
-        return new MergeCursor(new Cursor[]{movieCursor, videoCursor});
+        final Cursor reviewsCursor = REVIEWS_MOVIE_FAV_JOIN.query(readableDatabase,
+                allColumns,
+                SINGLE_MOVIE_SELECTION,
+                selectionArgs,
+                groupBy,
+                having,
+                orderBy
+        );
+
+        return new MergeCursor(new Cursor[]{movieCursor, videoCursor, reviewsCursor});
     }
 
 }

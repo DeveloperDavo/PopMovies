@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,14 +40,12 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.d(LOG_TAG, "onSaveInstanceState");
         if (selectedPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, selectedPosition);
         }
@@ -58,7 +55,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreateView");
 
         posterAdapter = new PosterAdapter(getActivity(), null, 0);
 
@@ -88,15 +84,24 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
              * @param parent the AdapterView where the click happened
              * @param view the view within the AdapterView that was clicked
              *             (this will be a view provided by the adapter)
-             * @param position the position of the view in the adapter
-             * @param id the row id of the item that was clicked
+             * @param position the position of the cursor in the adapter
+             * @param id the cursor id of the item that was clicked. In this case it is the movie._ID
              */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // call onItemSelected, which is overridden in MainActivity
-                ((Callback) getActivity()).onItemSelected(id);
+
                 selectedPosition = position;
-                Utility.setPosition(getContext(), selectedPosition);
+
+                // TODO: get movieId
+                final long movieId = 244786;
+
+                // onItemSelected is overridden in MainActivity
+                ((Callback) getActivity()).onItemSelected(id);
+
+                new FetchReviewsTask(getContext(), id, movieId).execute();
+
+                // persist position so it can be later restored
+                Utility.setPosition(getContext(), position);
             }
         });
     }
@@ -109,13 +114,11 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        Log.d(LOG_TAG, "onCreateOptionsMenu");
         inflater.inflate(R.menu.movie_posters, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        Log.d(LOG_TAG, "onOptionsItemSelected");
         int id = item.getItemId();
 
 //        PopMoviesSyncAdapter.syncImmediately(getContext());
@@ -151,7 +154,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     }
 
     private void setPreferences(String selection, String selectionArg, String sortOrder) {
-//        Log.d(LOG_TAG, "setPreferences");
         Utility.setSelection(getContext(), selection);
         Utility.setSelectionArg(getContext(), selectionArg);
         Utility.setSortOrder(getContext(), sortOrder);
@@ -160,8 +162,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Log.d(LOG_TAG, "onCreateLoader");
-
         final String[] projection = {
                 MovieEntry.TABLE_NAME + "." + MovieEntry._ID,
                 MovieEntry.COLUMN_POSTER,
@@ -189,8 +189,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        Log.d(LOG_TAG, "onLoaderFinished");
-
         posterAdapter.swapCursor(data);
 
         if (selectedPosition != GridView.INVALID_POSITION) {
@@ -200,7 +198,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.d(LOG_TAG, "onLoaderReset");
         posterAdapter.swapCursor(null);
     }
 

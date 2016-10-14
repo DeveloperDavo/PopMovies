@@ -150,7 +150,7 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
 
         }
 
-        // TODO not to be used so often in final version
+        // TODO: insertOrUpdate
         bulkInsert(contentValuesVector);
 //        final Cursor cursor = context.getContentResolver().query(ReviewEntry.CONTENT_URI, null, null, null, null);
 //        Log.d(LOG_TAG, "review query: " + DatabaseUtils.dumpCursorToString(cursor));
@@ -162,7 +162,7 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
             contentValuesVector.toArray(contentValuesArray);
             int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
-//            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
         }
     }
 
