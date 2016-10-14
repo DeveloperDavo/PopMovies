@@ -92,7 +92,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
                 selectedPosition = position;
 
-                final long movieId = Utility.getMovieIdFromMovieKey(getContext(), id);
+                final long movieId = Utility.getMovieIdFromMovieKey(getContext(), id, position);
 
                 // onItemSelected is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);

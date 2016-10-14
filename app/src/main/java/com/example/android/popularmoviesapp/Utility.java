@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
@@ -99,9 +100,8 @@ public class Utility {
         return cursor.getString(columnIndex);
     }
 
-    static long getMovieIdFromMovieKey(Context context, long movieKey) {
-        final Cursor cursor = querySingleMovieUri(context, movieKey);
-        cursor.moveToFirst();
+    static long getMovieIdFromMovieKey(Context context, long movieKey, int position) {
+        final Cursor cursor = getSingleMovieCursorAndMoveTo(context, position, movieKey);
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
         return cursor.getLong(columnIndex);
     }
@@ -119,6 +119,13 @@ public class Utility {
                 selection,
                 selectionArgs,
                 sortOrder);
+    }
+
+    @NonNull
+    static Cursor getSingleMovieCursorAndMoveTo(Context context, int position, long movieKey) {
+        final Cursor cursor = Utility.querySingleMovieUri(context, movieKey);
+        cursor.moveToPosition(position);
+        return cursor;
     }
 
     /* Helper methods */
