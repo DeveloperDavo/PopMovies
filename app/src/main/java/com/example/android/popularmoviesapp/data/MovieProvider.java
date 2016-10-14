@@ -205,7 +205,6 @@ public class MovieProvider extends ContentProvider {
                 rowsUpdated = writableDatabase.update(ReviewEntry.TABLE_NAME,
                         values, selection, selectionArgs);
                 break;
-            // TODO videos
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -226,7 +225,6 @@ public class MovieProvider extends ContentProvider {
                 return bulkInsertEntries(MovieEntry.TABLE_NAME, uri, values);
             case MovieUriMatcher.REVIEWS_CODE:
                 return bulkInsertEntries(ReviewEntry.TABLE_NAME, uri, values);
-            // TODO videos
             default:
                 return super.bulkInsert(uri, values);
         }

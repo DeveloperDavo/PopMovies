@@ -42,8 +42,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_RELEASE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0);";
 
-        // TODO: make movie_id a foreign key
-        // TODO: review_id should be text
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
                 ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +

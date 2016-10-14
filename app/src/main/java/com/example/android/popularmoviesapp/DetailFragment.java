@@ -113,8 +113,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     private Loader<Cursor> buildDetailCursorLoader() {
 
-        // TODO: update selection args to take the movie id (after updating db)
-
         // This tells query which uri to use so it can build the cursor in SingleMovieCursorBuilder
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
 

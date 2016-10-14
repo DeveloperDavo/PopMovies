@@ -25,7 +25,6 @@ public class SingleMovieCursorBuilder {
         this.uri = uri;
     }
 
-    // TODO: update to movie_id (after updating db)
     // movies._ID = ?
     private static final String SINGLE_MOVIE_SELECTION =
             MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ?";
@@ -54,8 +53,6 @@ public class SingleMovieCursorBuilder {
                         "." + VideoEntry.COLUMN_MOVIE_KEY);
     }
 
-    // TODO: update selection args to take the movie id (after updating db)
-    // TODO: same thing with movieKey
     public Cursor build() {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();

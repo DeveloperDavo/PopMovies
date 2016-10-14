@@ -97,8 +97,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
              */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: pass movieInfoParser instead of movieJsonStr - obsolete??
-
                 // call onItemSelected, which is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
                 selectedPosition = position;
@@ -125,7 +123,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 //        Log.d(LOG_TAG, "onOptionsItemSelected");
         int id = item.getItemId();
 
-        // TODO: remove
 //        PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {

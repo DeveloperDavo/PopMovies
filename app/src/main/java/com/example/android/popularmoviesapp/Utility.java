@@ -99,7 +99,6 @@ public class Utility {
         return cursor.getString(columnIndex);
     }
 
-    // TODO: update selection args to take the movie id (after updating db)
     static Cursor querySingleMovieUri(Context context, long movieKey) {
         final Uri uri = MovieEntry.buildMovieUri(movieKey);
         final String[] projection = null;

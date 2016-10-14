@@ -152,7 +152,6 @@ class MoviesSyncer {
 //        final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
         final String posterUrl = "http://image.tmdb.org/t/p/w185/" + posterPath;
 
-        // TODO only poster_path and movie id is necessary for the main activity
         insertOrUpdate(context, movieId, title, posterUrl, overview, rating, popularity, release,
                 favorite);
     }
@@ -234,15 +233,13 @@ class MoviesSyncer {
 
         // extract movieRowId from URI
         movieRowId = ContentUris.parseId(insertedUri);
-        // TODO: move to insertOrUpdate after db has been updated
+
         syncVideos(context, movieRowId, movieId);
         // TODO: sync reviews
 
         return movieRowId;
     }
 
-    // TODO: is there a better place for this? Does it make sense to put it in FRT?
-    // TODO: after updating db, only need movieId
     private static void syncVideos(Context context, long movieKey, long movieId) {
         VideoSyncer.syncVideos(context, movieKey, movieId);
     }
