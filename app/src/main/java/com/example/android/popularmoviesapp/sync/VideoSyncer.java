@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.android.popularmoviesapp.BuildConfig;
+import com.example.android.popularmoviesapp.Utility;
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 import org.json.JSONArray;
@@ -30,22 +31,32 @@ import java.net.URL;
 public class VideoSyncer {
     private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
 
+    private Context context;
+    private long movieKey;
+    private long movieId;
+
+    public VideoSyncer(Context context, long movieKey, long movieId) {
+        this.context = context;
+        this.movieKey = movieKey;
+        this.movieId = movieId;
+    }
+
     /**
      * Gets video data with a http request.
      * Parses data as a JSON string
      * and persists it.
      */
-    static void sync(Context context, long movieKey, long movieId) {
+    void sync() {
 
         // Declared outside in order to be closed in finally block
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
         try {
-            final URL url = buildUrl(movieId);
+            final URL url = buildUrl();
 //            Log.d(LOG_TAG, "url: " + url);
-            urlConnection = connect(url);
-            reader = persistDataFromServer(context, movieKey, urlConnection);
+            urlConnection = Utility.connect(url);
+            reader = persistDataFromServer(urlConnection);
         } catch (IOException | JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         } finally {
@@ -54,7 +65,7 @@ public class VideoSyncer {
     }
 
     @NonNull
-    static URL buildUrl(long movieId) throws MalformedURLException {
+    URL buildUrl() throws MalformedURLException {
         // https://www.themoviedb.org/
         final String BASE_URL = "http://api.themoviedb.org/3/movie/";
         final String API_PARAM = "api_key";
@@ -69,16 +80,7 @@ public class VideoSyncer {
     }
 
     @NonNull
-    private static HttpURLConnection connect(URL url) throws IOException {
-        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.connect();
-        return urlConnection;
-    }
-
-    @NonNull
-    private static BufferedReader persistDataFromServer(
-            Context context, long movieKey, HttpURLConnection urlConnection)
+    private BufferedReader persistDataFromServer(HttpURLConnection urlConnection)
             throws IOException, JSONException {
 
         // read the input stream into a string
@@ -95,13 +97,12 @@ public class VideoSyncer {
         final String videosJsonStr = buffer.toString();
 //                Log.d(LOG_TAG, "videosJsonStr: " + videosJsonStr);
 
-        parseAndPersistData(context, videosJsonStr, movieKey);
+        parseAndPersistData(videosJsonStr);
 
         return reader;
     }
 
-    static void parseAndPersistData(Context context, String videosJsonStr,
-                                    long movieKey) throws JSONException {
+    void parseAndPersistData(String videosJsonStr) throws JSONException {
 
         final String MD_RESULTS = "results";
 
@@ -109,12 +110,11 @@ public class VideoSyncer {
         final JSONArray videos = data.getJSONArray(MD_RESULTS);
 
         for (int i = 0; i < videos.length(); i++) {
-            parseAndPersistVideo(context, movieKey, videos, i);
+            parseAndPersistVideo(videos, i);
         }
     }
 
-    private static void parseAndPersistVideo(
-            Context context, long movieKey, JSONArray videos, int i) throws JSONException {
+    private void parseAndPersistVideo(JSONArray videos, int i) throws JSONException {
 
         final String MD_KEY = "key";
         final String MD_ID = "id";
@@ -128,23 +128,22 @@ public class VideoSyncer {
         final String site = videosData.getString(MD_SITE);
         final String type = videosData.getString(MD_TYPE);
 
-        insertOrUpdate(context, movieKey, id, key, site, type);
+        insertOrUpdate(id, key, site, type);
     }
 
-    private static long insertOrUpdate(
-            Context context, long movieKey, String id, String key, String site, String type) {
+    private long insertOrUpdate(String id, String key, String site, String type) {
 
-        final Cursor videoCursor = queryVideoId(context, id);
+        final Cursor videoCursor = queryVideoId(id);
         long _id = getRowIdFrom(videoCursor);
 
         if (-1 == _id) {
-            return insert(context, movieKey, id, key, site, type);
+            return insert(id, key, site, type);
         } else {
-            return update(context, _id, movieKey, id, key, site, type);
+            return update(_id, id, key, site, type);
         }
     }
 
-    static Cursor queryVideoId(Context context, String videoId) {
+    Cursor queryVideoId(String videoId) {
 
         final String[] projection = null;
         final String selection = VideoEntry.COLUMN_VIDEO_ID + " = ?";
@@ -158,7 +157,7 @@ public class VideoSyncer {
                 null); // sortOrder
     }
 
-    static long getRowIdFrom(Cursor videoCursor) {
+    long getRowIdFrom(Cursor videoCursor) {
         long _id = -1;
         if (videoCursor.moveToFirst()) {
             int videoKeyIndex = videoCursor.getColumnIndex(VideoEntry._ID);
@@ -170,10 +169,10 @@ public class VideoSyncer {
     /**
      * @return _ID of video being inserted
      */
-    static long insert(
-            Context context, long movieKey, String id, String key, String site, String type) {
+    long insert(
+            String id, String key, String site, String type) {
 
-        final ContentValues videoValues = getContentValuesFrom(movieKey, id, key, site, type);
+        final ContentValues videoValues = getContentValuesFrom(id, key, site, type);
 
         final Uri insertedUri = context.getContentResolver().insert(
                 VideoEntry.CONTENT_URI, videoValues);
@@ -184,10 +183,10 @@ public class VideoSyncer {
     /**
      * @return number of videos updated
      */
-    static int update(
-            Context context, long _id, long movieKey, String id, String key, String site, String type) {
+    int update(
+            long _id, String id, String key, String site, String type) {
 
-        final ContentValues videoValues = getContentValuesFrom(movieKey, id, key, site, type);
+        final ContentValues videoValues = getContentValuesFrom(id, key, site, type);
 
         final String where = VideoEntry._ID + " = ?";
         final String[] selectionArgs = {Long.toString(_id)};
@@ -196,8 +195,7 @@ public class VideoSyncer {
     }
 
     @NonNull
-    private static ContentValues getContentValuesFrom(
-            long movieKey, String id, String key, String site, String type) {
+    private ContentValues getContentValuesFrom(String id, String key, String site, String type) {
 
         ContentValues videoValues = new ContentValues();
 
@@ -210,7 +208,7 @@ public class VideoSyncer {
         return videoValues;
     }
 
-    private static void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
+    private void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
         if (urlConnection != null) {
             urlConnection.disconnect();
         }

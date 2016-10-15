@@ -9,7 +9,6 @@ import com.example.android.popularmoviesapp.data.TestUtilities;
 
 import java.net.URL;
 
-import static com.example.android.popularmoviesapp.sync.VideoSyncer.queryVideoId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -18,10 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestVideoSyncer extends AndroidTestCase {
 
-    public static final String VIDEO_ID = "54e013519251411956004b09";
-    public static final String VIDEO_KEY = "fHAfUSBc0pg";
-    public static final String VIDEO_SITE = "YouTube";
-    public static final String VIDEO_TYPE = "Trailer";
+    private static final int MOVIE_ID = 244786;
+
+    private static final String VIDEO_ID = "54e013519251411956004b09";
+    private static final String VIDEO_KEY = "fHAfUSBc0pg";
+    private static final String VIDEO_SITE = "YouTube";
+    private static final String VIDEO_TYPE = "Trailer";
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_PARAM = "api_key";
@@ -29,7 +30,7 @@ public class TestVideoSyncer extends AndroidTestCase {
     private long movieRowId;
 
     private static final String VIDEOS_JSON_STRING = "{\n" +
-            "  \"id\": 244786,\n" +
+            "  \"id\": " + MOVIE_ID + ",\n" +
             "  \"results\": [\n" +
             "    {\n" +
             "      \"id\": \"543d8f250e0a266f7d00059f\",\n" +
@@ -64,14 +65,14 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_buildUrl() throws Exception {
 
         // GIVEN
-        final long movieId = 128;
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
         final String expectedUrl = BASE_URL
-                + movieId
+                + MOVIE_ID
                 + "/" + "videos" + "?"
                 + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
 
         // WHEN
-        final URL url = VideoSyncer.buildUrl(movieId);
+        final URL url = videoSyncer.buildUrl();
 
         // THEN
         assertThat(url.toString()).isEqualTo(expectedUrl);
@@ -79,9 +80,12 @@ public class TestVideoSyncer extends AndroidTestCase {
 
     public void test_parseAndPersistData() throws Exception {
 
+        // GIVEN
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
+
         // WHEN
-        VideoSyncer.parseAndPersistData(mContext, VIDEOS_JSON_STRING, movieRowId);
-        final Cursor cursor = queryVideoId(mContext, VIDEO_ID);
+        videoSyncer.parseAndPersistData(VIDEOS_JSON_STRING);
+        final Cursor cursor = videoSyncer.queryVideoId(VIDEO_ID);
         boolean isCursor = cursor.moveToLast();
 
         // THEN
@@ -102,11 +106,12 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_queryVideoId_withExistingVideo() throws Exception {
 
         // GIVEN
-        insertTestVideo();
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
+        insertTestVideo(videoSyncer);
 
         // WHEN
-        final Cursor cursor = VideoSyncer.queryVideoId(mContext, VIDEO_ID);
-        long videosUpdated = VideoSyncer.getRowIdFrom(cursor);
+        final Cursor cursor = videoSyncer.queryVideoId(VIDEO_ID);
+        long videosUpdated = videoSyncer.getRowIdFrom(cursor);
 
         // THEN
         assertThat(videosUpdated).isNotEqualTo(-1);
@@ -115,24 +120,30 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_queryVideoId_withNewVideo() throws Exception {
 
         // GIVEN
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
         final String id = "fgh456"; // this id should never be inserted
 
         // WHEN
-        final Cursor cursor = VideoSyncer.queryVideoId(mContext, VIDEO_ID);
-        long _id = VideoSyncer.getRowIdFrom(cursor);
+        final Cursor cursor = videoSyncer.queryVideoId(id);
+        long _id = videoSyncer.getRowIdFrom(cursor);
 
         // THEN
         assertThat(_id).isEqualTo(-1);
     }
 
     public void test_insert() throws Exception {
-        insertTestVideo();
+
+        // GIVEN
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
+
+        // WHEN and THEN
+        insertTestVideo(videoSyncer);
     }
 
-    private long insertTestVideo() {
+    private long insertTestVideo(VideoSyncer videoSyncer) {
 
         // WHEN
-        long _id = VideoSyncer.insert(mContext, movieRowId, VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
+        long _id = videoSyncer.insert(VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
 
         // THEN
         assertThat(_id).isNotEqualTo(-1);
@@ -143,14 +154,11 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_update() throws Exception {
 
         // GIVEN
-        final long _id = insertTestVideo();
-        final String id = VIDEO_ID;
-        final String key = null;
-        final String site = null;
-        final String type = null;
+        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID);
+        final long _id = insertTestVideo(videoSyncer);
 
         // WHEN
-        final long videosUpdated = VideoSyncer.update(mContext, _id, movieRowId, id, key, site, type);
+        final long videosUpdated = videoSyncer.update(_id, VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
 
         // THEN
         assertThat(videosUpdated).isEqualTo(1);
