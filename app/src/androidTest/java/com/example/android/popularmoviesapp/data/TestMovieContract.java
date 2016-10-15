@@ -15,15 +15,15 @@ public class TestMovieContract extends AndroidTestCase {
     public void test_buildMovieUri() {
 
         // GIVEN
-        final int _id = 14;
+        final int rowId = 14;
 
         // WHEN
-        final Uri movieUri = MovieEntry.buildMovieUri(_id);
+        final Uri movieUri = MovieEntry.buildMovieUri(rowId);
 
         // THEN
         assertNotNull(movieUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + PATH_MOVIES + "/" + _id,
+                BASE_URL + PATH_MOVIES + "/" + rowId,
                 movieUri.toString());
     }
 
@@ -45,15 +45,15 @@ public class TestMovieContract extends AndroidTestCase {
     public void test_buildVideoUri() {
 
         // GIVEN
-        final int _id = 1;
+        final int rowId = 1;
 
         // WHEN
-        final Uri videoUri = VideoEntry.buildVideoUri(_id);
+        final Uri videoUri = VideoEntry.buildVideoUri(rowId);
 
         // THEN
         assertNotNull(videoUri);
         assertEquals("Error: Uri doesn't match expected result",
-                BASE_URL + PATH_VIDEOS + "/" + _id,
+                BASE_URL + PATH_VIDEOS + "/" + rowId,
                 videoUri.toString());
     }
 

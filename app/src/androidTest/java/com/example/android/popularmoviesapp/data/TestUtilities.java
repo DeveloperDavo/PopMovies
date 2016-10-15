@@ -104,7 +104,7 @@ public class TestUtilities extends AndroidTestCase {
     // default review values
     static ContentValues createReviewValues(long moviesRowId) {
         ContentValues reviewValues = new ContentValues();
-        reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, moviesRowId);
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, moviesRowId);
         reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, 5);
         reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "David S");
         reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
@@ -115,7 +115,7 @@ public class TestUtilities extends AndroidTestCase {
     // default video values
     static ContentValues createVideoValues(long moviesRowId) {
         ContentValues videoValues = new ContentValues();
-        videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, moviesRowId);
+        videoValues.put(VideoEntry.COLUMN_MOVIE_ROW_ID, moviesRowId);
         videoValues.put(VideoEntry.COLUMN_VIDEO_ID, "videoId_ADFK");
         videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, "videoKey_ASFDJK");
         videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, "YouTube");
@@ -170,7 +170,7 @@ public class TestUtilities extends AndroidTestCase {
 
         for (int i = 0; i < BULK_INSERT_SIZE_REVIEWS; i++) {
             ContentValues reviewValues = new ContentValues();
-            reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, 1000);
+            reviewValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, 1000);
             reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, "abc" + i);
             reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "author" + i);
             reviewValues.put(ReviewEntry.COLUMN_CONTENT, "I give this review " + i + " out of 10");

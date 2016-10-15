@@ -9,13 +9,13 @@ import android.util.Log;
 public class DetailActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
-    public static final String MOVIE_KEY = "movie_key";
+    public static final String MOVIE_ROW_ID = "movie_row_id";
 
-    public static Intent newIntent(Context context, long movieKey) {
+    public static Intent newIntent(Context context, long movieRowId) {
         Log.d(LOG_TAG, "newIntent");
 
         final Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra(MOVIE_KEY, movieKey);
+        intent.putExtra(MOVIE_ROW_ID, movieRowId);
         return intent;
     }
 
@@ -30,7 +30,7 @@ public class DetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
             long defaultValue = -1;
-            arguments.putLong(DetailFragment.MOVIE_KEY, getIntent().getLongExtra(MOVIE_KEY, defaultValue));
+            arguments.putLong(DetailFragment.MOVIE_ROW_ID, getIntent().getLongExtra(MOVIE_ROW_ID, defaultValue));
 
             final DetailFragment detailFragment = DetailFragment.newInstance();
             detailFragment.setArguments(arguments);

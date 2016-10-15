@@ -90,7 +90,7 @@ public class TestDb extends AndroidTestCase {
         // review entry columns
         final HashSet<String> reviewColumnHashSet = new HashSet<>();
         reviewColumnHashSet.add(ReviewEntry._ID);
-        reviewColumnHashSet.add(ReviewEntry.COLUMN_MOVIE_KEY);
+        reviewColumnHashSet.add(ReviewEntry.COLUMN_MOVIE_ROW_ID);
         reviewColumnHashSet.add(ReviewEntry.COLUMN_REVIEW_ID);
         reviewColumnHashSet.add(ReviewEntry.COLUMN_AUTHOR);
         reviewColumnHashSet.add(ReviewEntry.COLUMN_CONTENT);
@@ -113,7 +113,7 @@ public class TestDb extends AndroidTestCase {
         // video entry columns
         final HashSet<String> videoColumnHashSet = new HashSet<>();
         videoColumnHashSet.add(VideoEntry._ID);
-        videoColumnHashSet.add(VideoEntry.COLUMN_MOVIE_KEY);
+        videoColumnHashSet.add(VideoEntry.COLUMN_MOVIE_ROW_ID);
         videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_ID);
         videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_KEY);
         videoColumnHashSet.add(VideoEntry.COLUMN_VIDEO_SITE);

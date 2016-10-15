@@ -27,13 +27,13 @@ public abstract class AbstractSyncer {
     private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
 
     protected Context context;
-    protected long movieKey;
+    protected long movieRowId;
     protected long movieId;
     protected String path;
 
-    public AbstractSyncer(Context context, long movieKey, long movieId, String path) {
+    public AbstractSyncer(Context context, long movieRowId, long movieId, String path) {
         this.context = context;
-        this.movieKey = movieKey;
+        this.movieRowId = movieRowId;
         this.movieId = movieId;
         this.path = path;
     }

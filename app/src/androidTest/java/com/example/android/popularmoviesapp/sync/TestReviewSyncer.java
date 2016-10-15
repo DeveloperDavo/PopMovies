@@ -84,7 +84,7 @@ public class TestReviewSyncer extends AndroidTestCase {
 
         // THEN
         assertThat(isCursor).isTrue();
-        assertThat(cursor.getLong(cursor.getColumnIndex(ReviewEntry.COLUMN_MOVIE_KEY)))
+        assertThat(cursor.getLong(cursor.getColumnIndex(ReviewEntry.COLUMN_MOVIE_ROW_ID)))
                 .isEqualTo(movieRowId);
         assertThat(cursor.getString(cursor.getColumnIndex(ReviewEntry.COLUMN_REVIEW_ID)))
                 .isEqualTo(REVIEW_ID);
@@ -119,10 +119,10 @@ public class TestReviewSyncer extends AndroidTestCase {
 
         // WHEN
         final Cursor cursor = reviewSyncer.queryReviewId(REVIEW_ID);
-        long _id = reviewSyncer.getRowIdFrom(cursor);
+        long rowId = reviewSyncer.getRowIdFrom(cursor);
 
         // THEN
-        assertThat(_id).isEqualTo(-1);
+        assertThat(rowId).isEqualTo(-1);
     }
 
     public void test_insert() throws Exception {
@@ -137,22 +137,22 @@ public class TestReviewSyncer extends AndroidTestCase {
     private long insertTestVideo(ReviewSyncer reviewSyncer) {
 
         // WHEN
-        long _id = reviewSyncer.insert(REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
+        long rowId = reviewSyncer.insert(REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
 
         // THEN
-        assertThat(_id).isNotEqualTo(-1);
+        assertThat(rowId).isNotEqualTo(-1);
 
-        return _id;
+        return rowId;
     }
 
     public void test_update() throws Exception {
 
         // GIVEN
         final ReviewSyncer revieSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
-        final long _id = insertTestVideo(revieSyncer);
+        final long rowId = insertTestVideo(revieSyncer);
 
         // WHEN
-        final long videosUpdated = revieSyncer.update(_id, REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
+        final long videosUpdated = revieSyncer.update(rowId, REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
 
         // THEN
         assertThat(videosUpdated).isEqualTo(1);

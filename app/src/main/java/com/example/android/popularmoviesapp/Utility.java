@@ -101,8 +101,8 @@ public class Utility {
         return cursor.getString(columnIndex);
     }
 
-    static long getMovieIdFromMovieKey(Context context, long movieKey, int position) {
-        final Cursor cursor = getSingleMovieCursorAndMoveToPosition(context, position, movieKey);
+    static long getMovieIdFromMovieKey(Context context, long movieRowId, int position) {
+        final Cursor cursor = getSingleMovieCursorAndMoveToPosition(context, position, movieRowId);
         int columnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
         return cursor.getLong(columnIndex);
     }
@@ -123,8 +123,8 @@ public class Utility {
     }
 
     @NonNull
-    static Cursor getSingleMovieCursorAndMoveToPosition(Context context, int position, long movieKey) {
-        final Cursor cursor = Utility.querySingleMovieUri(context, movieKey);
+    static Cursor getSingleMovieCursorAndMoveToPosition(Context context, int position, long movieRowId) {
+        final Cursor cursor = Utility.querySingleMovieUri(context, movieRowId);
         cursor.moveToPosition(position);
         return cursor;
     }

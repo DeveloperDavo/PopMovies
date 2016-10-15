@@ -69,12 +69,12 @@ public class TestProvider extends AndroidTestCase {
     public void test_getType_movie() {
 
         // GIVEN
-        final int _id = 12;
+        final int rowId = 12;
 
         // WHEN
         // content://com.example.android.popularmoviesapp/movies/12/
         final String type = mContext.getContentResolver().
-                getType(MovieEntry.buildMovieUri(_id));
+                getType(MovieEntry.buildMovieUri(rowId));
 
         // THEN
         // vnd.android.cursor.dir/com.example.android.popularmoviesapp/movies/789

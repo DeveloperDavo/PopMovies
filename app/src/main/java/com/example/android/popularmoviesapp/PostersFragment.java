@@ -212,7 +212,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(long movieKey);
+        void onItemSelected(long movieRowId);
     }
 }
 

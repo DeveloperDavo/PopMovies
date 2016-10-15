@@ -16,7 +16,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntr
 public class MovieDbHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = MovieDbHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -44,7 +44,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " (" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
-                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER, " +
+                ReviewEntry.COLUMN_MOVIE_ROW_ID + " INTEGER, " +
                 ReviewEntry.COLUMN_REVIEW_ID + " INTEGER, " +
                 ReviewEntry.COLUMN_AUTHOR + " TEXT, " +
                 ReviewEntry.COLUMN_CONTENT + " TEXT, " +
@@ -52,7 +52,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_VIDEOS_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY, " +
-                VideoEntry.COLUMN_MOVIE_KEY + " INTEGER, " +
+                VideoEntry.COLUMN_MOVIE_ROW_ID + " INTEGER, " +
                 VideoEntry.COLUMN_VIDEO_ID + " TEXT, " +
                 VideoEntry.COLUMN_VIDEO_KEY + " TEXT, " +
                 VideoEntry.COLUMN_VIDEO_SITE + " TEXT, " +

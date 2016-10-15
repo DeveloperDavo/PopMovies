@@ -26,8 +26,8 @@ import java.net.URL;
 public class VideoSyncer extends AbstractSyncer {
     private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
 
-    public VideoSyncer(Context context, long movieKey, long movieId, String path) {
-        super(context, movieKey, movieId, path);
+    public VideoSyncer(Context context, long movieRowId, long movieId, String path) {
+        super(context, movieRowId, movieId, path);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class VideoSyncer extends AbstractSyncer {
     private long insertOrUpdate(String id, String key, String site, String type) {
 
         final Cursor videoCursor = queryVideoId(id);
-        long _id = getRowIdFrom(videoCursor);
+        long rowId = getRowIdFrom(videoCursor);
 
-        if (-1 == _id) {
+        if (-1 == rowId) {
             return insert(id, key, site, type);
         } else {
-            return update(_id, id, key, site, type);
+            return update(rowId, id, key, site, type);
         }
     }
 
@@ -108,12 +108,12 @@ public class VideoSyncer extends AbstractSyncer {
     }
 
     long getRowIdFrom(Cursor videoCursor) {
-        long _id = -1;
+        long rowId = -1;
         if (videoCursor.moveToFirst()) {
             int videoKeyIndex = videoCursor.getColumnIndex(VideoEntry._ID);
-            _id = videoCursor.getLong(videoKeyIndex);
+            rowId = videoCursor.getLong(videoKeyIndex);
         }
-        return _id;
+        return rowId;
     }
 
     /**
@@ -132,12 +132,12 @@ public class VideoSyncer extends AbstractSyncer {
     /**
      * @return number of videos updated
      */
-    int update(long _id, String id, String key, String site, String type) {
+    int update(long rowId, String id, String key, String site, String type) {
 
         final ContentValues videoValues = getContentValuesFrom(id, key, site, type);
 
         final String where = VideoEntry._ID + " = ?";
-        final String[] selectionArgs = {Long.toString(_id)};
+        final String[] selectionArgs = {Long.toString(rowId)};
         return context.getContentResolver().update(
                 VideoEntry.CONTENT_URI, videoValues, where, selectionArgs);
     }
@@ -147,7 +147,7 @@ public class VideoSyncer extends AbstractSyncer {
 
         ContentValues videoValues = new ContentValues();
 
-        videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, movieKey);
+        videoValues.put(VideoEntry.COLUMN_MOVIE_ROW_ID, movieRowId);
         videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, key);
         videoValues.put(VideoEntry.COLUMN_VIDEO_ID, id);
         videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, site);

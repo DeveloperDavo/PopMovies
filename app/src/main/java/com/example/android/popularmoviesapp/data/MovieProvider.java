@@ -121,10 +121,10 @@ public class MovieProvider extends ContentProvider {
     private Uri insertMovieEntries(Uri uri, ContentValues values) {
 
         Uri returnUri;
-        final long _id = movieDbHelper.getWritableDatabase().
+        final long rowId = movieDbHelper.getWritableDatabase().
                 insert(MovieEntry.TABLE_NAME, null, values);
-        if (_id > 0)
-            returnUri = MovieEntry.buildMovieUri(_id);
+        if (rowId > 0)
+            returnUri = MovieEntry.buildMovieUri(rowId);
         else
             throw new android.database.SQLException("Failed to insert row into " + uri);
         return returnUri;
@@ -133,10 +133,10 @@ public class MovieProvider extends ContentProvider {
     private Uri insertReviewEntries(Uri uri, ContentValues values) {
 
         Uri returnUri;
-        final long _id = movieDbHelper.getWritableDatabase().
+        final long rowId = movieDbHelper.getWritableDatabase().
                 insert(ReviewEntry.TABLE_NAME, null, values);
-        if (_id > 0)
-            returnUri = ReviewEntry.buildReviewUri(_id);
+        if (rowId > 0)
+            returnUri = ReviewEntry.buildReviewUri(rowId);
         else
             throw new android.database.SQLException("Failed to insert row into " + uri);
         return returnUri;
@@ -145,10 +145,10 @@ public class MovieProvider extends ContentProvider {
     private Uri insertVideoEntries(Uri uri, ContentValues values) {
 
         Uri returnUri;
-        final long _id = movieDbHelper.getWritableDatabase().
+        final long rowId = movieDbHelper.getWritableDatabase().
                 insert(VideoEntry.TABLE_NAME, null, values);
-        if (_id > 0)
-            returnUri = VideoEntry.buildVideoUri(_id);
+        if (rowId > 0)
+            returnUri = VideoEntry.buildVideoUri(rowId);
         else
             throw new android.database.SQLException("Failed to insert row into " + uri);
         return returnUri;
@@ -246,13 +246,13 @@ public class MovieProvider extends ContentProvider {
                 if (value == null) {
                     throw new IllegalArgumentException("Cannot have null content values");
                 }
-                long _id = -1;
+                long rowId = -1;
                 try {
-                    _id = writableDatabase.insertOrThrow(tableName, null, value);
+                    rowId = writableDatabase.insertOrThrow(tableName, null, value);
                 } catch (SQLiteConstraintException e) {
                     Log.w(LOG_TAG, "Value is already in database.");
                 }
-                if (_id != -1) {
+                if (rowId != -1) {
                     rowsInserted++;
                 }
             }

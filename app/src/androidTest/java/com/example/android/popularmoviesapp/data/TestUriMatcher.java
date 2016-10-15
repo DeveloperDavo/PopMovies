@@ -46,10 +46,10 @@ public class TestUriMatcher extends AndroidTestCase {
     public void test_match_movie() {
 
         // GIVEN
-        final int _id = 17;
+        final int rowId = 17;
 
-        // content://com.example.android.popularmoviesapp/movies/_id/"
-        final Uri movieItem = MovieContract.MovieEntry.buildMovieUri(_id);
+        // content://com.example.android.popularmoviesapp/movies/rowId/"
+        final Uri movieItem = MovieContract.MovieEntry.buildMovieUri(rowId);
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();

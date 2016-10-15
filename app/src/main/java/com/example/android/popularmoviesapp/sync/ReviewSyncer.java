@@ -26,8 +26,8 @@ import java.net.URL;
 public class ReviewSyncer extends AbstractSyncer {
     private static final String LOG_TAG = ReviewSyncer.class.getSimpleName();
 
-    public ReviewSyncer(Context context, long movieKey, long movieId, String path) {
-        super(context, movieKey, movieId, path);
+    public ReviewSyncer(Context context, long movieRowId, long movieId, String path) {
+        super(context, movieRowId, movieId, path);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class ReviewSyncer extends AbstractSyncer {
     private long insertOrUpdate(String reviewId, String author, String content, String url) {
 
         final Cursor reviewCursor = queryReviewId(reviewId);
-        long _id = getRowIdFrom(reviewCursor);
+        long rowId = getRowIdFrom(reviewCursor);
 
-        if (-1 == _id) {
+        if (-1 == rowId) {
             return insert(reviewId, author, content, url);
         } else {
-            return update(_id, reviewId, author, content, url);
+            return update(rowId, reviewId, author, content, url);
         }
     }
 
@@ -108,12 +108,12 @@ public class ReviewSyncer extends AbstractSyncer {
     }
 
     long getRowIdFrom(Cursor reviewCursor) {
-        long _id = -1;
+        long rowId = -1;
         if (reviewCursor.moveToFirst()) {
             int videoKeyIndex = reviewCursor.getColumnIndex(ReviewEntry._ID);
-            _id = reviewCursor.getLong(videoKeyIndex);
+            rowId = reviewCursor.getLong(videoKeyIndex);
         }
-        return _id;
+        return rowId;
     }
 
     /**
@@ -132,12 +132,12 @@ public class ReviewSyncer extends AbstractSyncer {
     /**
      * @return number of videos updated
      */
-    int update(long _id, String reviewId, String author, String content, String url) {
+    int update(long rowId, String reviewId, String author, String content, String url) {
 
         final ContentValues reviewValues = getContentValuesFrom(reviewId, author, content, url);
 
         final String where = ReviewEntry._ID + " = ?";
-        final String[] selectionArgs = {Long.toString(_id)};
+        final String[] selectionArgs = {Long.toString(rowId)};
         return context.getContentResolver().update(
                 ReviewEntry.CONTENT_URI, reviewValues, where, selectionArgs);
     }
@@ -148,7 +148,7 @@ public class ReviewSyncer extends AbstractSyncer {
 
         ContentValues videoValues = new ContentValues();
 
-        videoValues.put(ReviewEntry.COLUMN_MOVIE_KEY, movieKey);
+        videoValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, movieRowId);
         videoValues.put(ReviewEntry.COLUMN_REVIEW_ID, reviewId);
         videoValues.put(ReviewEntry.COLUMN_AUTHOR, author);
         videoValues.put(ReviewEntry.COLUMN_CONTENT, content);

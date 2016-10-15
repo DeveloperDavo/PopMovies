@@ -211,8 +211,8 @@ class DetailAdapter extends CursorAdapter {
 
     private Cursor buildNewCursorFrom(final Cursor oldCursor) {
         final int columnIndex = oldCursor.getColumnIndex(MovieEntry._ID);
-        final long movieKey = oldCursor.getLong(columnIndex);
-        return Utility.querySingleMovieUri(mContext, movieKey);
+        final long movieRowId = oldCursor.getLong(columnIndex);
+        return Utility.querySingleMovieUri(mContext, movieRowId);
     }
 
     /* Used to speed up loading the views within the list view */

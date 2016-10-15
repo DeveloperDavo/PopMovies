@@ -21,8 +21,8 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
-    public static final String MOVIE_KEY = "movie_key";
-    private long movieKey;
+    public static final String MOVIE_ROW_ID = "movie_row_id";
+    private long movieRowId;
     private DetailAdapter detailAdapter;
 
     private static final int DETAIL_LOADER = 0;
@@ -46,7 +46,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         final Bundle arguments = getArguments();
         if (arguments != null) {
-            movieKey = arguments.getLong(DetailFragment.MOVIE_KEY);
+            movieRowId = arguments.getLong(DetailFragment.MOVIE_ROW_ID);
         }
 
         // instantiate adapter
@@ -73,7 +73,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 final Cursor cursor = Utility.getSingleMovieCursorAndMoveToPosition(
-                        getContext(), position, movieKey);
+                        getContext(), position, movieRowId);
 
                 if (Utility.isVideosView(cursor)) {
                     final Uri videoUri = getVideoUriFrom(cursor);
@@ -110,7 +110,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // if detail fragment is created without data (ie two pane layout)
-        if (movieKey == -1) {
+        if (movieRowId == -1) {
             return null;
         }
 
@@ -121,7 +121,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Loader<Cursor> buildDetailCursorLoader() {
 
         // This tells query which uri to use so it can build the cursor in SingleMovieCursorBuilder
-        final Uri uri = MovieEntry.buildMovieUri(movieKey);
+        final Uri uri = MovieEntry.buildMovieUri(movieRowId);
 
         // The values are determined while the cursor is being built in SingleMovieCursorBuilder
         final String[] projection = null;

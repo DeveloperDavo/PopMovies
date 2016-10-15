@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity implements PostersFragment.C
     }
 
     @Override
-    public void onItemSelected(long movieKey) {
+    public void onItemSelected(long movieRowId) {
 
         // if two pane mode, show the detail view,
         // else launch detail activity
         if (twoPaneLayout) {
             final Bundle args = new Bundle();
-            args.putLong(DetailFragment.MOVIE_KEY, movieKey);
+            args.putLong(DetailFragment.MOVIE_ROW_ID, movieRowId);
 
             DetailFragment fragment = DetailFragment.newInstance();
             fragment.setArguments(args);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements PostersFragment.C
                     .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
                     .commit();
         } else {
-            startActivity(DetailActivity.newIntent(this, movieKey));
+            startActivity(DetailActivity.newIntent(this, movieRowId));
         }
     }
 }

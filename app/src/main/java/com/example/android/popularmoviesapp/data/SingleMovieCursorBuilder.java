@@ -44,14 +44,14 @@ public class SingleMovieCursorBuilder {
         VIDEOS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
-        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_key
+        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_row_id
         VIDEOS_MOVIE_FAV_JOIN.setTables(
                 MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
                         VideoEntry.TABLE_NAME +
                         " ON " + MovieEntry.TABLE_NAME +
                         "." + MovieEntry._ID +
                         " = " + VideoEntry.TABLE_NAME +
-                        "." + VideoEntry.COLUMN_MOVIE_KEY);
+                        "." + VideoEntry.COLUMN_MOVIE_ROW_ID);
     }
 
     private static final SQLiteQueryBuilder REVIEWS_MOVIE_FAV_JOIN;
@@ -60,14 +60,14 @@ public class SingleMovieCursorBuilder {
         REVIEWS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
-        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_key
+        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_row_id
         REVIEWS_MOVIE_FAV_JOIN.setTables(
                 MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
                         ReviewEntry.TABLE_NAME +
                         " ON " + MovieEntry.TABLE_NAME +
                         "." + MovieEntry._ID +
                         " = " + ReviewEntry.TABLE_NAME +
-                        "." + ReviewEntry.COLUMN_MOVIE_KEY);
+                        "." + ReviewEntry.COLUMN_MOVIE_ROW_ID);
     }
 
     public Cursor build() {
@@ -75,8 +75,8 @@ public class SingleMovieCursorBuilder {
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
         final String[] allColumns = null;
-        final long movieKey = ContentUris.parseId(uri);
-        final String[] selectionArgs = {String.valueOf(movieKey)};
+        final long movieRowId = ContentUris.parseId(uri);
+        final String[] selectionArgs = {String.valueOf(movieRowId)};
         final String groupBy = null;
         final String having = null;
         final String orderBy = null;
@@ -91,7 +91,7 @@ public class SingleMovieCursorBuilder {
                 orderBy
         );
 
-        final String[] videosSelectionArgs = {String.valueOf(movieKey), "YouTube", "Trailer"};
+        final String[] videosSelectionArgs = {String.valueOf(movieRowId), "YouTube", "Trailer"};
         final String videosSelection = SINGLE_MOVIE_SELECTION + " AND " + VIDEO_SITE_SELECTION + " AND " + VIDEO_TYPE_SELECTION;
         final Cursor videoCursor = VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,
                 allColumns,

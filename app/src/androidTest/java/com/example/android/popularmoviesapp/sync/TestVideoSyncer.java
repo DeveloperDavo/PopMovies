@@ -91,7 +91,7 @@ public class TestVideoSyncer extends AndroidTestCase {
 
         // THEN
         assertThat(isCursor).isTrue();
-        assertThat(cursor.getLong(cursor.getColumnIndex(VideoEntry.COLUMN_MOVIE_KEY)))
+        assertThat(cursor.getLong(cursor.getColumnIndex(VideoEntry.COLUMN_MOVIE_ROW_ID)))
                 .isEqualTo(movieRowId);
         assertThat(cursor.getString(cursor.getColumnIndex(VideoEntry.COLUMN_VIDEO_ID)))
                 .isEqualTo(VIDEO_ID);
@@ -126,10 +126,10 @@ public class TestVideoSyncer extends AndroidTestCase {
 
         // WHEN
         final Cursor cursor = videoSyncer.queryVideoId(id);
-        long _id = videoSyncer.getRowIdFrom(cursor);
+        long rowId = videoSyncer.getRowIdFrom(cursor);
 
         // THEN
-        assertThat(_id).isEqualTo(-1);
+        assertThat(rowId).isEqualTo(-1);
     }
 
     public void test_insert() throws Exception {
@@ -144,22 +144,22 @@ public class TestVideoSyncer extends AndroidTestCase {
     private long insertTestVideo(VideoSyncer videoSyncer) {
 
         // WHEN
-        long _id = videoSyncer.insert(VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
+        long rowId = videoSyncer.insert(VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
 
         // THEN
-        assertThat(_id).isNotEqualTo(-1);
+        assertThat(rowId).isNotEqualTo(-1);
 
-        return _id;
+        return rowId;
     }
 
     public void test_update() throws Exception {
 
         // GIVEN
         final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
-        final long _id = insertTestVideo(videoSyncer);
+        final long rowID = insertTestVideo(videoSyncer);
 
         // WHEN
-        final long videosUpdated = videoSyncer.update(_id, VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
+        final long videosUpdated = videoSyncer.update(rowID, VIDEO_ID, VIDEO_KEY, VIDEO_SITE, VIDEO_TYPE);
 
         // THEN
         assertThat(videosUpdated).isEqualTo(1);
