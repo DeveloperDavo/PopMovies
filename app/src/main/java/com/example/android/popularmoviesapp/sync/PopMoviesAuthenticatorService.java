@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 /**
  * The service which allows the sync adapter framework to access the authenticator.
+ * Note: modified from https://github.com/udacity/Sunshine-Version-2
  */
 public class PopMoviesAuthenticatorService extends Service {
 

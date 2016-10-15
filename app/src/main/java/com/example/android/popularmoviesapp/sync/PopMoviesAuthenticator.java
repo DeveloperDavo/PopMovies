@@ -11,8 +11,7 @@ import android.os.Bundle;
  * Manages "Authentication" to backend service.  The SyncAdapter framework
  * requires an authenticator object, so syncing to a service that doesn't need authentication
  * typically means creating a stub authenticator like this one.
- * This code is copied directly, in its entirety, from
- * http://developer.android.com/training/sync-adapters/creating-authenticator.html
+ * Note: modified from https://github.com/udacity/Sunshine-Version-2
  */
 public class PopMoviesAuthenticator extends AbstractAccountAuthenticator {
 

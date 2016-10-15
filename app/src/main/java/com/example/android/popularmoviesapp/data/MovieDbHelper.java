@@ -64,10 +64,11 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    /* Destroys old data when upgrading the db version */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
-                newVersion + ". OLD DATA WILL BE DESTROYED");
-        // should be your top priority before modifying this method.
+        Log.d(LOG_TAG, "Upgrading database from version " + oldVersion + " to " +
+                newVersion + ". OLD DATA IS BEING DESTROYED");
+
         db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + VideoEntry.TABLE_NAME);

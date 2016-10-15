@@ -28,13 +28,8 @@ class PosterAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-//        Log.d(LOG_TAG, "bindView");
-
         ImageView imageView = (ImageView) view.findViewById(R.id.poster_image_view);
         Picasso.with(context).load(Utility.getPosterPathFrom(cursor)).into(imageView);
-
-//        final Bitmap bitmap = Utility.getBitmapFromBlob(cursor);
-//        imageView.setImageBitmap(bitmap);
     }
 
 }

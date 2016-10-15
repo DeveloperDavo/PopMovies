@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 /**
  * Created by David on 25/09/16.
+ * Note: modified from https://github.com/udacity/Sunshine-Version-2
  */
 public class PopMoviesSyncService extends Service {
     private static final String LOG_TAG = PopMoviesSyncService.class.getSimpleName();

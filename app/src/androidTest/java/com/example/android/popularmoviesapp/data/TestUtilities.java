@@ -65,18 +65,10 @@ public class TestUtilities extends AndroidTestCase {
             assertFalse("Column '" + columnName + "' not found. " + errorMessage, idx == -1);
 
             if (columnName.equals(MovieEntry.COLUMN_POSTER)) {
-//                validatePoster(errorMessage, valueCursor, entry, idx);
             } else {
                 validate(errorMessage, valueCursor, entry, idx);
             }
         }
-    }
-
-    // TODO: expectedValue and actualValue are two different references so the test always fails
-    private static void validatePoster(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
-        final byte[] expectedValue = (byte[]) entry.getValue();
-        final byte[] actualValue = valueCursor.getBlob(idx);
-        assertEquals(errorMessage, expectedValue, actualValue);
     }
 
     private static void validate(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {

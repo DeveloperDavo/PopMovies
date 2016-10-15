@@ -25,10 +25,6 @@ public class MovieUriMatcher extends UriMatcher {
         uriMatcher.addURI(contentAuthority, MovieContract.PATH_REVIEWS, REVIEWS_CODE);
         uriMatcher.addURI(contentAuthority, MovieContract.PATH_VIDEOS, VIDEOS_CODE);
         uriMatcher.addURI(contentAuthority, MovieContract.PATH_MOVIES + "/#", SINGLE_MOVIE_CODE);
-        // TODO single review
-//        uriMatcher.addURI(contentAuthority,
-//                MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS + "/#",
-//                SINGLE_MOVIE_CODE);
         return uriMatcher;
     }
 }

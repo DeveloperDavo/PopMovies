@@ -4,6 +4,9 @@ import android.content.UriMatcher;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+
 /**
  * Created by David on 04/08/16.
  */
@@ -25,12 +28,28 @@ public class TestUriMatcher extends AndroidTestCase {
                 testMatcher.match(moviesDir), movies);
     }
 
+    public void test_match_videos() {
+
+        // GIVEN
+
+        // content://com.example.android.popularmoviesapp/videos"
+        final Uri vidoesDir = VideoEntry.CONTENT_URI;
+
+        // WHEN
+        final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
+        final int reviews = MovieUriMatcher.VIDEOS_CODE;
+
+        // THEN
+        assertEquals("Error: The VIDEOS_CODE URI was matched incorrectly.",
+                testMatcher.match(vidoesDir), reviews);
+    }
+
     public void test_match_reviews() {
 
         // GIVEN
 
         // content://com.example.android.popularmoviesapp/reviews"
-        final Uri reviewsDir = MovieContract.ReviewEntry.CONTENT_URI;
+        final Uri reviewsDir = ReviewEntry.CONTENT_URI;
 
         // WHEN
         final UriMatcher testMatcher = MovieUriMatcher.buildUriMatcher();
@@ -40,8 +59,6 @@ public class TestUriMatcher extends AndroidTestCase {
         assertEquals("Error: The REVIEWS_CODE URI was matched incorrectly.",
                 testMatcher.match(reviewsDir), reviews);
     }
-
-    // TODO test_match_videos
 
     public void test_match_movie() {
 

@@ -94,12 +94,8 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
                 selectedPosition = position;
 
-//                final long movieId = Utility.getMovieIdFromMovieKey(getContext(), id, position);
-
                 // onItemSelected is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
-
-//                new FetchReviewsTask(getContext(), id, movieId).execute();
 
                 // persist position so it can be later restored
                 Utility.setPosition(getContext(), position);
@@ -122,7 +118,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        // TODO: remove before "release" date
+        // TODO: remove before submitting
         PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {
