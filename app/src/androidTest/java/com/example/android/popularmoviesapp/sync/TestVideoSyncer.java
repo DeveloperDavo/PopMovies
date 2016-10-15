@@ -3,7 +3,6 @@ package com.example.android.popularmoviesapp.sync;
 import android.test.AndroidTestCase;
 
 import com.example.android.popularmoviesapp.data.TestUtilities;
-import com.example.android.popularmoviesapp.BuildConfig;
 
 import java.net.URL;
 
@@ -31,44 +30,20 @@ public class TestVideoSyncer extends AndroidTestCase {
         movieRowId = TestUtilities.insertTestMovie(mContext);
     }
 
-    public void test_queryVideoId_withExistingVideo() throws Exception {
+    public void test_buildUrl() throws Exception {
 
         // GIVEN
-        insertTestVideo();
+        final long movieId = 128;
+        final String expectedUrl = BASE_URL
+                + movieId
+                + "/" + "videos" + "?"
+                + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
 
         // WHEN
-        long videosUpdated = VideoSyncer.queryVideoId(mContext, ID);
+        final URL url = VideoSyncer.buildUrl(movieId);
 
         // THEN
-        assertThat(videosUpdated).isNotEqualTo(-1);
-    }
-
-    public void test_queryVideoId_withNewVideo() throws Exception {
-
-        // GIVEN
-        final String id = "fgh456"; // this id should never be inserted
-
-        // WHEN
-        long _id = VideoSyncer.queryVideoId(mContext, id);
-
-        // THEN
-        assertThat(_id).isEqualTo(-1);
-    }
-
-    public void test_update() throws Exception {
-
-        // GIVEN
-        final long _id = insertTestVideo();
-        final String id = ID;
-        final String key = null;
-        final String site = null;
-        final String type = null;
-
-        // WHEN
-        final long videosUpdated = VideoSyncer.update(mContext, _id, movieRowId, id, key, site, type);
-
-        // THEN
-        assertThat(videosUpdated).isEqualTo(1);
+        assertThat(url.toString()).isEqualTo(expectedUrl);
     }
 
     public void test_insert() throws Exception {
@@ -86,20 +61,20 @@ public class TestVideoSyncer extends AndroidTestCase {
         return _id;
     }
 
-    public void test_buildUrl() throws Exception {
+    public void test_update() throws Exception {
 
         // GIVEN
-        final long movieId = 128;
-        final String expectedUrl = BASE_URL
-                + movieId
-                + "/" + "videos" + "?"
-                + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
+        final long _id = insertTestVideo();
+        final String id = ID;
+        final String key = null;
+        final String site = null;
+        final String type = null;
 
         // WHEN
-        final URL url = VideoSyncer.buildUrl(movieId);
+        final long videosUpdated = VideoSyncer.update(mContext, _id, movieRowId, id, key, site, type);
 
         // THEN
-        assertThat(url.toString()).isEqualTo(expectedUrl);
+        assertThat(videosUpdated).isEqualTo(1);
     }
 
     @Override

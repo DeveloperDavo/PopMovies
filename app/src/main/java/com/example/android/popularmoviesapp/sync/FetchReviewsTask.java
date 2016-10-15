@@ -1,7 +1,9 @@
 package com.example.android.popularmoviesapp.sync;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -33,12 +35,12 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
     private String reviewsJsonStr;
 
     private long movie_id;
-    private long movie_key;
+    private long movieKey;
 
-    public FetchReviewsTask(Context context, long movie_key, long movie_id) {
+    public FetchReviewsTask(Context context, long movieKey, long movie_id) {
         this.context = context;
         this.movie_id = movie_id;
-        this.movie_key = movie_key;
+        this.movieKey = movieKey;
     }
 
     /* HTTP request on background thread. */
@@ -62,7 +64,7 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
 
             URL url = new URL(builtUri.toString());
 
-//            Log.d(LOG_TAG, "movie_key: " + movie_key);
+//            Log.d(LOG_TAG, "movieKey: " + movieKey);
 //            Log.d(LOG_TAG, "reviews url: " + url);
 
             // create the request to TMDb, and open the connection
@@ -134,37 +136,94 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, Void> {
 
             // get data from JSON String
             final JSONObject reviewsData = reviews.getJSONObject(i);
-            final String id = reviewsData.getString(MD_ID);
+            final String reviewId = reviewsData.getString(MD_ID);
             final String author = reviewsData.getString(MD_AUTHOR);
             final String content = reviewsData.getString(MD_CONTENT);
             final String url = reviewsData.getString(MD_URL);
 
             ContentValues reviewValues = new ContentValues();
 
-            reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, movie_key);
-            reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, id);
+            reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, movieKey);
+            reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, reviewId);
             reviewValues.put(ReviewEntry.COLUMN_AUTHOR, author);
             reviewValues.put(ReviewEntry.COLUMN_CONTENT, content);
             reviewValues.put(ReviewEntry.COLUMN_URL, url);
 
             contentValuesVector.add(reviewValues);
 
-        }
-
-        // TODO: insertOrUpdate
-        bulkInsert(contentValuesVector);
-//        final Cursor cursor = context.getContentResolver().query(ReviewEntry.CONTENT_URI, null, null, null, null);
-//        Log.d(LOG_TAG, "review query: " + DatabaseUtils.dumpCursorToString(cursor));
-    }
-
-    private void bulkInsert(Vector<ContentValues> contentValuesVector) {
-        if (contentValuesVector.size() > 0) {
-            Uri uri = ReviewEntry.CONTENT_URI;
-            ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];
-            contentValuesVector.toArray(contentValuesArray);
-            int inserted = context.getContentResolver().bulkInsert(uri, contentValuesArray);
-            Log.d(LOG_TAG, "Bulk insert complete. " + inserted + " inserted");
+            insertOrUpdate(context, movieKey, reviewId, author, content, url);
         }
     }
 
+    /**
+     * @return review rowId upon insert and number of rows updated upon update
+     */
+    static long insertOrUpdate(Context context, long movieKey, String reviewId,
+                               String author, String content, String url) {
+
+        long reviewRowId = checkIfReviewIdExists(context, reviewId);
+
+        if (reviewRowId == -1) {
+            return insertReview(context, movieKey, reviewId, author, content, url);
+        } else {
+            return updateReview(context, reviewId, author, content, url);
+        }
+    }
+
+    private static long checkIfReviewIdExists(Context context, String reviewId) {
+        long reviewRowId = -1;
+
+        final String[] projection = {ReviewEntry._ID};
+        final String selection = ReviewEntry.COLUMN_REVIEW_ID + " = ?";
+        final String[] selectionArgs = {reviewId};
+
+        final Cursor reviewCursor = context.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null); // sortOrder
+
+        assert reviewCursor != null;
+        if (reviewCursor.moveToFirst()) {
+            int reviewKeyIndex = reviewCursor.getColumnIndex(ReviewEntry._ID);
+            reviewRowId = reviewCursor.getLong(reviewKeyIndex);
+        }
+
+        reviewCursor.close();
+        return reviewRowId;
+    }
+
+    private static long insertReview(Context context, long movieKey, String reviewId,
+                                     String author, String content, String url) {
+
+        long reviewRowId;
+        ContentValues reviewValues = new ContentValues();
+
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_KEY, movieKey);
+        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, reviewId);
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, author);
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT, content);
+        reviewValues.put(ReviewEntry.COLUMN_URL, url);
+
+        final Uri insertedUri = context.getContentResolver().insert(
+                ReviewEntry.CONTENT_URI, reviewValues);
+
+        reviewRowId = ContentUris.parseId(insertedUri);
+        return reviewRowId;
+    }
+
+    private static long updateReview(Context context, String reviewId, String author, String content, String url) {
+
+        ContentValues reviewValues = new ContentValues();
+
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, author);
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT, content);
+        reviewValues.put(ReviewEntry.COLUMN_URL, url);
+
+        final String where = ReviewEntry.COLUMN_REVIEW_ID + " = ?";
+        final String[] selectionArgs = {reviewId};
+        return context.getContentResolver().update(
+                ReviewEntry.CONTENT_URI, reviewValues, where, selectionArgs);
+    }
 }

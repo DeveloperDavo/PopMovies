@@ -122,6 +122,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        // TODO: remove before "release" date
         PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {

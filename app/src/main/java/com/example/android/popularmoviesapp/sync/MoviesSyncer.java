@@ -216,7 +216,6 @@ class MoviesSyncer {
                                     long movieId, String title, String posterUrl, String overview,
                                     double rating, double popularity, String release, int favorite) {
 
-        long movieRowId;
         ContentValues movieValues = new ContentValues();
 
         movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
@@ -231,14 +230,7 @@ class MoviesSyncer {
         final Uri insertedUri = context.getContentResolver().insert(
                 MovieEntry.CONTENT_URI, movieValues);
 
-        // extract movieRowId from URI
-        movieRowId = ContentUris.parseId(insertedUri);
-
-        // TODO: move to insertOrUpdate
-        VideoSyncer.sync(context, movieRowId, movieId);
-        // TODO: sync reviews
-
-        return movieRowId;
+        return ContentUris.parseId(insertedUri);
     }
 
 }

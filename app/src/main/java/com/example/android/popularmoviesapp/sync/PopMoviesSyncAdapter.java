@@ -8,11 +8,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.android.popularmoviesapp.R;
+import com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 /**
  * Created by David on 25/09/16.
@@ -34,6 +36,33 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync");
         MoviesSyncer.syncPopularMovies(getContext());
         MoviesSyncer.syncTopRatedMovies(getContext());
+        syncVideosAndReviews();
+    }
+
+    private void syncVideosAndReviews() {
+        final Cursor cursor = queryAllMovies();
+
+        while (cursor.moveToNext()) {
+            long movieKey = cursor.getLong(cursor.getColumnIndex(MovieEntry._ID));
+            long movieId = cursor.getLong(cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID));
+            VideoSyncer.sync(getContext(), movieKey, movieId);
+//        ReviewSyncer.sync(getContext());
+        }
+    }
+
+    private Cursor queryAllMovies() {
+        final String[] columns = {MovieEntry._ID, MovieEntry.COLUMN_MOVIE_ID};
+        final String selection = null;
+        final String[] selectionArgs = null;
+        final String sortOrder = null;
+
+        return getContext().getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                columns,
+                selection,
+                selectionArgs,
+                sortOrder);
+
     }
 
     public static void initializeSyncAdapter(Context context) {

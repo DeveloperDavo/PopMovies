@@ -110,8 +110,7 @@ public class VideoSyncer {
     }
 
     private static void parseAndPersistVideosData(Context context, String videosJsonStr,
-                                                  long movieKey)
-            throws JSONException {
+                                                  long movieKey) throws JSONException {
 
         final String MD_RESULTS = "results";
         final String MD_KEY = "key";
@@ -176,20 +175,6 @@ public class VideoSyncer {
     }
 
     /**
-     * @return number of videos updated
-     */
-    static int update(
-            Context context, long _id, long movieKey, String id, String key, String site, String type) {
-
-        final ContentValues videoValues = getContentValuesFrom(movieKey, id, key, site, type);
-
-        final String where = VideoEntry._ID + " = ?";
-        final String[] selectionArgs = {Long.toString(_id)};
-        return context.getContentResolver().update(
-                VideoEntry.CONTENT_URI, videoValues, where, selectionArgs);
-    }
-
-    /**
      * @return _ID of video being inserted
      */
     static long insert(
@@ -201,6 +186,20 @@ public class VideoSyncer {
                 VideoEntry.CONTENT_URI, videoValues);
 
         return ContentUris.parseId(insertedUri);
+    }
+
+    /**
+     * @return number of videos updated
+     */
+    static int update(
+            Context context, long _id, long movieKey, String id, String key, String site, String type) {
+
+        final ContentValues videoValues = getContentValuesFrom(movieKey, id, key, site, type);
+
+        final String where = VideoEntry._ID + " = ?";
+        final String[] selectionArgs = {Long.toString(_id)};
+        return context.getContentResolver().update(
+                VideoEntry.CONTENT_URI, videoValues, where, selectionArgs);
     }
 
     @NonNull
