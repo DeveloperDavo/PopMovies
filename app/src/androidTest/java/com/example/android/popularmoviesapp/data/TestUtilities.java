@@ -262,24 +262,9 @@ public class TestUtilities extends AndroidTestCase {
      *
      * Modified from https://github.com/udacity/Sunshine-Version-2
      */
+    // TODO: move to test case
     public static void deleteAllRecordsFromProvider(Context context) {
-        context.getContentResolver().delete(
-                MovieEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // SELECTION args
-        );
-
-        context.getContentResolver().delete(
-                ReviewEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // SELECTION args
-        );
-
-        context.getContentResolver().delete(
-                VideoEntry.CONTENT_URI, // URI
-                null, // all rows
-                null // SELECTION args
-        );
+        deleteAllRecordsFromP(context);
 
         final Cursor movieCursor = context.getContentResolver().query(
                 MovieEntry.CONTENT_URI, // URI
@@ -313,6 +298,27 @@ public class TestUtilities extends AndroidTestCase {
         assertEquals("Error: Records not deleted from videos table during delete",
                 0, videoCursor.getCount());
         videoCursor.close();
+    }
+
+    // TODO rename
+    public static void deleteAllRecordsFromP(Context context) {
+        context.getContentResolver().delete(
+                MovieEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        context.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        context.getContentResolver().delete(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
     }
 
     /**

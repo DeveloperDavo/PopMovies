@@ -42,56 +42,15 @@ public class VideoSyncer {
         BufferedReader reader = null;
 
         try {
-            URL url = buildUrl(movieId);
+            final URL url = buildUrl(movieId);
 //            Log.d(LOG_TAG, "url: " + url);
             urlConnection = connect(url);
-            reader = getVideoJsonStringFromInputStreamAndParseAndPersistVideosData(
-                    context, movieKey, urlConnection);
+            reader = persistDataFromServer(context, movieKey, urlConnection);
         } catch (IOException | JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
+            disconnectAndClose(urlConnection, reader);
         }
-    }
-
-    @NonNull
-    private static BufferedReader getVideoJsonStringFromInputStreamAndParseAndPersistVideosData(
-            Context context, long movieKey, HttpURLConnection urlConnection)
-            throws IOException, JSONException {
-        String videosJsonStr;
-
-        // read the input stream into a string
-        final InputStream inputStream = urlConnection.getInputStream();
-        StringBuffer buffer = new StringBuffer();
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // new line is not necessary, but helps for debugging
-            buffer.append(line + "\n");
-        }
-
-        videosJsonStr = buffer.toString();
-//                Log.d(LOG_TAG, "videosJsonStr: " + videosJsonStr);
-        parseAndPersistVideosData(context, videosJsonStr, movieKey);
-        return reader;
-    }
-
-    @NonNull
-    private static HttpURLConnection connect(URL url) throws IOException {
-        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.connect();
-        return urlConnection;
     }
 
     @NonNull
@@ -109,36 +68,74 @@ public class VideoSyncer {
         return new URL(builtUri.toString());
     }
 
-    private static void parseAndPersistVideosData(Context context, String videosJsonStr,
-                                                  long movieKey) throws JSONException {
+    @NonNull
+    private static HttpURLConnection connect(URL url) throws IOException {
+        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        return urlConnection;
+    }
+
+    @NonNull
+    private static BufferedReader persistDataFromServer(
+            Context context, long movieKey, HttpURLConnection urlConnection)
+            throws IOException, JSONException {
+
+        // read the input stream into a string
+        final InputStream inputStream = urlConnection.getInputStream();
+        StringBuffer buffer = new StringBuffer();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // new line is not necessary, but helps for debugging
+            buffer.append(line + "\n");
+        }
+
+        final String videosJsonStr = buffer.toString();
+//                Log.d(LOG_TAG, "videosJsonStr: " + videosJsonStr);
+
+        parseAndPersistData(context, videosJsonStr, movieKey);
+
+        return reader;
+    }
+
+    static void parseAndPersistData(Context context, String videosJsonStr,
+                                    long movieKey) throws JSONException {
 
         final String MD_RESULTS = "results";
-        final String MD_KEY = "key";
-        final String MD_ID = "id";
-        final String MD_SITE = "site";
-        final String MD_TYPE = "type";
 
         final JSONObject data = new JSONObject(videosJsonStr);
         final JSONArray videos = data.getJSONArray(MD_RESULTS);
 
         for (int i = 0; i < videos.length(); i++) {
-
-            // get data from JSON String
-            final JSONObject videosData = videos.getJSONObject(i);
-            final String id = videosData.getString(MD_ID);
-            final String key = videosData.getString(MD_KEY);
-            final String site = videosData.getString(MD_SITE);
-            final String type = videosData.getString(MD_TYPE);
-
-            insertOrUpdate(context, movieKey, id, key, site, type);
-
+            parseAndPersistVideo(context, movieKey, videos, i);
         }
+    }
+
+    private static void parseAndPersistVideo(
+            Context context, long movieKey, JSONArray videos, int i) throws JSONException {
+
+        final String MD_KEY = "key";
+        final String MD_ID = "id";
+        final String MD_SITE = "site";
+        final String MD_TYPE = "type";
+
+        // get data from JSON String
+        final JSONObject videosData = videos.getJSONObject(i);
+        final String id = videosData.getString(MD_ID);
+        final String key = videosData.getString(MD_KEY);
+        final String site = videosData.getString(MD_SITE);
+        final String type = videosData.getString(MD_TYPE);
+
+        insertOrUpdate(context, movieKey, id, key, site, type);
     }
 
     private static long insertOrUpdate(
             Context context, long movieKey, String id, String key, String site, String type) {
 
-        final long _id = queryVideoId(context, id);
+        final Cursor videoCursor = queryVideoId(context, id);
+        long _id = getRowIdFrom(videoCursor);
 
         if (-1 == _id) {
             return insert(context, movieKey, id, key, site, type);
@@ -147,31 +144,27 @@ public class VideoSyncer {
         }
     }
 
-    /**
-     * @return the row containing the existing video id, -1 otherwise
-     */
-    static long queryVideoId(Context context, String videoId) {
+    static Cursor queryVideoId(Context context, String videoId) {
 
-        long videoRowId = -1;
-
-        final String[] projection = {VideoEntry._ID};
+        final String[] projection = null;
         final String selection = VideoEntry.COLUMN_VIDEO_ID + " = ?";
         final String[] selectionArgs = {videoId};
 
-        final Cursor videoCursor = context.getContentResolver().query(
+        return context.getContentResolver().query(
                 VideoEntry.CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,
                 null); // sortOrder
+    }
 
+    static long getRowIdFrom(Cursor videoCursor) {
+        long _id = -1;
         if (videoCursor.moveToFirst()) {
             int videoKeyIndex = videoCursor.getColumnIndex(VideoEntry._ID);
-            videoRowId = videoCursor.getLong(videoKeyIndex);
+            _id = videoCursor.getLong(videoKeyIndex);
         }
-
-        videoCursor.close();
-        return videoRowId;
+        return _id;
     }
 
     /**
@@ -208,13 +201,26 @@ public class VideoSyncer {
 
         ContentValues videoValues = new ContentValues();
 
-        videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, movieKey );
+        videoValues.put(VideoEntry.COLUMN_MOVIE_KEY, movieKey);
         videoValues.put(VideoEntry.COLUMN_VIDEO_KEY, key);
         videoValues.put(VideoEntry.COLUMN_VIDEO_ID, id);
         videoValues.put(VideoEntry.COLUMN_VIDEO_SITE, site);
         videoValues.put(VideoEntry.COLUMN_VIDEO_TYPE, type);
 
         return videoValues;
+    }
+
+    private static void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
+        if (urlConnection != null) {
+            urlConnection.disconnect();
+        }
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (final IOException e) {
+                Log.e(LOG_TAG, "Error closing stream", e);
+            }
+        }
     }
 
 }

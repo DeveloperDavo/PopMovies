@@ -107,8 +107,8 @@ public class Utility {
         return cursor.getLong(columnIndex);
     }
 
-    static Cursor querySingleMovieUri(Context context, long movieKey) {
-        final Uri uri = MovieEntry.buildMovieUri(movieKey);
+    public static Cursor querySingleMovieUri(Context context, long movieRowId) {
+        final Uri uri = MovieEntry.buildMovieUri(movieRowId);
         final String[] projection = null;
         final String selection = null;
         final String[] selectionArgs = null;

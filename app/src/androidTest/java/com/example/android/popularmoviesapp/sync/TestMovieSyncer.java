@@ -4,8 +4,14 @@ import android.test.AndroidTestCase;
 
 import com.example.android.popularmoviesapp.data.TestUtilities;
 
-import static com.example.android.popularmoviesapp.data.TestUtilities.*;
-import static com.example.android.popularmoviesapp.data.MovieContract.*;
+import static com.example.android.popularmoviesapp.data.TestUtilities.FAVORITE;
+import static com.example.android.popularmoviesapp.data.TestUtilities.MOVIE_ID;
+import static com.example.android.popularmoviesapp.data.TestUtilities.OVERVIEW;
+import static com.example.android.popularmoviesapp.data.TestUtilities.POPULARITY;
+import static com.example.android.popularmoviesapp.data.TestUtilities.POSTER;
+import static com.example.android.popularmoviesapp.data.TestUtilities.RATING;
+import static com.example.android.popularmoviesapp.data.TestUtilities.RELEASE;
+import static com.example.android.popularmoviesapp.data.TestUtilities.TITLE;
 
 public class TestMovieSyncer extends AndroidTestCase {
     private static final double UPDATED_RATING = 7.4;
@@ -13,7 +19,7 @@ public class TestMovieSyncer extends AndroidTestCase {
 
     @Override
     protected void setUp() throws Exception {
-        deleteExistingEntries();
+        super.setUp();
     }
 
     public void test_isMovieInDb_true() {
@@ -73,25 +79,8 @@ public class TestMovieSyncer extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        // reset our state back to normal
-        deleteExistingEntries();
-
-        // clean up the test so that other tests can use the content provider
-        getContext().getContentResolver().
-                acquireContentProviderClient(MovieEntry.CONTENT_URI).
-                getLocalContentProvider().shutdown();
-    }
-
-    private void deleteExistingEntries() {
-        getContext().getContentResolver().delete(MovieEntry.CONTENT_URI,
-                null,
-                null);
-        getContext().getContentResolver().delete(ReviewEntry.CONTENT_URI,
-                null,
-                null);
-        getContext().getContentResolver().delete(VideoEntry.CONTENT_URI,
-                null,
-                null);
+        super.tearDown();
+        TestUtilities.deleteAllRecordsFromProvider(mContext);
     }
 
 }
