@@ -9,16 +9,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.Suppress;
-import android.util.Log;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.CONTENT_AUTHORITY;
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
+import static com.example.android.popularmoviesapp.data.TestUtilities.createAndInsertMovieValues;
 
 /**
  * Created by David on 13/07/16.
+ * Note: modified from https://github.com/udacity/Sunshine-Version-2
  */
 public class TestProvider extends AndroidTestCase {
 
@@ -27,10 +27,9 @@ public class TestProvider extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        deleteAllRecordsFromProvider();
+        TestUtilities.deleteAllRecordsFromProvider(mContext);
     }
 
-    // TODO improve understanding
     public void testContentProviderIsRegisteredCorrectly() {
 
         final PackageManager pm = mContext.getPackageManager();
@@ -52,6 +51,10 @@ public class TestProvider extends AndroidTestCase {
                     false);
         }
     }
+
+    /****************
+     * getType
+     ***********************/
 
     public void test_getType_movies() {
 
@@ -82,19 +85,6 @@ public class TestProvider extends AndroidTestCase {
                 MovieEntry.CONTENT_ITEM_TYPE, type);
     }
 
-    public void test_getType_reviews() {
-
-        // WHEN
-        // content://com.example.android.popularmoviesapp/reviews/
-        final String type = mContext.getContentResolver().
-                getType(ReviewEntry.CONTENT_URI);
-
-        // THEN
-        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
-        assertEquals("Error: the ReviewEntry CONTENT_URI should return ReviewEntry.CONTENT_TYPE",
-                ReviewEntry.CONTENT_TYPE, type);
-    }
-
     public void test_getType_videos() {
 
         // WHEN
@@ -108,8 +98,138 @@ public class TestProvider extends AndroidTestCase {
                 VideoEntry.CONTENT_TYPE, type);
     }
 
+    public void test_getType_reviews() {
+
+        // WHEN
+        // content://com.example.android.popularmoviesapp/reviews/
+        final String type = mContext.getContentResolver().
+                getType(ReviewEntry.CONTENT_URI);
+
+        // THEN
+        // vnd.android.cursor.dir/com.example.android.popularmoviesapp/reviews
+        assertEquals("Error: the ReviewEntry CONTENT_URI should return ReviewEntry.CONTENT_TYPE",
+                ReviewEntry.CONTENT_TYPE, type);
+    }
+
+    /****************
+     * insert
+     ***********************/
+
+    public void test_insert_movieEntry() {
+        final ContentValues testValues = TestUtilities.createMovieValues();
+        insertMovieEntry(testValues);
+    }
+
+    private long insertMovieEntry(ContentValues testValues) {
+
+        // GIVEN
+
+        // register content observer
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().
+                registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
+
+        // WHEN
+        final Uri movieInsertUri = mContext.getContentResolver().
+                insert(MovieEntry.CONTENT_URI, testValues);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // THEN
+        long movieRowId = ContentUris.parseId(movieInsertUri);
+        assertTrue(movieRowId != -1);
+
+        return movieRowId;
+    }
+
+    public void test_insert_videoEntry() throws Exception {
+        long movieRowId = createAndInsertMovieValues(mContext);
+        final ContentValues videoValues = TestUtilities.createVideoValues(movieRowId);
+        insertVideoEntry(videoValues);
+    }
+
+    private long insertVideoEntry(ContentValues videoValues) {
+
+        // GIVEN
+
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().
+                registerContentObserver(VideoEntry.CONTENT_URI, true, tco);
+
+        // WHEN
+        Uri videoInsertUri = mContext.getContentResolver()
+                .insert(VideoEntry.CONTENT_URI, videoValues);
+        assertTrue(videoInsertUri != null);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // THEN
+        long videoRowId = ContentUris.parseId(videoInsertUri);
+        assertTrue(videoRowId != -1);
+
+        return videoRowId;
+    }
+
+    public void test_insert_reviewEntry() throws Exception {
+        long movieRowId = createAndInsertMovieValues(mContext);
+        final ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
+        insertReviewEntry(reviewValues);
+    }
+
+    private long insertReviewEntry(ContentValues reviewValues) {
+
+        // GIVEN
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().
+                registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
+
+        // WHEN
+        Uri reviewInsertUri = mContext.getContentResolver()
+                .insert(ReviewEntry.CONTENT_URI, reviewValues);
+        assertTrue(reviewInsertUri != null);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // THEN
+        long reviewRowId = ContentUris.parseId(reviewInsertUri);
+        assertTrue(reviewRowId != -1);
+
+        return reviewRowId;
+
+    }
+
+    /****************
+     * query
+     ***********************/
+
     public void test_query_movies() {
         queryMovies();
+    }
+
+    private Cursor queryMovies() {
+
+        // GIVEN
+        final ContentValues movieValues = TestUtilities.createMovieValues();
+        insertMovieEntry(movieValues);
+
+        // WHEN
+        final Cursor movieCursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // THEN
+        TestUtilities.validateCursor("testSingleMovieQuery, movie query", movieCursor, movieValues);
+
+        return movieCursor;
     }
 
     public void test_getNotificationUri_movies() {
@@ -128,17 +248,20 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
-    private Cursor queryMovies() {
+    public void test_query_videos() {
+        queryVideos();
+    }
+
+    private Cursor queryVideos() {
 
         // GIVEN
-        long movieRowId = TestUtilities.createAndInsertMovieValues(mContext);
-        assertTrue("Unable to Insert MovieEntry into the Database", movieRowId != -1);
-
-        final ContentValues movieValues = TestUtilities.createMovieValues();
+        final long testMovieRowId = createAndInsertMovieValues(mContext);
+        final ContentValues videoValues = TestUtilities.createVideoValues(testMovieRowId);
+        insertVideoEntry(videoValues);
 
         // WHEN
-        final Cursor movieCursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI,
+        final Cursor videoCursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -146,53 +269,9 @@ public class TestProvider extends AndroidTestCase {
         );
 
         // THEN
-        TestUtilities.validateCursor("testSingleMovieQuery, movie query", movieCursor, movieValues);
-        return movieCursor;
-    }
+        TestUtilities.validateCursor("testVideoQuery", videoCursor, videoValues);
 
-    public void test_query_reviews() {
-        queryReviews();
-    }
-
-    public void test_getNotificationUri_reviews() {
-
-        // GIVEN
-        final Cursor reviewCursor = queryReviews();
-
-        if (Build.VERSION.SDK_INT >= 19) {
-
-            // WHEN
-            final Uri notificationUri = reviewCursor.getNotificationUri();
-
-            // THEN
-            assertEquals("Error: Review Query did not properly set NotificationUri",
-                    notificationUri, ReviewEntry.CONTENT_URI);
-        }
-    }
-
-    private Cursor queryReviews() {
-        final long testMovieRowId = 1;
-        long reviewRowId = TestUtilities.createAndInsertReviewValues(mContext, testMovieRowId);
-        assertTrue("Unable to Insert ReviewEntry into the Database", reviewRowId != -1);
-
-        // create review values
-        final ContentValues reviewValues = TestUtilities.createReviewValues(testMovieRowId);
-
-        // test the basic content provider query
-        final Cursor reviewCursor = mContext.getContentResolver().query(
-                ReviewEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
-
-        return reviewCursor;
-    }
-
-    public void test_query_videos() {
-        queryVideos();
+        return videoCursor;
     }
 
     public void test_getNotificationUri_videos() {
@@ -211,300 +290,258 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
-    private Cursor queryVideos() {
-        final long testMovieRowId = 1;
-        long videoRowId = TestUtilities.createAndInsertVideoValues(mContext, testMovieRowId);
-        assertTrue("Unable to Insert VideoEntry into the Database", videoRowId != -1);
-
-        // create video values
-        final ContentValues videoValues = TestUtilities.createVideoValues(testMovieRowId);
-
-        // test the basic content provider query
-        final Cursor videoCursor = mContext.getContentResolver().query(
-                VideoEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        TestUtilities.validateCursor("testVideoQuery", videoCursor, videoValues);
-
-        return videoCursor;
+    public void test_query_reviews() {
+        queryReviews();
     }
 
-    public void testInsertReadProvider() {
-        test_insert_and_query();
-    }
-
-    /**
-     * A movie entry is created and inserted into the content provider.
-     * Ensures the queried movies URI returns a cursor.
-     *
-     * A review entry is created and inserted into the content provider.
-     * Ensures the queried reviews URI returns a cursor.
-     *
-     * A video entry is created and inserted into the content provider.
-     * Ensures the queried videos URI returns a cursor.
-     *
-     * Ensures the queried movie URI, which is a join between the movie, review and video entry,
-     * returns a cursor.
-     *
-     * Modified from https://github.com/udacity/Sunshine-Version-2
-     *
-     * TODO has too much responsibility
-     */
-    public void test_insert_and_query() {
-
-        final ContentValues testValues = TestUtilities.createMovieValues();
-
-        // register content observer
-        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().
-                registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
-
-        final Uri movieInsertUri = mContext.getContentResolver().
-                insert(MovieEntry.CONTENT_URI, testValues);
-
-        tco.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(tco);
-
-        long movieRowId = ContentUris.parseId(movieInsertUri);
-        assertTrue(movieRowId != -1);
-
-        final Cursor moviesCursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI,
-                null, // all columns
-                null, // selection
-                null, // selection args
-                null  // sort order
-        );
-        TestUtilities.validateCursor("Error validating movie data",
-                moviesCursor, testValues);
-
-        final ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
-
-        tco = TestUtilities.getTestContentObserver();
-
-        mContext.getContentResolver().
-                registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
-
-        Uri reviewInsertUri = mContext.getContentResolver()
-                .insert(ReviewEntry.CONTENT_URI, reviewValues);
-        assertTrue(reviewInsertUri != null);
-
-        tco.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(tco);
-
-        final Cursor reviewsCursor = mContext.getContentResolver().query(
-                ReviewEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        TestUtilities.validateCursor("Error validating review data",
-                reviewsCursor, reviewValues);
-
-        // add review values to test values
-        testValues.putAll(reviewValues);
-
-        final ContentValues videoValues = TestUtilities.createVideoValues(movieRowId);
-
-        tco = TestUtilities.getTestContentObserver();
-
-        mContext.getContentResolver().
-                registerContentObserver(VideoEntry.CONTENT_URI, true, tco);
-
-        Uri videoInsertUri = mContext.getContentResolver()
-                .insert(VideoEntry.CONTENT_URI, videoValues);
-        assertTrue(videoInsertUri != null);
-
-        tco.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(tco);
-
-        final Cursor videosCursor = mContext.getContentResolver().query(
-                VideoEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        TestUtilities.validateCursor("Error validating video data",
-                videosCursor, videoValues);
-
-        // add review values to testValues
-        testValues.putAll(videoValues);
-    }
-
-
-    /**
-     * Ensures bulkInsert inserts the correct amount of movie entries.
-     *
-     * Ensures each movie entry can be validated by querying the movies table.
-     *
-     * TODO: too much responsibility
-     * TODO: bulkInsert is not in use at the moment so the test has been suppressed
-     */
-    @Suppress
-    public void test_bulkInsert_movies() {
-
-        ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertMovieValues();
-
-        // register content observer
-        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(
-                MovieEntry.CONTENT_URI, true, movieObserver);
-
-        int insertCount = mContext.getContentResolver().bulkInsert(
-                MovieEntry.CONTENT_URI, bulkInsertContentValues);
-
-        movieObserver.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(movieObserver);
-
-        assertEquals(TestUtilities.BULK_INSERT_SIZE, insertCount);
-
-        // TODO: sort order
-        String sortOrder = null;
-        Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI,
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                sortOrder
-        );
-
-        assertEquals(cursor.getCount(), TestUtilities.BULK_INSERT_SIZE);
-
-        cursor.moveToFirst();
-        for (int i = 0; i < TestUtilities.BULK_INSERT_SIZE; i++, cursor.moveToNext()) {
-            TestUtilities.validateCurrentRecord("test_bulkInsert_movies.  Error validating MovieEntry " + i,
-                    cursor, bulkInsertContentValues[i]);
-        }
-        cursor.close();
-    }
-
-    /**
-     * Ensures bulkInsert inserts the correct amount of review entries.
-     *
-     * Ensures each review entry can be validated by querying the reviews table.
-     *
-     * TODO too much responsibility
-     */
-    public void test_bulkInsert_reviews() {
-
-        ContentValues[] bulkInsertContentValues = TestUtilities.createBulkInsertReviewValues();
-
-        // register content observer
-        TestUtilities.TestContentObserver reviewObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(
-                ReviewEntry.CONTENT_URI, true, reviewObserver);
-
-        int insertCount = mContext.getContentResolver().bulkInsert(
-                ReviewEntry.CONTENT_URI, bulkInsertContentValues);
-
-        reviewObserver.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(reviewObserver);
-
-        assertEquals(TestUtilities.BULK_INSERT_SIZE_REVIEWS, insertCount);
-
-        String sortOrder = null;
-        Cursor cursor = mContext.getContentResolver().query(
-                ReviewEntry.CONTENT_URI,
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                sortOrder
-        );
-
-        assertEquals(cursor.getCount(), TestUtilities.BULK_INSERT_SIZE_REVIEWS);
-
-        cursor.moveToFirst();
-        for (int i = 0; i < TestUtilities.BULK_INSERT_SIZE_REVIEWS; i++, cursor.moveToNext()) {
-            TestUtilities.validateCurrentRecord("test_bulkInsert_reviews.  " +
-                    "Error validating ReviewEntry " + i, cursor, bulkInsertContentValues[i]);
-        }
-        cursor.close();
-    }
-
-    /**
-     * Ensures all entries are deleted after being inserted
-     */
-    public void testDeleteRecords() {
-        test_insert_and_query();
-
-        // Register a content observer for our movies delete.
-        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, movieObserver);
-
-        // Register a content observer for our reviews delete.
-        TestUtilities.TestContentObserver reviewObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(ReviewEntry.CONTENT_URI, true, reviewObserver);
-
-        deleteAllRecordsFromProvider();
-
-        movieObserver.waitForNotificationOrFail();
-        reviewObserver.waitForNotificationOrFail();
-
-        mContext.getContentResolver().unregisterContentObserver(movieObserver);
-        mContext.getContentResolver().unregisterContentObserver(reviewObserver);
-    }
-
-    /**
-     * Inserts a movie entry and ensures the overview column has been updated correctly
-     * Modified from https://github.com/udacity/Sunshine-Version-2
-     */
-    public void testUpdateMovies() {
+    private Cursor queryReviews() {
 
         // GIVEN
-
-        final ContentValues values = TestUtilities.createMovieValues();
-
-        final Uri movieUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
-        long movieRowId = ContentUris.parseId(movieUri);
-
-        assertTrue(movieRowId != -1);
-        Log.d(LOG_TAG, "New row id: " + movieRowId);
-
-        final ContentValues updatedValues = new ContentValues(values);
-        updatedValues.put(MovieEntry._ID, movieRowId);
-        updatedValues.put(MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker has ben found");
-
-        // Create a cursor with observer to make sure that the content provider is notifying
-        // the observers as expected
-        final Cursor movieCursor = mContext.getContentResolver().
-                query(MovieEntry.CONTENT_URI, null, null, null, null);
-
-        final TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-        movieCursor.registerContentObserver(tco);
+        final long testMovieRowId = createAndInsertMovieValues(mContext);
+        final ContentValues reviewValues = TestUtilities.createReviewValues(testMovieRowId);
+        insertReviewEntry(reviewValues);
 
         // WHEN
-
-        int count = mContext.getContentResolver().update(
-                MovieEntry.CONTENT_URI, updatedValues, MovieEntry._ID + "= ?",
-                new String[]{Long.toString(movieRowId)});
-        assertEquals(count, 1);
-
-        tco.waitForNotificationOrFail();
-
-        movieCursor.unregisterContentObserver(tco);
-        movieCursor.close();
-
-        final Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI,
-                null,   // projection
-                MovieEntry._ID + " = " + movieRowId,
-                null,   // Values for the "where" clause
-                null    // sort order
+        final Cursor reviewCursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
         );
 
         // THEN
-        TestUtilities.validateCursor("testUpdateMovies.  Error validating movie entry update.",
+        TestUtilities.validateCursor("testReviewQuery", reviewCursor, reviewValues);
+
+        return reviewCursor;
+    }
+
+    public void test_getNotificationUri_reviews() {
+
+        // GIVEN
+        final Cursor reviewCursor = queryReviews();
+
+        if (Build.VERSION.SDK_INT >= 19) {
+
+            // WHEN
+            final Uri notificationUri = reviewCursor.getNotificationUri();
+
+            // THEN
+            assertEquals("Error: Review Query did not properly set NotificationUri",
+                    notificationUri, ReviewEntry.CONTENT_URI);
+        }
+    }
+
+    /****************
+     * update
+     ***********************/
+
+
+    public void test_update_movieEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues testValues = TestUtilities.createMovieValues();
+        final long movieRowId = insertMovieEntry(testValues);
+
+        final ContentValues updatedValues = new ContentValues(testValues);
+        updatedValues.put(MovieEntry._ID, movieRowId);
+        updatedValues.put(MovieEntry.COLUMN_OVERVIEW, "Luke Skywalker has been found");
+
+        // WHEN
+        int updatedRows = mContext.getContentResolver().update(
+                MovieEntry.CONTENT_URI, updatedValues, MovieEntry._ID + "= ?",
+                new String[]{Long.toString(movieRowId)});
+
+        // THEN
+        final Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI,
+                null, // projection
+                MovieEntry._ID + " = ?",
+                new String[]{String.valueOf(movieRowId)}, // Values for the "where" clause
+                null // sort order
+        );
+
+        assert cursor != null;
+        TestUtilities.validateCursor("testUpdateMovies. Error validating entry update.",
                 cursor, updatedValues);
 
         cursor.close();
     }
 
-    public void deleteAllRecordsFromProvider() {
-        TestUtilities.deleteAllRecordsFromProvider(mContext);
+    public void test_update_videoEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues movieValues = TestUtilities.createMovieValues();
+        final long movieRowId = insertMovieEntry(movieValues);
+
+        final ContentValues testValues = TestUtilities.createVideoValues(movieRowId);
+        final long videoRowId = insertVideoEntry(testValues);
+
+        final ContentValues updatedValues = new ContentValues(testValues);
+        updatedValues.put(VideoEntry._ID, videoRowId);
+        updatedValues.put(VideoEntry.COLUMN_VIDEO_TYPE, "Featurette");
+
+        // WHEN
+        int updatedRows = mContext.getContentResolver().update(
+                VideoEntry.CONTENT_URI, updatedValues, VideoEntry._ID + "= ?",
+                new String[]{Long.toString(videoRowId)});
+
+        // THEN
+        final Cursor cursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI,
+                null, // projection
+                VideoEntry._ID + " = ?",
+                new String[]{String.valueOf(videoRowId)}, // Values for the "where" clause
+                null // sort order
+        );
+
+        assert cursor != null;
+        TestUtilities.validateCursor("testUpdateMovies. Error validating entry update.",
+                cursor, updatedValues);
+
+        cursor.close();
+    }
+
+    public void test_update_reviewEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues movieValues = TestUtilities.createMovieValues();
+        final long movieRowId = insertMovieEntry(movieValues);
+
+        final ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+        final long reviewRowId = insertReviewEntry(testValues);
+
+        final ContentValues updatedValues = new ContentValues(testValues);
+        updatedValues.put(ReviewEntry._ID, reviewRowId);
+        updatedValues.put(ReviewEntry.COLUMN_CONTENT, "Greatest movie ever");
+
+        // WHEN
+        int updatedRows = mContext.getContentResolver().update(
+                ReviewEntry.CONTENT_URI, updatedValues, ReviewEntry._ID + "= ?",
+                new String[]{Long.toString(reviewRowId)});
+
+        // THEN
+        final Cursor cursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI,
+                null, // projection
+                ReviewEntry._ID + " = ?",
+                new String[]{String.valueOf(reviewRowId)}, // Values for the "where" clause
+                null // sort order
+        );
+
+        assert cursor != null;
+        TestUtilities.validateCursor("testUpdateMovies. Error validating entry update.",
+                cursor, updatedValues);
+
+        cursor.close();
+    }
+
+    /****************
+     * delete
+     ***********************/
+
+    public void test_delete_movieEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues testValues = TestUtilities.createMovieValues();
+        insertMovieEntry(testValues);
+
+        TestUtilities.TestContentObserver testObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, testObserver);
+
+        // WHEN
+        mContext.getContentResolver().delete(
+                MovieEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        // THEN
+        testObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(testObserver);
+
+        final Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+
+        assert cursor != null;
+        assertEquals("Error: Records not deleted from table during delete", 0, cursor.getCount());
+        cursor.close();
+    }
+
+    public void test_delete_videoEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues movieValues = TestUtilities.createMovieValues();
+        final long movieRowId = insertMovieEntry(movieValues);
+
+        final ContentValues testValues = TestUtilities.createVideoValues(movieRowId);
+        insertVideoEntry(testValues);
+
+        TestUtilities.TestContentObserver testObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(VideoEntry.CONTENT_URI, true, testObserver);
+
+        // WHEN
+        mContext.getContentResolver().delete(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        // THEN
+        testObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(testObserver);
+
+        final Cursor cursor = mContext.getContentResolver().query(
+                VideoEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+
+        assert cursor != null;
+        assertEquals("Error: Records not deleted from table during delete", 0, cursor.getCount());
+        cursor.close();
+    }
+
+    public void test_delete_reviewEntry() throws Exception {
+
+        // GIVEN
+        final ContentValues movieValues = TestUtilities.createMovieValues();
+        final long movieRowId = insertMovieEntry(movieValues);
+
+        final ContentValues testValues = TestUtilities.createReviewValues(movieRowId);
+        insertReviewEntry(testValues);
+
+        TestUtilities.TestContentObserver testObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ReviewEntry.CONTENT_URI, true, testObserver);
+
+        // WHEN
+        mContext.getContentResolver().delete(
+                ReviewEntry.CONTENT_URI, // URI
+                null, // all rows
+                null // SELECTION args
+        );
+
+        // THEN
+        testObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(testObserver);
+
+        final Cursor cursor = mContext.getContentResolver().query(
+                ReviewEntry.CONTENT_URI, // URI
+                null, // all columns
+                null, // all rows
+                null, // SELECTION args
+                null // sort order
+        );
+
+        assert cursor != null;
+        assertEquals("Error: Records not deleted from table during delete", 0, cursor.getCount());
+        cursor.close();
     }
 }

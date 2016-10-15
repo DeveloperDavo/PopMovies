@@ -35,12 +35,9 @@ public class TestUtilities extends AndroidTestCase {
     public static final String RELEASE = "2015-12-17";
     public static final int FAVORITE = 1;
 
-    static final int BULK_INSERT_SIZE = 10;
-    static final int BULK_INSERT_SIZE_REVIEWS = 3;
-
     /**
      * Ensures an empty cursor is not returned.
-     * Modified from https://github.com/udacity/Sunshine-Version-2
+     * Note: copied from https://github.com/udacity/Sunshine-Version-2
      *
      * @param error message that is different for each test case
      */
@@ -52,7 +49,7 @@ public class TestUtilities extends AndroidTestCase {
 
     /**
      * Ensures all columns are found and have the correct values.
-     * Modified from https://github.com/udacity/Sunshine-Version-2
+     * Note: copied from https://github.com/udacity/Sunshine-Version-2
      */
     static void validateCurrentRecord(
             String errorMessage, Cursor valueCursor, ContentValues expectedValues) {
@@ -64,18 +61,17 @@ public class TestUtilities extends AndroidTestCase {
 
             assertFalse("Column '" + columnName + "' not found. " + errorMessage, idx == -1);
 
-            if (columnName.equals(MovieEntry.COLUMN_POSTER)) {
-            } else {
-                validate(errorMessage, valueCursor, entry, idx);
-            }
+            validate(errorMessage, valueCursor, entry, idx);
         }
     }
 
-    private static void validate(String errorMessage, Cursor valueCursor, Map.Entry<String, Object> entry, int idx) {
-        String expectedValue = entry.getValue().toString();
+    private static void validate(String errorMessage, Cursor valueCursor,
+                                 Map.Entry<String, Object> entry, int idx) {
+
+        final String expectedValue = entry.getValue().toString();
         final String actualValue = valueCursor.getString(idx);
-        assertEquals("Value '" + actualValue +
-                "' did not match the expected value '" +
+
+        assertEquals("Value '" + actualValue + "' did not match the expected value '" +
                 expectedValue + "'. " + errorMessage, expectedValue, actualValue);
     }
 
@@ -115,16 +111,10 @@ public class TestUtilities extends AndroidTestCase {
         return videoValues;
     }
 
-    /**
-     * @return movieRowId
-     */
     public static long createAndInsertMovieValues(Context context) {
 
+        // GIVEN
         ContentValues testValues = TestUtilities.createMovieValues();
-        return insertMovieValues(context, testValues);
-    }
-
-    static long insertMovieValues(Context context, ContentValues testValues) {
 
         // WHEN
         MovieDbHelper dbHelper = new MovieDbHelper(context);
@@ -137,73 +127,9 @@ public class TestUtilities extends AndroidTestCase {
         return moviesRowId;
     }
 
-    static ContentValues[] createBulkInsertMovieValues() {
-        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_SIZE];
-
-        for (int i = 0; i < BULK_INSERT_SIZE; i++) {
-            ContentValues movieValues = new ContentValues();
-            movieValues.put(MovieEntry.COLUMN_MOVIE_ID, i + 1000);
-            movieValues.put(MovieEntry.COLUMN_TITLE, "title " + i);
-            movieValues.put(MovieEntry.COLUMN_POSTER, "posterPath " + i);
-            movieValues.put(MovieEntry.COLUMN_OVERVIEW, "overview " + i);
-            movieValues.put(MovieEntry.COLUMN_RATING, i + 0.99);
-            movieValues.put(MovieEntry.COLUMN_POPULARITY, 0.01 + 10 * i);
-            movieValues.put(MovieEntry.COLUMN_RELEASE, "release " + i);
-            movieValues.put(MovieEntry.COLUMN_FAVORITE, i % 2);
-
-            returnContentValues[i] = movieValues;
-        }
-
-        return returnContentValues;
-    }
-
-    static ContentValues[] createBulkInsertReviewValues() {
-        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_SIZE_REVIEWS];
-
-        for (int i = 0; i < BULK_INSERT_SIZE_REVIEWS; i++) {
-            ContentValues reviewValues = new ContentValues();
-            reviewValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, 1000);
-            reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, "abc" + i);
-            reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "author" + i);
-            reviewValues.put(ReviewEntry.COLUMN_CONTENT, "I give this review " + i + " out of 10");
-            reviewValues.put(ReviewEntry.COLUMN_URL, "www.examplereview.com");
-
-            returnContentValues[i] = reviewValues;
-        }
-
-        return returnContentValues;
-    }
-
-    static long createAndInsertReviewValues(Context context, long movieRowId) {
-
-        // insert our test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        final ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
-
-        long reviewRowId = db.insert(ReviewEntry.TABLE_NAME, null, reviewValues);
-
-        assertTrue("Error: Failure to insert review values", reviewRowId != -1);
-
-        return reviewRowId;
-    }
-
-    static long createAndInsertVideoValues(Context context, long movieRowId) {
-
-        // insert our test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        final ContentValues videoValues = TestUtilities.createVideoValues(movieRowId);
-
-        long videoRowId = db.insert(VideoEntry.TABLE_NAME, null, videoValues);
-
-        assertTrue("Error: Failure to insert video values", videoRowId != -1);
-
-        return videoRowId;
-    }
 
     /**
-     * sourced from https://github.com/udacity/Sunshine-Version-2
+     * Note: copied from https://github.com/udacity/Sunshine-Version-2
      */
     public static class TestContentObserver extends ContentObserver {
         final HandlerThread mHT;
@@ -250,50 +176,7 @@ public class TestUtilities extends AndroidTestCase {
         return TestContentObserver.getTestContentObserver();
     }
 
-    /**
-     *
-     * Modified from https://github.com/udacity/Sunshine-Version-2
-     */
-    // TODO: move to test case
     public static void deleteAllRecordsFromProvider(Context context) {
-        deleteAllRecordsFromP(context);
-
-        final Cursor movieCursor = context.getContentResolver().query(
-                MovieEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // SELECTION args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from movie table during delete",
-                0, movieCursor.getCount());
-        movieCursor.close();
-
-        final Cursor reviewCursor = context.getContentResolver().query(
-                ReviewEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // SELECTION args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from reviews table during delete",
-                0, reviewCursor.getCount());
-        reviewCursor.close();
-
-        final Cursor videoCursor = context.getContentResolver().query(
-                VideoEntry.CONTENT_URI, // URI
-                null, // all columns
-                null, // all rows
-                null, // SELECTION args
-                null // sort order
-        );
-        assertEquals("Error: Records not deleted from videos table during delete",
-                0, videoCursor.getCount());
-        videoCursor.close();
-    }
-
-    // TODO rename
-    public static void deleteAllRecordsFromP(Context context) {
         context.getContentResolver().delete(
                 MovieEntry.CONTENT_URI, // URI
                 null, // all rows
@@ -313,10 +196,6 @@ public class TestUtilities extends AndroidTestCase {
         );
     }
 
-    /**
-     *
-     * Modified from https://github.com/udacity/Sunshine-Version-2
-     */
     public static long insertTestMovie(Context context) {
         final ContentValues testValues = TestUtilities.createMovieValues();
 

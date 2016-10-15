@@ -7,6 +7,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.*;
 
 /**
  * Created by David on 04/08/16.
+ * Note: modified from https://github.com/udacity/Sunshine-Version-2
  */
 public class TestMovieContract extends AndroidTestCase {
 

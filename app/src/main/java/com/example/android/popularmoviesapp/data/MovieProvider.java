@@ -5,12 +5,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
@@ -217,60 +215,6 @@ public class MovieProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
-    }
-
-    @Override
-    public int bulkInsert(@NonNull Uri uri, ContentValues[] values) {
-
-        final int match = URI_MATCHER.match(uri);
-
-        switch (match) {
-            case MovieUriMatcher.MOVIES_CODE:
-                return bulkInsertEntries(MovieEntry.TABLE_NAME, uri, values);
-            case MovieUriMatcher.REVIEWS_CODE:
-                return bulkInsertEntries(ReviewEntry.TABLE_NAME, uri, values);
-            default:
-                return super.bulkInsert(uri, values);
-        }
-    }
-
-    private int bulkInsertEntries(String tableName, Uri uri, ContentValues[] values) {
-
-        final SQLiteDatabase writableDatabase = movieDbHelper.getWritableDatabase();
-
-        writableDatabase.beginTransaction();
-
-        int rowsInserted = 0;
-        try {
-            for (ContentValues value : values) {
-                if (value == null) {
-                    throw new IllegalArgumentException("Cannot have null content values");
-                }
-                long rowId = -1;
-                try {
-                    rowId = writableDatabase.insertOrThrow(tableName, null, value);
-                } catch (SQLiteConstraintException e) {
-                    Log.w(LOG_TAG, "Value is already in database.");
-                }
-                if (rowId != -1) {
-                    rowsInserted++;
-                }
-            }
-            if (rowsInserted > 0) {
-                // If no errors, declare a successful transaction.
-                // database will not populate if this is not called
-                writableDatabase.setTransactionSuccessful();
-            }
-        } finally {
-            writableDatabase.endTransaction();
-        }
-        if (rowsInserted > 0) {
-            // if there was successful insertion, notify the content resolver that there
-            // was a change
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-
-        return rowsInserted;
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing
