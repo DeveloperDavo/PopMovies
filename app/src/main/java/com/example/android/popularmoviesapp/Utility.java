@@ -11,9 +11,6 @@ import android.support.annotation.NonNull;
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
@@ -157,14 +154,6 @@ public class Utility {
         SharedPreferences settings = context.getSharedPreferences(
                 preference, Context.MODE_PRIVATE);
         return settings.getString(context.getString(key), defValue);
-    }
-
-    @NonNull
-    public static HttpURLConnection connect(URL url) throws IOException {
-        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.connect();
-        return urlConnection;
     }
 
 

@@ -45,8 +45,8 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         while (cursor.moveToNext()) {
             long movieKey = cursor.getLong(cursor.getColumnIndex(MovieEntry._ID));
             long movieId = cursor.getLong(cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID));
-            new VideoSyncer(getContext(), movieKey, movieId).sync();
-//        ReviewSyncer.sync(getContext());
+            new VideoSyncer(getContext(), movieKey, movieId, "videos").sync();
+            new ReviewSyncer(getContext(), movieKey, movieId, "reviews").sync();
         }
     }
 
