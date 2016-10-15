@@ -90,7 +90,8 @@ class DetailAdapter extends CursorAdapter {
         } else if (viewType == VIEW_TYPE_VIDEOS) {
             setVideoText(viewHolder, cursor);
         } else {
-            setReviewText(viewHolder, cursor);
+            setAuthorText(viewHolder, cursor);
+            setContentText(viewHolder, cursor);
         }
     }
 
@@ -129,11 +130,15 @@ class DetailAdapter extends CursorAdapter {
         viewHolder.videoTextView.setText("Trailer " + videoCount);
     }
 
-    private void setReviewText(ViewHolder viewHolder, Cursor cursor) {
-        int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_CONTENT);
-        viewHolder.reviewTextView.setText(cursor.getString(columnIndex));
+    private void setAuthorText(ViewHolder viewHolder, Cursor cursor) {
+        final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_AUTHOR);
+        viewHolder.reviewAuthorView.setText(cursor.getString(columnIndex));
     }
 
+    private void setContentText(ViewHolder viewHolder, Cursor cursor) {
+        final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_CONTENT);
+        viewHolder.reviewContentView.setText(cursor.getString(columnIndex));
+    }
     private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
                                                final Context context, final Cursor cursor) {
         final Button favoriteButton = viewHolder.favoriteButton;
@@ -220,7 +225,8 @@ class DetailAdapter extends CursorAdapter {
         TextView releaseDateView;
         Button favoriteButton;
         TextView videoTextView;
-        TextView reviewTextView;
+        TextView reviewAuthorView;
+        TextView reviewContentView;
 
         ViewHolder(View rootView) {
             posterView = (ImageView) rootView.findViewById(R.id.detail_image_view);
@@ -230,7 +236,8 @@ class DetailAdapter extends CursorAdapter {
             releaseDateView = (TextView) rootView.findViewById(R.id.release);
             favoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
             videoTextView = (TextView) rootView.findViewById(R.id.video_text_view);
-            reviewTextView = (TextView) rootView.findViewById(R.id.review_text_view);
+            reviewAuthorView = (TextView) rootView.findViewById(R.id.review_author_view);
+            reviewContentView = (TextView) rootView.findViewById(R.id.review_content_view);
         }
     }
 }

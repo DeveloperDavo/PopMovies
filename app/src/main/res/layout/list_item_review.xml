@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp">
+
 
     <TextView
-        android:id="@+id/review_text_view"
-        android:layout_width="match_parent"
-        android:textSize="26sp"
-        tools:text="reviewN"
-        android:layout_height="wrap_content" />
+        android:id="@+id/review_author_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="left"
+        android:paddingBottom="16dp"
+        android:textAppearance="?android:textAppearanceLarge"
+        tools:text="Author" />
+
+    <TextView
+        android:id="@+id/review_content_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="center_horizontal"
+        android:textAppearance="?android:textAppearanceListItem"
+        tools:text="The quick brown fox jumps over the lazy dog." />
 
 </LinearLayout>
