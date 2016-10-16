@@ -1,9 +1,11 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -72,7 +74,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final Cursor cursor = Utility.getSingleMovieCursorAndMoveToPosition(
+                final Cursor cursor = getSingleMovieCursorAndMoveToPosition(
                         getContext(), position, movieRowId);
 
                 if (Utility.isVideosView(cursor)) {
@@ -84,6 +86,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
     }
+
+    @NonNull
+    private Cursor getSingleMovieCursorAndMoveToPosition(Context context, int position, long movieRowId) {
+        final Cursor cursor = Utility.querySingleMovieUri(context, movieRowId);
+        cursor.moveToPosition(position);
+        return cursor;
+    }
+
 
     private Uri getVideoUriFrom(Cursor cursor) {
         final String videoKey = Utility.getVideoKeyFrom(cursor);
