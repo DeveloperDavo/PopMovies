@@ -8,12 +8,6 @@
     <string name="action_sort_by_popularity">Most Popular</string>
     <string name="action_show_favorites">Favorites</string>
 
-
-    <!-- source of data -->
-    <string name="source_top_rated">top_rated</string>
-    <string name="source_popular">popular</string>
-    <string name="source_favorites">favorites</string>
-
     <!-- user rating format -->
     <string name="format_user_rating"><xliff:g id="rating">%1.1f</xliff:g>/10</string>
 
@@ -28,7 +22,9 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">popularmovies.example.com</string>
     <string name="content_authority">com.example.android.popularmoviesapp</string>
-    <string name="videos_header">Trailers:</string>
+
+    <!--Headers-->
+    <string name="videos_header_text_view">Trailers:</string>
     <string name="reviews_header_text_view">Reviews:</string>
 
 </resources>

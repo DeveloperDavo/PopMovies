@@ -15,7 +15,7 @@
         android:layout_gravity="left"
         android:fontFamily="sans-serif"
         android:paddingBottom="16dp"
-        android:text="@string/videos_header"
+        android:text="@string/videos_header_text_view"
         android:textAppearance="?android:textAppearanceMedium"
         android:visibility="gone" />
 
