@@ -184,10 +184,12 @@ class DetailAdapter extends CursorAdapter {
     private void setContentText(ViewHolder viewHolder, Cursor cursor) {
         final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_CONTENT);
         String content = cursor.getString(columnIndex);
-//        if (content.length() > 100) {
-//            // TODO iterate until end of word
-//            content = content.substring(0, 100);
-//        }
+
+        final int maxStringLength = 500;
+        if (content.length() > maxStringLength) {
+            content = content.substring(0, 500);
+            content += "...";
+        }
         viewHolder.reviewContentView.setText(content);
     }
 

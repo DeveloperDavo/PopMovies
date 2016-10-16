@@ -38,7 +38,7 @@
             android:layout_gravity="center_vertical"
             android:fontFamily="sans-serif"
             android:paddingLeft="32dp"
-            android:textAppearance="?android:textAppearanceSmall"
+            android:textAppearance="?android:textAppearanceListItem"
             tools:text="VideoN" />
 
     </LinearLayout>

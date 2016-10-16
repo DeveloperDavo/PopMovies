@@ -25,8 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
+        android:layout_marginLeft="16dp"
         android:fontFamily="sans-serif"
-        android:paddingBottom="16dp"
         android:textAppearance="?android:textAppearanceListItem"
         tools:text="Author" />
 
@@ -36,8 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="left"
         android:fontFamily="sans-serif"
+        android:paddingTop="16dp"
         android:textAppearance="?android:textAppearanceSmall"
         tools:text="The quick brown fox jumps over the lazy dog." />
-
 
 </LinearLayout>

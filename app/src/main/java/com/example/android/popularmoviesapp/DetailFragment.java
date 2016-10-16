@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
+
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -61,14 +63,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         detailView = (ListView) rootView.findViewById(R.id.list_view_details);
         detailView.setAdapter(detailAdapter);
 
-        openVideoOnClick();
-
+        openVideoOrReviewOnClick();
 
         return rootView;
 
     }
 
-    private void openVideoOnClick() {
+    private void openVideoOrReviewOnClick() {
         detailView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -77,12 +78,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 final Cursor cursor = getSingleMovieCursorAndMoveToPosition(
                         getContext(), position, movieRowId);
 
+                Uri uri = null;
                 if (Utility.isVideosView(cursor)) {
-                    final Uri videoUri = getVideoUriFrom(cursor);
-                    startExternalIntent(videoUri);
-                } else {
-
+                    uri = getVideoUriFrom(cursor);
+                } else if (Utility.isReviewsView(cursor)) {
+                    uri = getReviewUriFrom(cursor);
                 }
+
+                startExternalIntent(uri);
             }
         });
     }
@@ -94,12 +97,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return cursor;
     }
 
-
     private Uri getVideoUriFrom(Cursor cursor) {
         final String videoKey = Utility.getVideoKeyFrom(cursor);
         return Uri.parse("https://www.youtube.com/watch?v=" + videoKey);
     }
 
+    private Uri getReviewUriFrom(Cursor cursor) {
+        final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_URL);
+        final String reviewUrl = cursor.getString(columnIndex);
+        return Uri.parse(reviewUrl);
+    }
     private void startExternalIntent(Uri videoUri) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
         if (intent.resolveActivity(getContext().getPackageManager()) != null) {

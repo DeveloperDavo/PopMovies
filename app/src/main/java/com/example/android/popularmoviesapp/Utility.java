@@ -99,7 +99,7 @@ public class Utility {
     }
 
     /**
-     * @return cursor of data from movieRow
+     * @return single movie cursor
      */
     static Cursor querySingleMovieUri(Context context, long movieRowId) {
         final Uri uri = MovieEntry.buildMovieUri(movieRowId);
