@@ -5,130 +5,43 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import com.example.android.popularmoviesapp.BuildConfig;
-import com.example.android.popularmoviesapp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 /**
- * Created by David on 25/09/16.
+ * Created by David on 16/10/2016.
  */
-class MoviesSyncer {
+
+public class MoviesSyncer extends AbstractSyncer {
     private static final String LOG_TAG = MoviesSyncer.class.getSimpleName();
 
-    static void syncTopRatedMovies(Context context) {
-        final String source = context.getString(R.string.source_top_rated);
-        syncMovies(context, source);
+    @NonNull
+    @Override
+    protected URL buildUrl() throws MalformedURLException {
+        // https://www.themoviedb.org/
+        final String BASE_URL = "http://api.themoviedb.org/3/movie";
+        final String API_PARAM = "api_key";
+
+        Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                .appendPath(source)
+                .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
+                .build();
+
+        return new URL(builtUri.toString());
     }
 
-    static void syncPopularMovies(Context context) {
-        final String source = context.getString(R.string.source_popular);
-        syncMovies(context, source);
-    }
-
-    /**
-     * Gets movie data with a http request.
-     * Parses data as a JSON string
-     * and persists it.
-     * publishes the result on the UI.
-     */
-    private static void syncMovies(Context context, String source) {
-
-        // Declared outside in order to be closed in finally block
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String movieJsonStr;
-
-        try {
-            // https://www.themoviedb.org/
-            final String BASE_URL = "http://api.themoviedb.org/3/movie";
-            final String API_PARAM = "api_key";
-
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(source)
-                    .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
-                    .build();
-
-            URL url = new URL(builtUri.toString());
-
-            Log.d(LOG_TAG, "url: " + url);
-
-            // create the request to TMDb, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // read the input stream into a string
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // nothing to do.
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // new line is not necessary, but helps for debugging
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // stream was empty
-            }
-            movieJsonStr = buffer.toString();
-//                Log.d(LOG_TAG, "movieJsonStr: " + movieJsonStr);
-            parseAndPersistMoviesData(context, movieJsonStr);
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // no movie data found
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-    }
-
-    private static void parseAndPersistMoviesData(Context context, String movieJsonStr)
-            throws JSONException {
-
-        final String MD_RESULTS = "results";
-
-        final JSONObject data = new JSONObject(movieJsonStr);
-        final JSONArray movies = data.getJSONArray(MD_RESULTS);
-
-        for (int i = 0; i < movies.length(); i++) {
-//        for (int i = 0; i < 1; i++) {
-            parseAndPersistMovieData(context, movies, i);
-        }
-    }
-
-    private static void parseAndPersistMovieData(
-            Context context, JSONArray movies, int i) throws JSONException {
-
+    @Override
+    protected void parseAndPersist(JSONArray dataArray, int i) throws JSONException {
         final String MD_ID = "id";
         final String MD_TITLE = "original_title";
         final String MD_POSTER_PATH = "poster_path";
@@ -138,7 +51,7 @@ class MoviesSyncer {
         final String MD_RELEASE = "release_date";
 
         // get data from JSON String
-        final JSONObject movieData = movies.getJSONObject(i);
+        final JSONObject movieData = dataArray.getJSONObject(i);
         final long movieId = movieData.getLong(MD_ID);
         final String title = movieData.getString(MD_TITLE);
         final String posterPath = movieData.getString(MD_POSTER_PATH);
@@ -232,5 +145,4 @@ class MoviesSyncer {
 
         return ContentUris.parseId(insertedUri);
     }
-
 }

@@ -23,19 +23,56 @@ import java.net.URL;
  * Created by David on 15/10/2016.
  */
 
+// TODO: rename
 public abstract class AbstractSyncer {
-    private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
+    private static final String LOG_TAG = AbstractSyncer.class.getSimpleName();
 
-    protected Context context;
-    protected long movieRowId;
-    protected long movieId;
-    protected String path;
+    public static final String SOURCE_TOP_RATED = "top_rated";
+    public static final String SOURCE_POPULAR = "popular";
 
-    public AbstractSyncer(Context context, long movieRowId, long movieId, String path) {
-        this.context = context;
-        this.movieRowId = movieRowId;
-        this.movieId = movieId;
-        this.path = path;
+    public static final String SOURCE_VIDEOS = "videos";
+    public static final String SOURCE_REVIEWS = "reviews";
+
+    protected static Context context;
+    protected static long movieRowId;
+    private static long movieId;
+    protected static String source;
+
+    public static AbstractSyncer newInstance(Context context, long movieRowId, long movieId, String source) {
+
+        AbstractSyncer.context = context;
+        AbstractSyncer.movieRowId = movieRowId;
+        AbstractSyncer.movieId = movieId;
+        AbstractSyncer.source = source;
+
+        AbstractSyncer syncer;
+        if (SOURCE_VIDEOS.equals(source)) {
+            syncer = new VideoSyncer();
+        } else if (SOURCE_REVIEWS.equals(source)) {
+            syncer = new ReviewSyncer();
+        } else {
+            Log.e(LOG_TAG, "source unknown", new IllegalArgumentException());
+            syncer = null;
+        }
+
+        return syncer;
+    }
+
+    public static AbstractSyncer newInstance(Context context, String source) {
+        AbstractSyncer.context = context;
+        AbstractSyncer.source = source;
+
+        AbstractSyncer syncer;
+        if (SOURCE_TOP_RATED.equals(source)) {
+            syncer = new MoviesSyncer();
+        } else if (SOURCE_POPULAR.equals(source)) {
+            syncer = new MoviesSyncer();
+        } else {
+            Log.e(LOG_TAG, "source unknown", new IllegalArgumentException());
+            syncer = null;
+        }
+
+        return syncer;
     }
 
     /**
@@ -69,7 +106,7 @@ public abstract class AbstractSyncer {
 
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(String.valueOf(movieId))
-                .appendPath(path)
+                .appendPath(source)
                 .appendQueryParameter(API_PARAM, BuildConfig.MOVIE_DB_API_KEY)
                 .build();
 
@@ -77,7 +114,7 @@ public abstract class AbstractSyncer {
     }
 
     @NonNull
-    protected HttpURLConnection connect(URL url) throws IOException {
+    private HttpURLConnection connect(URL url) throws IOException {
         final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.connect();
@@ -85,7 +122,7 @@ public abstract class AbstractSyncer {
     }
 
     @NonNull
-    protected BufferedReader persistDataFromServer(HttpURLConnection urlConnection)
+    private BufferedReader persistDataFromServer(HttpURLConnection urlConnection)
             throws IOException, JSONException {
 
         // read the input stream into a string
@@ -107,7 +144,7 @@ public abstract class AbstractSyncer {
         return reader;
     }
 
-    protected void parseAndPersistData(String jsonStr) throws JSONException {
+    void parseAndPersistData(String jsonStr) throws JSONException {
 
         final String MD_RESULTS = "results";
 
@@ -119,9 +156,9 @@ public abstract class AbstractSyncer {
         }
     }
 
-    protected abstract void parseAndPersist(JSONArray videos, int i) throws JSONException;
+    protected abstract void parseAndPersist(JSONArray dataArray, int i) throws JSONException;
 
-    protected void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
+    private void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
         if (urlConnection != null) {
             urlConnection.disconnect();
         }

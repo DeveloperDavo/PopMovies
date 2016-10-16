@@ -19,7 +19,6 @@ public class TestReviewSyncer extends AndroidTestCase {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_PARAM = "api_key";
-    private static final String PATH = "reviews";
 
     private long movieRowId;
 
@@ -59,10 +58,12 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_buildUrl() throws Exception {
 
         // GIVEN
-        final AbstractSyncer reviewSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+
         final String expectedUrl = BASE_URL
                 + TestUtilities.MOVIE_ID
-                + "/" + PATH + "?"
+                + "/" + AbstractSyncer.SOURCE_REVIEWS + "?"
                 + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
 
         // WHEN
@@ -75,7 +76,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_parseAndPersistData() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
 
         // WHEN
         reviewSyncer.parseAndPersistData(REVIEWS_JSON_STRING);
@@ -100,7 +102,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_queryReview_withExistingReview() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
         insertTestVideo(reviewSyncer);
 
         // WHEN
@@ -114,7 +117,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_queryVideoId_withNewVideo() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
         final String id = "fgh456"; // this id should never be inserted
 
         // WHEN
@@ -128,7 +132,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_insert() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
 
         // WHEN and THEN
         insertTestVideo(reviewSyncer);
@@ -148,14 +153,15 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_update() throws Exception {
 
         // GIVEN
-        final ReviewSyncer revieSyncer = new ReviewSyncer(mContext, movieRowId, TestUtilities.MOVIE_ID, PATH);
-        final long rowId = insertTestVideo(revieSyncer);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final long rowId = insertTestVideo(reviewSyncer);
 
         // WHEN
-        final long videosUpdated = revieSyncer.update(rowId, REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
+        final long reviewsUpdated = reviewSyncer.update(rowId, REVIEW_ID, REVIEW_AUTHOR, REVIEW_CONTENT, REVIEW_URL);
 
         // THEN
-        assertThat(videosUpdated).isEqualTo(1);
+        assertThat(reviewsUpdated).isEqualTo(1);
     }
 
     @Override

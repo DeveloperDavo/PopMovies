@@ -26,7 +26,6 @@ public class TestVideoSyncer extends AndroidTestCase {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String API_PARAM = "api_key";
-    public static final String PATH = "videos";
 
     private long movieRowId;
 
@@ -66,10 +65,12 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_buildUrl() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
+
         final String expectedUrl = BASE_URL
-                + MOVIE_ID
-                + "/" + PATH + "?"
+                + TestUtilities.MOVIE_ID
+                + "/" + AbstractSyncer.SOURCE_VIDEOS + "?"
                 + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
 
         // WHEN
@@ -82,7 +83,8 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_parseAndPersistData() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
 
         // WHEN
         videoSyncer.parseAndPersistData(VIDEOS_JSON_STRING);
@@ -107,7 +109,8 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_queryVideoId_withExistingVideo() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
         insertTestVideo(videoSyncer);
 
         // WHEN
@@ -121,7 +124,8 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_queryVideoId_withNewVideo() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
         final String id = "fgh456"; // this id should never be inserted
 
         // WHEN
@@ -135,7 +139,8 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_insert() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
 
         // WHEN and THEN
         insertTestVideo(videoSyncer);
@@ -155,7 +160,9 @@ public class TestVideoSyncer extends AndroidTestCase {
     public void test_update() throws Exception {
 
         // GIVEN
-        final VideoSyncer videoSyncer = new VideoSyncer(mContext, movieRowId, MOVIE_ID, PATH);
+        final VideoSyncer videoSyncer = (VideoSyncer) AbstractSyncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_VIDEOS);
+
         final long rowID = insertTestVideo(videoSyncer);
 
         // WHEN

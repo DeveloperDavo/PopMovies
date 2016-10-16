@@ -34,8 +34,8 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "onPerformSync");
-        MoviesSyncer.syncPopularMovies(getContext());
-        MoviesSyncer.syncTopRatedMovies(getContext());
+        AbstractSyncer.newInstance(getContext(), AbstractSyncer.SOURCE_POPULAR).sync();
+        AbstractSyncer.newInstance(getContext(), AbstractSyncer.SOURCE_TOP_RATED).sync();
         syncVideosAndReviews();
     }
 
@@ -45,8 +45,15 @@ public class PopMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         while (cursor.moveToNext()) {
             long movieRowId = cursor.getLong(cursor.getColumnIndex(MovieEntry._ID));
             long movieId = cursor.getLong(cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID));
-            new VideoSyncer(getContext(), movieRowId, movieId, "videos").sync();
-            new ReviewSyncer(getContext(), movieRowId, movieId, "reviews").sync();
+
+            AbstractSyncer.newInstance(
+                    getContext(), movieRowId, movieId, AbstractSyncer.SOURCE_VIDEOS)
+                    .sync();
+
+            AbstractSyncer.newInstance(
+                    getContext(), movieRowId, movieId, AbstractSyncer.SOURCE_REVIEWS)
+                    .sync();
+
         }
     }
 

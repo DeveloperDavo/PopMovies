@@ -2,7 +2,6 @@ package com.example.android.popularmoviesapp.sync;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -13,12 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * Created by David on 15/10/2016.
  */
@@ -26,45 +19,8 @@ import java.net.URL;
 public class ReviewSyncer extends AbstractSyncer {
     private static final String LOG_TAG = ReviewSyncer.class.getSimpleName();
 
-    public ReviewSyncer(Context context, long movieRowId, long movieId, String path) {
-        super(context, movieRowId, movieId, path);
-    }
-
     @Override
-    protected void sync() {
-        super.sync();
-    }
-
-    @Override
-    protected void parseAndPersistData(String jsonStr) throws JSONException {
-        super.parseAndPersistData(jsonStr);
-    }
-
-    @NonNull
-    @Override
-    protected BufferedReader persistDataFromServer(HttpURLConnection urlConnection) throws IOException, JSONException {
-        return super.persistDataFromServer(urlConnection);
-    }
-
-    @Override
-    protected void disconnectAndClose(HttpURLConnection urlConnection, BufferedReader reader) {
-        super.disconnectAndClose(urlConnection, reader);
-    }
-
-    @NonNull
-    @Override
-    protected URL buildUrl() throws MalformedURLException {
-        return super.buildUrl();
-    }
-
-    @NonNull
-    @Override
-    protected HttpURLConnection connect(URL url) throws IOException {
-        return super.connect(url);
-    }
-
-    @Override
-    protected void parseAndPersist(JSONArray reviews, int i) throws JSONException {
+    protected void parseAndPersist(JSONArray dataArray, int i) throws JSONException {
 
         final String MD_ID = "id";
         final String MD_AUTHOR = "author";
@@ -72,7 +28,7 @@ public class ReviewSyncer extends AbstractSyncer {
         final String MD_URL = "url";
 
         // get data from JSON String
-        final JSONObject reviewsData = reviews.getJSONObject(i);
+        final JSONObject reviewsData = dataArray.getJSONObject(i);
         final String reviewId = reviewsData.getString(MD_ID);
         final String author = reviewsData.getString(MD_AUTHOR);
         final String content = reviewsData.getString(MD_CONTENT);
