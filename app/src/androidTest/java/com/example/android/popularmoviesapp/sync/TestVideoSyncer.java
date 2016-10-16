@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesapp.sync;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
@@ -61,7 +62,8 @@ public class TestVideoSyncer extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        movieRowId = TestUtilities.insertTestMovie(mContext);
+        final ContentValues testValues = TestUtilities.createMovieValues();
+        movieRowId = TestUtilities.insertMovieValues(mContext, testValues);
         contentResolver = mContext.getContentResolver();
     }
 

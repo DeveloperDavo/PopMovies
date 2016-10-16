@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesapp.data;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -75,6 +74,14 @@ public class TestUtilities extends AndroidTestCase {
                 expectedValue + "'. " + errorMessage, expectedValue, actualValue);
     }
 
+    public static long createAndInsertMovieValues(Context context) {
+
+        // GIVEN
+        ContentValues testValues = TestUtilities.createMovieValues();
+        return insertMovieValues(context, testValues);
+
+    }
+
     // default movie values
     public static ContentValues createMovieValues() {
         ContentValues movieValues = new ContentValues();
@@ -89,15 +96,16 @@ public class TestUtilities extends AndroidTestCase {
         return movieValues;
     }
 
-    // default review values
-    static ContentValues createReviewValues(long moviesRowId) {
-        ContentValues reviewValues = new ContentValues();
-        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, moviesRowId);
-        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, 5);
-        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "David S");
-        reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
-        reviewValues.put(ReviewEntry.COLUMN_URL, "www.example.com");
-        return reviewValues;
+    public static long insertMovieValues(Context context, ContentValues testValues) {
+        // WHEN
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long moviesRowId = db.insert(MovieEntry.TABLE_NAME, null, testValues);
+
+        // THEN
+        assertTrue("Error: Failure inserting movie values", moviesRowId != -1);
+
+        return moviesRowId;
     }
 
     // default video values
@@ -111,23 +119,40 @@ public class TestUtilities extends AndroidTestCase {
         return videoValues;
     }
 
-    public static long createAndInsertMovieValues(Context context) {
-
-        // GIVEN
-        ContentValues testValues = TestUtilities.createMovieValues();
-
+    public static long insertVideoValues(Context context, ContentValues testValues) {
         // WHEN
         MovieDbHelper dbHelper = new MovieDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        long moviesRowId = db.insert(MovieEntry.TABLE_NAME, null, testValues);
+        long videoRowId = db.insert(VideoEntry.TABLE_NAME, null, testValues);
 
         // THEN
-        assertTrue("Error: Failure inserting movie values", moviesRowId != -1);
+        assertTrue("Error: Failure inserting video values", videoRowId != -1);
 
-        return moviesRowId;
+        return videoRowId;
     }
 
+    // default review values
+    static ContentValues createReviewValues(long moviesRowId) {
+        ContentValues reviewValues = new ContentValues();
+        reviewValues.put(ReviewEntry.COLUMN_MOVIE_ROW_ID, moviesRowId);
+        reviewValues.put(ReviewEntry.COLUMN_REVIEW_ID, 5);
+        reviewValues.put(ReviewEntry.COLUMN_AUTHOR, "David S");
+        reviewValues.put(ReviewEntry.COLUMN_CONTENT, "Great movie :)");
+        reviewValues.put(ReviewEntry.COLUMN_URL, "www.example.com");
+        return reviewValues;
+    }
 
+    public static long insertReviewValues(Context context, ContentValues testValues) {
+        // WHEN
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long reviewRowId = db.insert(ReviewEntry.TABLE_NAME, null, testValues);
+
+        // THEN
+        assertTrue("Error: Failure inserting review values", reviewRowId != -1);
+
+        return reviewRowId;
+    }
     /**
      * Note: copied from https://github.com/udacity/Sunshine-Version-2
      */
@@ -194,23 +219,6 @@ public class TestUtilities extends AndroidTestCase {
                 null, // all rows
                 null // SELECTION args
         );
-    }
-
-    public static long insertTestMovie(Context context) {
-        final ContentValues testValues = TestUtilities.createMovieValues();
-
-        // register content observer
-        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-        context.getContentResolver().
-                registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
-
-        final Uri movieInsertUri = context.getContentResolver().
-                insert(MovieEntry.CONTENT_URI, testValues);
-
-        tco.waitForNotificationOrFail();
-        context.getContentResolver().unregisterContentObserver(tco);
-
-        return ContentUris.parseId(movieInsertUri);
     }
 
 }

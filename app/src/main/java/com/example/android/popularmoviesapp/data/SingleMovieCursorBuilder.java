@@ -18,12 +18,12 @@ import static com.example.android.popularmoviesapp.data.MovieContract.VideoEntry
  */
 public class SingleMovieCursorBuilder {
 
-    private final Uri uri;
-    private Context context;
+    private final long movieRowId;
+    private final Context context;
 
     public SingleMovieCursorBuilder(Context context, Uri uri) {
         this.context = context;
-        this.uri = uri;
+        movieRowId = ContentUris.parseId(uri);
     }
 
     // movies._ID = ?
@@ -43,7 +43,7 @@ public class SingleMovieCursorBuilder {
     static {
         VIDEOS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
 
-        // movies INNER JOIN videos ON movies._ID = videos.movie_row_id
+        //movies INNER JOIN videos ON movies._ID = videos.movie_row_id
         VIDEOS_MOVIE_FAV_JOIN.setTables(
                 MovieEntry.TABLE_NAME + " INNER JOIN " +
                         VideoEntry.TABLE_NAME +
@@ -68,19 +68,25 @@ public class SingleMovieCursorBuilder {
                         "." + ReviewEntry.COLUMN_MOVIE_ROW_ID);
     }
 
-    // TODO: refactor
     public Cursor build() {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
 
+        final Cursor movieCursor = buildMovieCursor(readableDatabase);
+        final Cursor videosCursor = buildVideosCursor(readableDatabase);
+        final Cursor reviewsCursor = buildReviewsCursor(readableDatabase);
+
+        return new MergeCursor(new Cursor[]{movieCursor, videosCursor, reviewsCursor});
+    }
+
+    Cursor buildMovieCursor(SQLiteDatabase readableDatabase) {
         final String[] allColumns = null;
-        final long movieRowId = ContentUris.parseId(uri);
         final String[] selectionArgs = {String.valueOf(movieRowId)};
         final String groupBy = null;
         final String having = null;
         final String orderBy = null;
 
-        final Cursor movieCursor = readableDatabase.query(
+        return readableDatabase.query(
                 MovieEntry.TABLE_NAME,
                 allColumns,
                 SINGLE_MOVIE_SELECTION,
@@ -89,11 +95,18 @@ public class SingleMovieCursorBuilder {
                 having,
                 orderBy
         );
+    }
 
-        // Only YouTube trailers are to be selected
-        final String[] videosSelectionArgs = {String.valueOf(movieRowId), "YouTube", "Trailer"};
+    Cursor buildVideosCursor(SQLiteDatabase readableDatabase) {
+        final String[] allColumns = null;
+        final String groupBy = null;
+        final String having = null;
+        final String orderBy = null;
+
+        // Only YouTube and trailers are to be selected
         final String videosSelection = SINGLE_MOVIE_SELECTION + " AND " + VIDEO_SITE_SELECTION + " AND " + VIDEO_TYPE_SELECTION;
-        final Cursor videoCursor = VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,
+        final String[] videosSelectionArgs = {String.valueOf(movieRowId), "YouTube", "Trailer"};
+        return VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,
                 allColumns,
                 videosSelection,
                 videosSelectionArgs,
@@ -101,8 +114,16 @@ public class SingleMovieCursorBuilder {
                 having,
                 orderBy
         );
+    }
 
-        final Cursor reviewsCursor = REVIEWS_MOVIE_FAV_JOIN.query(readableDatabase,
+    Cursor buildReviewsCursor(SQLiteDatabase readableDatabase) {
+        final String[] allColumns = null;
+        final String[] selectionArgs = {String.valueOf(movieRowId)};
+        final String groupBy = null;
+        final String having = null;
+        final String orderBy = null;
+
+        return REVIEWS_MOVIE_FAV_JOIN.query(readableDatabase,
                 allColumns,
                 SINGLE_MOVIE_SELECTION,
                 selectionArgs,
@@ -110,8 +131,6 @@ public class SingleMovieCursorBuilder {
                 having,
                 orderBy
         );
-
-        return new MergeCursor(new Cursor[]{movieCursor, videoCursor, reviewsCursor});
     }
 
 }
