@@ -132,6 +132,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         }
 
         getLoaderManager().restartLoader(MOVIE_POSTERS_LOADER, null, this);
+        gridView.smoothScrollToPosition(selectedPosition);
         return true;
 
     }
