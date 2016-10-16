@@ -13,7 +13,6 @@
 
     <!-- Preferences -->
     <string name="source_key">source</string>
-    <!-- TODO: workaround for savedInstanceState -->
     <string name="sort_order_key">sort_order</string>
     <string name="selection_key">selection_key</string>
     <string name="selection_arg_key">selection_arg_key</string>

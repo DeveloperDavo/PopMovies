@@ -15,8 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.example.android.popularmoviesapp.sync.PopMoviesSyncAdapter;
-
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
 
 
@@ -118,8 +116,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        // TODO: remove before submitting
-        PopMoviesSyncAdapter.syncImmediately(getContext());
+//        PopMoviesSyncAdapter.syncImmediately(getContext());
 
         if (id == R.id.action_sort_by_popularity) {
             setPopularPrefs();
