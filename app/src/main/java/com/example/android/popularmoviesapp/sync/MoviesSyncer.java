@@ -22,7 +22,7 @@ import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry
  * Created by David on 16/10/2016.
  */
 
-public class MoviesSyncer extends AbstractSyncer {
+public class MoviesSyncer extends Syncer {
     private static final String LOG_TAG = MoviesSyncer.class.getSimpleName();
 
     @NonNull

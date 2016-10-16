@@ -58,12 +58,12 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_buildUrl() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
 
         final String expectedUrl = BASE_URL
                 + TestUtilities.MOVIE_ID
-                + "/" + AbstractSyncer.SOURCE_REVIEWS + "?"
+                + "/" + Syncer.SOURCE_REVIEWS + "?"
                 + API_PARAM + "=" + BuildConfig.MOVIE_DB_API_KEY;
 
         // WHEN
@@ -76,8 +76,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_parseAndPersistData() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
 
         // WHEN
         reviewSyncer.parseAndPersistData(REVIEWS_JSON_STRING);
@@ -102,8 +102,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_queryReview_withExistingReview() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
         insertTestVideo(reviewSyncer);
 
         // WHEN
@@ -117,8 +117,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_queryVideoId_withNewVideo() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
         final String id = "fgh456"; // this id should never be inserted
 
         // WHEN
@@ -132,8 +132,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_insert() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
 
         // WHEN and THEN
         insertTestVideo(reviewSyncer);
@@ -153,8 +153,8 @@ public class TestReviewSyncer extends AndroidTestCase {
     public void test_update() throws Exception {
 
         // GIVEN
-        final ReviewSyncer reviewSyncer = (ReviewSyncer) AbstractSyncer.newInstance(
-                mContext, movieRowId, TestUtilities.MOVIE_ID, AbstractSyncer.SOURCE_REVIEWS);
+        final ReviewSyncer reviewSyncer = (ReviewSyncer) Syncer.newInstance(
+                mContext, movieRowId, TestUtilities.MOVIE_ID, Syncer.SOURCE_REVIEWS);
         final long rowId = insertTestVideo(reviewSyncer);
 
         // WHEN

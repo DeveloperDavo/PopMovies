@@ -16,7 +16,7 @@ import org.json.JSONObject;
  * Created by David on 02/10/16.
  */
 
-public class VideoSyncer extends AbstractSyncer {
+public class VideoSyncer extends Syncer {
     private static final String LOG_TAG = VideoSyncer.class.getSimpleName();
 
     @Override

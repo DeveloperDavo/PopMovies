@@ -23,9 +23,8 @@ import java.net.URL;
  * Created by David on 15/10/2016.
  */
 
-// TODO: rename
-public abstract class AbstractSyncer {
-    private static final String LOG_TAG = AbstractSyncer.class.getSimpleName();
+public abstract class Syncer {
+    private static final String LOG_TAG = Syncer.class.getSimpleName();
 
     public static final String SOURCE_TOP_RATED = "top_rated";
     public static final String SOURCE_POPULAR = "popular";
@@ -38,14 +37,13 @@ public abstract class AbstractSyncer {
     private static long movieId;
     protected static String source;
 
-    public static AbstractSyncer newInstance(Context context, long movieRowId, long movieId, String source) {
+    public static Syncer newInstance(Context context, long movieRowId, long movieId, String source) {
+        Syncer.context = context;
+        Syncer.movieRowId = movieRowId;
+        Syncer.movieId = movieId;
+        Syncer.source = source;
 
-        AbstractSyncer.context = context;
-        AbstractSyncer.movieRowId = movieRowId;
-        AbstractSyncer.movieId = movieId;
-        AbstractSyncer.source = source;
-
-        AbstractSyncer syncer;
+        Syncer syncer;
         if (SOURCE_VIDEOS.equals(source)) {
             syncer = new VideoSyncer();
         } else if (SOURCE_REVIEWS.equals(source)) {
@@ -58,11 +56,11 @@ public abstract class AbstractSyncer {
         return syncer;
     }
 
-    public static AbstractSyncer newInstance(Context context, String source) {
-        AbstractSyncer.context = context;
-        AbstractSyncer.source = source;
+    public static Syncer newInstance(Context context, String source) {
+        Syncer.context = context;
+        Syncer.source = source;
 
-        AbstractSyncer syncer;
+        Syncer syncer;
         if (SOURCE_TOP_RATED.equals(source)) {
             syncer = new MoviesSyncer();
         } else if (SOURCE_POPULAR.equals(source)) {

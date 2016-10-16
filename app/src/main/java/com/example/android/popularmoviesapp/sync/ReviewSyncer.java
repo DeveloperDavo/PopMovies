@@ -16,7 +16,7 @@ import org.json.JSONObject;
  * Created by David on 15/10/2016.
  */
 
-public class ReviewSyncer extends AbstractSyncer {
+public class ReviewSyncer extends Syncer {
     private static final String LOG_TAG = ReviewSyncer.class.getSimpleName();
 
     @Override
