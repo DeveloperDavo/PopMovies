@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:paddingBottom="16dp"
-                android:textAppearance="?android:textAppearanceListItem"
+                android:textAppearance="?android:textAppearanceSmall"
                 android:textColor="#000000"
                 tools:text="rating" />
 
@@ -71,7 +71,7 @@
         android:layout_gravity="center_horizontal"
         android:fontFamily="sans-serif"
         android:padding="16dp"
-        android:textAppearance="?android:textAppearanceListItem"
+        android:textAppearance="?android:textAppearanceSmall"
         tools:text="Overview: The quick brown fox jumps over the lazy dog" />
 
 </LinearLayout>

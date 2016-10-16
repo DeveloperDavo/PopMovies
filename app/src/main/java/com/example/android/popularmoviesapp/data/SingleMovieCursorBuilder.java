@@ -43,10 +43,9 @@ public class SingleMovieCursorBuilder {
     static {
         VIDEOS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
 
-        //This is an inner join which looks like
-        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_row_id
+        // movies INNER JOIN videos ON movies._ID = videos.movie_row_id
         VIDEOS_MOVIE_FAV_JOIN.setTables(
-                MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                MovieEntry.TABLE_NAME + " INNER JOIN " +
                         VideoEntry.TABLE_NAME +
                         " ON " + MovieEntry.TABLE_NAME +
                         "." + MovieEntry._ID +
@@ -59,10 +58,9 @@ public class SingleMovieCursorBuilder {
     static {
         REVIEWS_MOVIE_FAV_JOIN = new SQLiteQueryBuilder();
 
-        //This is an inner join which looks like
-        //movies LEFT OUTER JOIN videos ON movies._ID = videos.movie_row_id
+        // movies INNER JOIN videos ON movies._ID = videos.movie_row_id
         REVIEWS_MOVIE_FAV_JOIN.setTables(
-                MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                MovieEntry.TABLE_NAME + " INNER JOIN " +
                         ReviewEntry.TABLE_NAME +
                         " ON " + MovieEntry.TABLE_NAME +
                         "." + MovieEntry._ID +
@@ -70,6 +68,7 @@ public class SingleMovieCursorBuilder {
                         "." + ReviewEntry.COLUMN_MOVIE_ROW_ID);
     }
 
+    // TODO: refactor
     public Cursor build() {
         final MovieDbHelper movieDbHelper = new MovieDbHelper(context);
         final SQLiteDatabase readableDatabase = movieDbHelper.getReadableDatabase();
@@ -91,6 +90,7 @@ public class SingleMovieCursorBuilder {
                 orderBy
         );
 
+        // Only YouTube trailers are to be selected
         final String[] videosSelectionArgs = {String.valueOf(movieRowId), "YouTube", "Trailer"};
         final String videosSelection = SINGLE_MOVIE_SELECTION + " AND " + VIDEO_SITE_SELECTION + " AND " + VIDEO_TYPE_SELECTION;
         final Cursor videoCursor = VIDEOS_MOVIE_FAV_JOIN.query(readableDatabase,

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import com.squareup.picasso.Picasso;
 class DetailAdapter extends CursorAdapter {
     private static final String LOG_TAG = DetailAdapter.class.getSimpleName();
     private static final int VIEW_TYPE_MOVIE_DETAILS = 0;
-    private static final int VIEW_TYPE_VIDEOS = 1;
-    private static final int VIEW_TYPE_REVIEWS = 2;
-    private static final int VIEW_TYPE_COUNT = 3;
+    private static final int VIEW_TYPE_VIDEOS_HEADER = 1;
+    private static final int VIEW_TYPE_VIDEO = 2;
+    private static final int VIEW_TYPE_REVIEWS_HEADER = 3;
+    private static final int VIEW_TYPE_REVIEW = 4;
+    private static final int VIEW_TYPE_COUNT = 5;
 
     DetailAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
@@ -43,29 +46,56 @@ class DetailAdapter extends CursorAdapter {
     @Override
     public int getItemViewType(int position) {
         return (position == 0) ?
-                VIEW_TYPE_MOVIE_DETAILS : getItemViewTypeFrom((Cursor) getItem(position));
+                VIEW_TYPE_MOVIE_DETAILS : getItemViewTypeFrom(position);
     }
 
-    private int getItemViewTypeFrom(Cursor cursor) {
+    private int getItemViewTypeFrom(int position) {
+        final Cursor cursor = (Cursor) getItem(position);
         if (Utility.isVideosView(cursor)) {
-            return VIEW_TYPE_VIDEOS;
+            // if this is the first position after the movie details
+            if (position == 1) {
+                return VIEW_TYPE_VIDEOS_HEADER;
+            } else {
+                return VIEW_TYPE_VIDEO;
+            }
+        } else if (Utility.isReviewsView(cursor)) {
+            // if this is the first position after the movie details
+            // or the previous view was a video
+            if (position == 1 || isVideosViewPrevious(cursor)) {
+                return VIEW_TYPE_REVIEWS_HEADER;
+            } else {
+                return VIEW_TYPE_REVIEW;
+            }
         } else {
-            return VIEW_TYPE_REVIEWS;
+            Log.e(LOG_TAG, "No view type found");
+            return -1;
         }
+    }
+
+    /**
+     * @return true iff the previous view was a video
+     */
+    private boolean isVideosViewPrevious(Cursor cursor) {
+        cursor.moveToPrevious();
+        final boolean isVideosView = Utility.isVideosView(cursor);
+        cursor.moveToNext();
+        return isVideosView;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-//        Log.d(LOG_TAG, "newView");
         final int viewType = getItemViewType(cursor.getPosition());
 
         int layoutId;
         if (viewType == VIEW_TYPE_MOVIE_DETAILS) {
             layoutId = R.layout.list_item_movie;
-        } else if (viewType == VIEW_TYPE_VIDEOS) {
+        } else if (viewType == VIEW_TYPE_VIDEO || viewType == VIEW_TYPE_VIDEOS_HEADER) {
             layoutId = R.layout.list_item_video;
-        } else {
+        } else if (viewType == VIEW_TYPE_REVIEW || viewType == VIEW_TYPE_REVIEWS_HEADER) {
             layoutId = R.layout.list_item_review;
+        } else {
+            layoutId = -1;
+            Log.e(LOG_TAG, "No view found");
         }
 
         final View rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
@@ -76,7 +106,6 @@ class DetailAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-//        Log.d(LOG_TAG, "bindView");
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         final int viewType = getItemViewType(cursor.getPosition());
@@ -87,17 +116,26 @@ class DetailAdapter extends CursorAdapter {
             setRating(viewHolder, context, cursor);
             setRelease(viewHolder, cursor);
             setButtonViewAndPersistChoice(viewHolder, context, cursor);
-        } else if (viewType == VIEW_TYPE_VIDEOS) {
+        } else if (viewType == VIEW_TYPE_VIDEOS_HEADER) {
+            makeVideosHeaderVisible(viewHolder);
             setVideoText(viewHolder, cursor);
-        } else {
+        } else if (viewType == VIEW_TYPE_VIDEO) {
+            setVideoText(viewHolder, cursor);
+        } else if (viewType == VIEW_TYPE_REVIEWS_HEADER) {
+            makeReviewsHeaderVisible(viewHolder);
             setAuthorText(viewHolder, cursor);
             setContentText(viewHolder, cursor);
+        } else if (viewType == VIEW_TYPE_REVIEW) {
+            setAuthorText(viewHolder, cursor);
+            setContentText(viewHolder, cursor);
+        } else {
+            Log.e(LOG_TAG, "No view found");
         }
+
     }
 
     private void setPoster(ViewHolder viewHolder, Context context, Cursor cursor) {
         Picasso.with(context).load(Utility.getPosterPathFrom(cursor)).into(viewHolder.posterView);
-//        viewHolder.posterView.setImageBitmap(Utility.getBitmapFromBlob(cursor));
     }
 
     private void setMovieTitle(ViewHolder viewHolder, Cursor cursor) {
@@ -125,22 +163,37 @@ class DetailAdapter extends CursorAdapter {
         viewHolder.releaseDateView.setText(releaseYear);
     }
 
+    private void makeVideosHeaderVisible(ViewHolder viewHolder) {
+        viewHolder.videosHeaderTextView.setVisibility(View.VISIBLE);
+    }
+
     private void setVideoText(ViewHolder viewHolder, Cursor cursor) {
         final int videoCount = cursor.getPosition();
         viewHolder.videoTextView.setText("Trailer " + videoCount);
     }
 
+    private void makeReviewsHeaderVisible(ViewHolder viewHolder) {
+        viewHolder.reviewsHeaderTextView.setVisibility(View.VISIBLE);
+    }
+
     private void setAuthorText(ViewHolder viewHolder, Cursor cursor) {
         final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_AUTHOR);
-        viewHolder.reviewAuthorView.setText(cursor.getString(columnIndex));
+        viewHolder.reviewAuthorView.setText("A movie review by " + cursor.getString(columnIndex));
     }
 
     private void setContentText(ViewHolder viewHolder, Cursor cursor) {
         final int columnIndex = cursor.getColumnIndex(ReviewEntry.COLUMN_CONTENT);
-        viewHolder.reviewContentView.setText(cursor.getString(columnIndex));
+        String content = cursor.getString(columnIndex);
+//        if (content.length() > 100) {
+//            // TODO iterate until end of word
+//            content = content.substring(0, 100);
+//        }
+        viewHolder.reviewContentView.setText(content);
     }
-    private void setButtonViewAndPersistChoice(final ViewHolder viewHolder,
-                                               final Context context, final Cursor cursor) {
+
+    private void setButtonViewAndPersistChoice(
+            final ViewHolder viewHolder, final Context context, final Cursor cursor) {
+
         final Button favoriteButton = viewHolder.favoriteButton;
         setButtonText(cursor, favoriteButton);
         setButtonColor(context, cursor, favoriteButton);
@@ -224,7 +277,9 @@ class DetailAdapter extends CursorAdapter {
         TextView userRatingView;
         TextView releaseDateView;
         Button favoriteButton;
+        TextView videosHeaderTextView;
         TextView videoTextView;
+        TextView reviewsHeaderTextView;
         TextView reviewAuthorView;
         TextView reviewContentView;
 
@@ -235,7 +290,9 @@ class DetailAdapter extends CursorAdapter {
             userRatingView = (TextView) rootView.findViewById(R.id.rating);
             releaseDateView = (TextView) rootView.findViewById(R.id.release);
             favoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
+            videosHeaderTextView = (TextView) rootView.findViewById(R.id.videos_header_text_view);
             videoTextView = (TextView) rootView.findViewById(R.id.video_text_view);
+            reviewsHeaderTextView = (TextView) rootView.findViewById(R.id.reviews_header_text_view);
             reviewAuthorView = (TextView) rootView.findViewById(R.id.review_author_view);
             reviewContentView = (TextView) rootView.findViewById(R.id.review_content_view);
         }

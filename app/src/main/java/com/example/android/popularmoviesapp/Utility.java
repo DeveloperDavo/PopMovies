@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.example.android.popularmoviesapp.data.MovieContract.ReviewEntry;
 import com.example.android.popularmoviesapp.data.MovieContract.VideoEntry;
 
 import static com.example.android.popularmoviesapp.data.MovieContract.MovieEntry;
@@ -100,6 +101,10 @@ public class Utility {
 
     static boolean isVideosView(Cursor cursor) {
         return VideoEntry.COLUMN_VIDEO_ID.equals(getColumnNameOf12thColumn(cursor));
+    }
+
+    static boolean isReviewsView(Cursor cursor) {
+        return ReviewEntry.COLUMN_REVIEW_ID.equals(getColumnNameOf12thColumn(cursor));
     }
 
     /* Helper methods */

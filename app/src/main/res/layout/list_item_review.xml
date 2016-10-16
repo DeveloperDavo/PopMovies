@@ -9,24 +9,35 @@
     android:paddingRight="16dp"
     android:paddingTop="16dp">
 
+    <TextView
+        android:id="@+id/reviews_header_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:fontFamily="sans-serif"
+        android:paddingBottom="16dp"
+        android:text="@string/reviews_header_text_view"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/review_author_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
         android:layout_gravity="left"
+        android:fontFamily="sans-serif"
         android:paddingBottom="16dp"
-        android:textAppearance="?android:textAppearanceLarge"
+        android:textAppearance="?android:textAppearanceListItem"
         tools:text="Author" />
 
     <TextView
         android:id="@+id/review_content_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="left"
         android:fontFamily="sans-serif"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:textAppearanceListItem"
+        android:textAppearance="?android:textAppearanceSmall"
         tools:text="The quick brown fox jumps over the lazy dog." />
+
 
 </LinearLayout>

@@ -28,5 +28,7 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">popularmovies.example.com</string>
     <string name="content_authority">com.example.android.popularmoviesapp</string>
+    <string name="videos_header">Trailers:</string>
+    <string name="reviews_header_text_view">Reviews:</string>
 
 </resources>
