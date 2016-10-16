@@ -1,6 +1,6 @@
 package com.example.android.popularmoviesapp.sync;
 
-import android.content.Context;
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -32,13 +32,15 @@ public abstract class Syncer {
     public static final String SOURCE_VIDEOS = "videos";
     public static final String SOURCE_REVIEWS = "reviews";
 
-    protected static Context context;
+    static ContentResolver contentResolver;
     protected static long movieRowId;
     private static long movieId;
     protected static String source;
 
-    public static Syncer newInstance(Context context, long movieRowId, long movieId, String source) {
-        Syncer.context = context;
+    public static Syncer newInstance(
+            ContentResolver contentResolver, long movieRowId, long movieId, String source) {
+
+        Syncer.contentResolver = contentResolver;
         Syncer.movieRowId = movieRowId;
         Syncer.movieId = movieId;
         Syncer.source = source;
@@ -56,8 +58,8 @@ public abstract class Syncer {
         return syncer;
     }
 
-    public static Syncer newInstance(Context context, String source) {
-        Syncer.context = context;
+    public static Syncer newInstance(ContentResolver contentResolver, String source) {
+        Syncer.contentResolver = contentResolver;
         Syncer.source = source;
 
         Syncer syncer;

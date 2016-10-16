@@ -55,7 +55,7 @@ public class ReviewSyncer extends Syncer {
         final String selection = ReviewEntry.COLUMN_REVIEW_ID + " = ?";
         final String[] selectionArgs = {videoId};
 
-        return context.getContentResolver().query(
+        return contentResolver.query(
                 ReviewEntry.CONTENT_URI,
                 projection,
                 selection,
@@ -79,7 +79,7 @@ public class ReviewSyncer extends Syncer {
 
         final ContentValues reviewValues = getContentValuesFrom(reviewId, author, content, url);
 
-        final Uri insertedUri = context.getContentResolver().insert(
+        final Uri insertedUri = contentResolver.insert(
                 ReviewEntry.CONTENT_URI, reviewValues);
 
         return ContentUris.parseId(insertedUri);
@@ -94,7 +94,7 @@ public class ReviewSyncer extends Syncer {
 
         final String where = ReviewEntry._ID + " = ?";
         final String[] selectionArgs = {Long.toString(rowId)};
-        return context.getContentResolver().update(
+        return contentResolver.update(
                 ReviewEntry.CONTENT_URI, reviewValues, where, selectionArgs);
     }
 

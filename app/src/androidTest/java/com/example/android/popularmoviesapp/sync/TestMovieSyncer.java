@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp.sync;
 
+import android.content.ContentResolver;
 import android.test.AndroidTestCase;
 
 import com.example.android.popularmoviesapp.data.TestUtilities;
@@ -17,18 +18,22 @@ public class TestMovieSyncer extends AndroidTestCase {
     private static final double UPDATED_RATING = 7.4;
     private static final double UPDATED_POPULARITY = 23.19;
 
+    private ContentResolver contentResolver;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        contentResolver = mContext.getContentResolver();
     }
 
     public void test_isMovieInDb_true() {
 
         // GIVEN
+        MoviesSyncer moviesSyncer = (MoviesSyncer) Syncer.newInstance(contentResolver, Syncer.SOURCE_TOP_RATED);
         TestUtilities.createAndInsertMovieValues(getContext());
 
         // WHEN
-        final boolean isMovieInDb = MoviesSyncer.isMovieInDb(getContext(), MOVIE_ID);
+        final boolean isMovieInDb = moviesSyncer.isMovieInDb(MOVIE_ID);
 
         // THEN
         assertTrue(isMovieInDb);
@@ -38,11 +43,12 @@ public class TestMovieSyncer extends AndroidTestCase {
     public void test_isMovieInDb_false() {
 
         // GIVEN
+        MoviesSyncer moviesSyncer = (MoviesSyncer) Syncer.newInstance(contentResolver, Syncer.SOURCE_TOP_RATED);
         TestUtilities.createAndInsertMovieValues(getContext());
         final int movieId = 65;
 
         // WHEN
-        final boolean isMovieInDb = MoviesSyncer.isMovieInDb(getContext(), movieId);
+        final boolean isMovieInDb = moviesSyncer.isMovieInDb(movieId);
 
         // THEN
         assertFalse(isMovieInDb);
@@ -51,8 +57,11 @@ public class TestMovieSyncer extends AndroidTestCase {
 
     public void test_insertOrUpdate_insertsMovie() {
 
+        // GIVEN
+        MoviesSyncer moviesSyncer = (MoviesSyncer) Syncer.newInstance(contentResolver, Syncer.SOURCE_TOP_RATED);
+
         // WHEN
-        final long movieRowId = MoviesSyncer.insertOrUpdate(getContext(),
+        final long movieRowId = moviesSyncer.insertOrUpdate(
                 MOVIE_ID, TITLE, POSTER, OVERVIEW, RATING,
                 POPULARITY, RELEASE, FAVORITE);
 
@@ -64,12 +73,12 @@ public class TestMovieSyncer extends AndroidTestCase {
     public void test_insertOrUpdate_updatesMovie() {
 
         // GIVEN
+        MoviesSyncer moviesSyncer = (MoviesSyncer) Syncer.newInstance(contentResolver, Syncer.SOURCE_TOP_RATED);
         TestUtilities.createAndInsertMovieValues(getContext());
         final int expectedMoviesUpdated = 1;
 
         // WHEN
-        final long moviesUpdated = MoviesSyncer.insertOrUpdate(
-                getContext(), MOVIE_ID, TITLE, POSTER, OVERVIEW,
+        final long moviesUpdated = moviesSyncer.insertOrUpdate(MOVIE_ID, TITLE, POSTER, OVERVIEW,
                 UPDATED_RATING, UPDATED_POPULARITY, RELEASE, FAVORITE);
 
         // THEN

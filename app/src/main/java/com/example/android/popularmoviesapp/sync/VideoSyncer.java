@@ -55,7 +55,7 @@ public class VideoSyncer extends Syncer {
         final String selection = VideoEntry.COLUMN_VIDEO_ID + " = ?";
         final String[] selectionArgs = {videoId};
 
-        return context.getContentResolver().query(
+        return contentResolver.query(
                 VideoEntry.CONTENT_URI,
                 projection,
                 selection,
@@ -79,7 +79,7 @@ public class VideoSyncer extends Syncer {
 
         final ContentValues videoValues = getContentValuesFrom(id, key, site, type);
 
-        final Uri insertedUri = context.getContentResolver().insert(
+        final Uri insertedUri = contentResolver.insert(
                 VideoEntry.CONTENT_URI, videoValues);
 
         return ContentUris.parseId(insertedUri);
@@ -94,7 +94,7 @@ public class VideoSyncer extends Syncer {
 
         final String where = VideoEntry._ID + " = ?";
         final String[] selectionArgs = {Long.toString(rowId)};
-        return context.getContentResolver().update(
+        return contentResolver.update(
                 VideoEntry.CONTENT_URI, videoValues, where, selectionArgs);
     }
 

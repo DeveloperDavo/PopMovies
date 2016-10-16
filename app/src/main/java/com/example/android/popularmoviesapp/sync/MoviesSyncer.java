@@ -2,7 +2,6 @@ package com.example.android.popularmoviesapp.sync;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -65,34 +64,33 @@ public class MoviesSyncer extends Syncer {
 //        final byte[] posterBlob = Utility.convertBitmapIntoBytes(bitmap);
         final String posterUrl = "http://image.tmdb.org/t/p/w185/" + posterPath;
 
-        insertOrUpdate(context, movieId, title, posterUrl, overview, rating, popularity, release,
+        insertOrUpdate(movieId, title, posterUrl, overview, rating, popularity, release,
                 favorite);
     }
 
     /**
      * @return movieId upon insert and number of rows updated upon update
      */
-    static long insertOrUpdate(Context context,
-                               long movieId, String title, String posterUrl, String overview,
+    long insertOrUpdate(long movieId, String title, String posterUrl, String overview,
                                double rating, double popularity, String release, int favorite) {
 
-        if (isMovieInDb(context, movieId)) {
-            return updateMovie(context, movieId, rating, popularity);
+        if (isMovieInDb(movieId)) {
+            return updateMovie(movieId, rating, popularity);
         } else {
-            return insertMovie(context, movieId, title, posterUrl, overview, rating, popularity,
+            return insertMovie(movieId, title, posterUrl, overview, rating, popularity,
                     release, favorite);
         }
 
     }
 
-    static boolean isMovieInDb(Context context, long movieId) {
+    boolean isMovieInDb(long movieId) {
         long movieRowId = -1;
 
         final String[] projection = {MovieEntry._ID};
         final String selection = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};
 
-        final Cursor movieCursor = context.getContentResolver().query(
+        final Cursor movieCursor = contentResolver.query(
                 MovieEntry.CONTENT_URI,
                 projection,
                 selection,
@@ -110,8 +108,7 @@ public class MoviesSyncer extends Syncer {
         return movieRowId != -1;
     }
 
-    private static long updateMovie(
-            Context context, long movieId, double rating, double popularity) {
+    private long updateMovie(long movieId, double rating, double popularity) {
 
         ContentValues movieValues = new ContentValues();
 
@@ -121,12 +118,11 @@ public class MoviesSyncer extends Syncer {
         final String where = MovieEntry.COLUMN_MOVIE_ID + " = ?";
         final String[] selectionArgs = {Long.toString(movieId)};
         final Uri contentUri = MovieEntry.CONTENT_URI;
-        return context.getContentResolver().update(
+        return contentResolver.update(
                 contentUri, movieValues, where, selectionArgs);
     }
 
-    private static long insertMovie(Context context,
-                                    long movieId, String title, String posterUrl, String overview,
+    private long insertMovie(long movieId, String title, String posterUrl, String overview,
                                     double rating, double popularity, String release, int favorite) {
 
         ContentValues movieValues = new ContentValues();
@@ -140,7 +136,7 @@ public class MoviesSyncer extends Syncer {
         movieValues.put(MovieEntry.COLUMN_RELEASE, release);
         movieValues.put(MovieEntry.COLUMN_FAVORITE, favorite);
 
-        final Uri insertedUri = context.getContentResolver().insert(
+        final Uri insertedUri = contentResolver.insert(
                 MovieEntry.CONTENT_URI, movieValues);
 
         return ContentUris.parseId(insertedUri);
