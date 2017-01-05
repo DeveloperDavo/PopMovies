@@ -69,8 +69,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         // if a position has already been selected, get it
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             selectedPosition = savedInstanceState.getInt(SELECTED_KEY);
-        } else {
-            selectedPosition = Integer.parseInt(Utility.getPosition(getContext()));
         }
 
         return rootView;
@@ -94,9 +92,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
 
                 // onItemSelected is overridden in MainActivity
                 ((Callback) getActivity()).onItemSelected(id);
-
-                // persist position so it can be later restored
-                Utility.setPosition(getContext(), position);
             }
         });
     }
@@ -153,7 +148,6 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
         Utility.setSelection(getContext(), selection);
         Utility.setSelectionArg(getContext(), selectionArg);
         Utility.setSortOrder(getContext(), sortOrder);
-        Utility.setPosition(getContext(), GridView.INVALID_POSITION);
     }
 
     @Override

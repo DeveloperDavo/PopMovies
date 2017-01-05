@@ -18,7 +18,6 @@ public class Utility {
     private static final String SORT_ORDER_PREFERENCE = "sort_order";
     private static final String SELECTION_PREFERENCE = "selection";
     private static final String SELECTION_ARG_PREFERENCE = "selection_arg";
-    private static final String POSITION_PREFERENCE = "position";
 
     static final String SORT_BY_POPULARITY_DESC = MovieEntry.COLUMN_POPULARITY + " DESC";
     static final String SORT_BY_RATING_DESC = MovieEntry.COLUMN_RATING + " DESC";
@@ -50,16 +49,6 @@ public class Utility {
     static String getSortOrder(Context context) {
         return getPreferenceText(context, SORT_ORDER_PREFERENCE,
                 SORT_BY_POPULARITY_DESC, R.string.sort_order_key);
-    }
-
-    static void setPosition(Context context, int position) {
-        setPreferenceText(context, Integer.toString(position),
-                R.string.position_key, POSITION_PREFERENCE);
-    }
-
-    static String getPosition(Context context) {
-        return getPreferenceText(context, POSITION_PREFERENCE,
-                Integer.toString(-1), R.string.position_key);
     }
 
     private static void setPreferenceText(
