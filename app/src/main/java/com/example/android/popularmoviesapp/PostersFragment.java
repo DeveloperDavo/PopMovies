@@ -167,7 +167,7 @@ public class PostersFragment extends Fragment implements LoaderCallbacks<Cursor>
             selectionArgs = new String[]{selectionArg};
         }
 
-        final String sortOrder = Utility.getSortOrder(getContext());
+        final String sortOrder = Utility.getSortOrder(getContext()) + " LIMIT 40";
 
         return new CursorLoader(getActivity(),
                 MovieEntry.CONTENT_URI,
